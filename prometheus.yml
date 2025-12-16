@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+#  - job_name: 'authorization-server'
+#    metrics_path: '/actuator/prometheus'
+#    static_configs:
+#      - targets: ['authorization-server:8080']
+
+  - job_name: 'enrollment-server'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['enrollment-server:8080']
