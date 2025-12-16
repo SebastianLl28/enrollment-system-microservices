@@ -10,8 +10,8 @@ ifneq (,$(wildcard .env))
 endif
 
 # Servicios de aplicación
-# SERVICES       = config-server discovery-server authorization-server api-gateway enrollment-server notification-server event-store-server frontend-client
-SERVICES       = config-server discovery-server authorization-server api-gateway enrollment-server notification-server event-store-server
+# SERVICES       = discovery-server authorization-server api-gateway enrollment-server notification-server event-store-server frontend-client
+SERVICES       = discovery-server authorization-server api-gateway enrollment-server notification-server event-store-server
 
 # Infraestructura
 INFRASTRUCTURE = zookeeper postgres-auth postgres-events postgres-enrollment kafka prometheus grafana loki promtail
@@ -34,7 +34,6 @@ help:
 	@echo "  auth  : Auth Server"
 	@echo "  es    : Enrollment Server"
 	@echo "  disc  : Discovery Server"
-	@echo "  cfg   : Config Server"
 	@echo "  notif : Notification Server"
 	@echo "  event : Event Store"
 	@echo ""
@@ -93,9 +92,6 @@ rebuild-es: ## Reconstruir Enrollment
 rebuild-disc: ## Reconstruir Discovery
 	$(COMPOSE) up -d --build --no-deps discovery-server
 
-rebuild-cfg: ## Reconstruir Config Server
-	$(COMPOSE) up -d --build --no-deps config-server
-
 rebuild-notif: ## Reconstruir Notification
 	$(COMPOSE) up -d --build --no-deps notification-server
 
@@ -123,9 +119,6 @@ restart-es: ## Reiniciar Enrollment
 restart-disc: ## Reiniciar Discovery
 	$(COMPOSE) restart discovery-server
 
-restart-cfg: ## Reiniciar Config Server
-	$(COMPOSE) restart config-server
-
 restart-notif: ## Reiniciar Notification
 	$(COMPOSE) restart notification-server
 
@@ -151,9 +144,6 @@ up-es: ## Levantar solo Enrollment
 
 up-disc: ## Levantar solo Discovery
 	$(COMPOSE) up -d discovery-server
-
-up-cfg: ## Levantar solo Config Server
-	$(COMPOSE) up -d config-server
 
 up-notif: ## Levantar solo Notification
 	$(COMPOSE) up -d notification-server
@@ -183,9 +173,6 @@ logs-es: ## Logs Enrollment
 
 logs-disc: ## Logs Discovery
 	$(COMPOSE) logs -f discovery-server
-
-logs-cfg: ## Logs Config Server
-	$(COMPOSE) logs -f config-server
 
 logs-notif: ## Logs Notification
 	$(COMPOSE) logs -f notification-server
@@ -238,9 +225,6 @@ urls: ## Mostrar URLs de los servicios
 	@echo "========================================="
 	@echo "  URLs de Servicios"
 	@echo "========================================="
-	@echo ""
-	@echo "Config Server:"
-	@echo "  http://localhost:$(CONFIG_PORT)"
 	@echo ""
 	@echo "Discovery Server (Eureka):"
 	@echo "  http://localhost:$(EUREKA_PORT)"
