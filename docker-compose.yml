@@ -1,6 +1,8 @@
 services:
   discovery-server:
-    build: ./discovery-server
+    build:
+      context: .
+      dockerfile: ./discovery-server/Dockerfile
     container_name: discovery-server
     ports:
       - "8761:8761"
@@ -83,7 +85,9 @@ services:
 
 
   authorization-server:
-    build: ./authorization-server
+    build:
+      context: .
+      dockerfile: ./authorization-server/Dockerfile
     container_name: authorization-server
     environment:
       SPRING_PROFILES_ACTIVE: docker
@@ -166,7 +170,9 @@ services:
       - backend-network
 
   enrollment-server:
-    build: ./enrollment-server
+    build:
+      context: .
+      dockerfile: ./enrollment-server/Dockerfile
     container_name: enrollment-server
     ports:
       - "5005:5005"
@@ -191,7 +197,9 @@ services:
       - backend-network
 
   api-gateway:
-    build: ./api-gateway
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
     container_name: api-gateway
     ports:
       - "${API_GATEWAY_PORT}:8080"
@@ -207,7 +215,9 @@ services:
       - backend-network
 
   notification-server:
-    build: ./notification-server
+    build:
+      context: .
+      dockerfile: ./notification-server/Dockerfile
     container_name: notification-server
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
@@ -240,7 +250,9 @@ services:
       - backend-network
 
   event-store-server:
-    build: ./event-store-server
+    build:
+      context: .
+      dockerfile: ./event-store-server/Dockerfile
     container_name: event-store-server
     environment:
       SPRING_PROFILES_ACTIVE: docker
