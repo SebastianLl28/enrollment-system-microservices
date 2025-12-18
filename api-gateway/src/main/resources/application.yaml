@@ -1,5 +1,6 @@
 server:
   port: 8080
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -9,9 +10,6 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-
-#  config:
-#    import: "optional:configserver:${CONFIG_URI:http://config-server:8888}"
 
 eureka:
   instance:
@@ -24,19 +22,15 @@ eureka:
 
 springdoc:
   api-docs:
-    enabled: true
     path: /v3/api-docs
   swagger-ui:
-    enabled: true
     path: /swagger-ui.html
-    use-root-path: true
     urls:
-      - name: api-gateway
-        url: /v3/api-docs
       - name: auth-service
         url: /v3/api-docs/auth-service
       - name: enrollment-service
         url: /v3/api-docs/enrollment-service
+
 
 management:
   endpoints:

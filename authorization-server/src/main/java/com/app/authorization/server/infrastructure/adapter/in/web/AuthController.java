@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Alonso
  */
 @RestController
-@RequestMapping("/auth")
+//@RequestMapping("/auth")
 public class AuthController {
   
   private final LoginUseCase loginUseCase;

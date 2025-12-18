@@ -10,7 +10,9 @@ spring:
 
 eureka:
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: false
+    hostname: ${HOSTNAME:discovery-server}
+    instance-id: ${spring.application.name}:${HOSTNAME}:${server.port}
   client:
     register-with-eureka: false
     fetch-registry: false

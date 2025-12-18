@@ -17,7 +17,6 @@ public class OAuth2RedirectUriResolver implements OAuth2AuthorizationRequestReso
   private final DefaultOAuth2AuthorizationRequestResolver defaultResolver;
   private final String publicBaseUrl;
   
-  
   public OAuth2RedirectUriResolver(
     ClientRegistrationRepository clientRegistrationRepository,
     @Value("${oauth2.public-base-url}") String publicBaseUrl) {
@@ -35,8 +34,7 @@ public class OAuth2RedirectUriResolver implements OAuth2AuthorizationRequestReso
   }
   
   @Override
-  public OAuth2AuthorizationRequest resolve(HttpServletRequest request,
-    String clientRegistrationId) {
+  public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
     OAuth2AuthorizationRequest authorizationRequest = defaultResolver.resolve(request, clientRegistrationId);
     return customizeAuthorizationRequest(authorizationRequest);
   }
@@ -47,7 +45,6 @@ public class OAuth2RedirectUriResolver implements OAuth2AuthorizationRequestReso
     }
     
     String originalRedirectUri = authorizationRequest.getRedirectUri();
-    
     String customRedirectUri = originalRedirectUri
       .replaceFirst("http://[^/]+", publicBaseUrl)
       .replaceFirst("https://[^/]+", publicBaseUrl);

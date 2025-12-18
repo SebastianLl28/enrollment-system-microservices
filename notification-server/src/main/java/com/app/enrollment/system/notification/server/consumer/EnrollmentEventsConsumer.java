@@ -34,7 +34,7 @@ public class EnrollmentEventsConsumer {
       
       log.info("Received enrollment event: {}", event.toString());
       
-//      notificationService.sendEnrollmentEmail(event);
+      notificationService.sendEnrollmentEmail(event);
     
     } catch (Exception e) {
       log.error("Error processing enrollment event", e);

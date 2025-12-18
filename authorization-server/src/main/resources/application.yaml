@@ -83,6 +83,9 @@ management:
   info:
     env:
       enabled: true
+  metrics:
+    tags:
+        application: authorization-server
 
 twofactor:
   issuer: ${TWO_FACTOR_ISSUER:AuthorizationApp}

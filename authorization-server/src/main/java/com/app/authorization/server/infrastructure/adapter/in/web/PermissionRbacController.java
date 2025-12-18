@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Alonso
  */
 @RestController
-@RequestMapping("/auth/rbac/permissions")
+@RequestMapping("/rbac/permissions")
 public class PermissionRbacController {
   
   private final RbacPermissionUseCase permissionUseCase;

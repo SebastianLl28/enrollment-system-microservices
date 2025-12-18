@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthFilter extends AbstractGatewayFilterFactory<Config> {
   
+  
   private final Logger log = LoggerFactory.getLogger(AuthFilter.class);
   
   private final WebClient webClient;
@@ -55,7 +56,7 @@ public class AuthFilter extends AbstractGatewayFilterFactory<Config> {
       
       
       
-      return webClient.get().uri("/auth/validateToken")
+      return webClient.get().uri("/validateToken")
         .header(HttpHeaders.AUTHORIZATION, authHeader).retrieve()
         .bodyToMono(ValidationResponse.class).flatMap(response -> {
           

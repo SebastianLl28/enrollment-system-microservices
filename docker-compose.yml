@@ -89,6 +89,7 @@ services:
       context: .
       dockerfile: ./authorization-server/Dockerfile
     container_name: authorization-server
+    hostname: authorization-server
     environment:
       SPRING_PROFILES_ACTIVE: docker
       DB_AUTH_HOST: ${DB_AUTH_HOST}
@@ -176,6 +177,7 @@ services:
     container_name: enrollment-server
     ports:
       - "5005:5005"
+    hostname: enrollment-server
     environment:
       SPRING_PROFILES_ACTIVE: docker
       JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
@@ -241,6 +243,7 @@ services:
       context: ./frontend
       args:
         VITE_AUTH_BASE_URL: ""
+        VITE_API_URL: ""
     container_name: frontend-client
     ports:
       - "80:80"
@@ -283,6 +286,8 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+      - "--web.external-url=${PROMETHEUS_EXTERNAL_URL}"
+      - "--web.route-prefix=/prometheus"
     ports:
       - "${PROMETHEUS_PORT}:9090"
     networks:
@@ -291,11 +296,12 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
-    ports:
-      - "${GRAFANA_PORT}:3000"
     environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+#      GF_SERVER_ROOT_URL: ${GRAFANA_SERVER_ROOT_URL}
+      GF_SERVER_ROOT_URL: http://www.llamucasebas.tech/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
     depends_on:
       - prometheus
     networks:

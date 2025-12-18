@@ -15,9 +15,11 @@ public class RouterConfig {
   public RouteLocator routes(RouteLocatorBuilder builder, AuthFilter authFilter,
     EventFilter eventFilter) {
     return builder.routes()
+      
       .route("auth-service-route", r -> r.path("/auth/**")
-        .filters(f -> f.filter(eventFilter.apply(new EventFilter.Config())))
+        .filters(f -> f.stripPrefix(1).filter(eventFilter.apply(new EventFilter.Config())))
         .uri("lb://authorization-server"))
+      
       
       .route("auth-service-docs", r -> r.path("/v3/api-docs/auth-service")
         .filters(f -> f.rewritePath("/v3/api-docs/auth-service", "/v3/api-docs"))
@@ -27,23 +29,9 @@ public class RouterConfig {
         .filters(f -> f.rewritePath("/v3/api-docs/enrollment-service", "/v3/api-docs"))
         .uri("lb://enrollment-server"))
       
-      .route("oauth2-authorization", r -> r
-        .path("/oauth2/authorization/**")
-        .filters(f -> f
-            .filter(eventFilter.apply(new EventFilter.Config()))
-            .preserveHostHeader()
-        )
-        .uri("lb://authorization-server"))
-      
-      .route("oauth2-callback", r -> r
-        .path("/login/oauth2/code/**")
-        .filters(GatewayFilterSpec::preserveHostHeader
-        )
-        .uri("lb://authorization-server"))
-      
-      .route("enrollment-service", r -> r.path("/api/**")
-        .filters(f -> f.filter(authFilter.apply(new AuthFilter.Config())))
-        .uri("lb://enrollment-server"))
-      .build();
+      .route("enrollment-service",
+        r -> r.path("/api/**").filters(f -> f.filter(authFilter.apply(new AuthFilter.Config())))
+          .uri("lb://enrollment-server")).build();
+    
   }
 }
