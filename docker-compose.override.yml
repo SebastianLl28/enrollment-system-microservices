@@ -1,0 +1,48 @@
+services:
+
+  discovery-server:
+    ports:
+      - "8761:8761"
+
+  postgres-enrollment:
+    ports:
+      - "${DB_PORT_EXTERNAL}:5432"
+
+  postgres-auth:
+    ports:
+      - "${DB_AUTH_PORT_EXTERNAL}:5432"
+
+  postgres-events:
+    ports:
+      - "${DB_EVENTS_PORT_EXTERNAL}:5432"
+
+  kafka:
+    ports:
+      - "29092:29092"
+    environment:
+      # Listener extra para conectarte a Kafka desde tu máquina host
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+
+  api-gateway:
+    ports:
+      - "${API_GATEWAY_PORT}:8080"
+
+  enrollment-server:
+    ports:
+      - "5005:5005"
+    environment:
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+
+  prometheus:
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+
+  grafana:
+    ports:
+      - "${GRAFANA_PORT}:3000"
+
+  loki:
+    ports:
+      - "3100:3100"

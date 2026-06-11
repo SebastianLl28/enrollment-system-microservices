@@ -49,6 +49,8 @@ public class AuthFilter extends AbstractGatewayFilterFactory<Config> {
       
       String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
       
+      log.warn("🔐 [Auth Filter] Incoming request to {} with Authorization);", request.getURI());
+      
       if (authHeader == null || !authHeader.startsWith("Bearer ")) {
         return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED,
           "Missing or invalid Authorization header"));
@@ -56,7 +58,7 @@ public class AuthFilter extends AbstractGatewayFilterFactory<Config> {
       
       
       
-      return webClient.get().uri("/validateToken")
+      return webClient.get().uri("/auth/validateToken")
         .header(HttpHeaders.AUTHORIZATION, authHeader).retrieve()
         .bodyToMono(ValidationResponse.class).flatMap(response -> {
           

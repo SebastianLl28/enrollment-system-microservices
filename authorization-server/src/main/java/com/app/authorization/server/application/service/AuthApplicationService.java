@@ -60,24 +60,33 @@ public class AuthApplicationService implements LoginUseCase, ValidateTokenUseCas
     String username = command.username();
     String password = command.password();
     
+    System.out.println(username);
+    System.out.println(password);
+    
     User user = userRepository.findByUsername(username)
       .orElseThrow(InvalidCredentialsException::new);
     
     if (!passwordHasher.verify(password, user.getPassword().getValue())) {
+      System.out.println("Password does not match");
       throw new InvalidCredentialsException();
     }
-    
+    System.out.println("si pasaron");
     UserAccessProfile profile = userAccessProfilePort.loadByUsername(username);
-    
+    System.out.println("asdssssss");
     Boolean twoFactorRequired = user.requiresTwoFactorAuth();
     String token = "";
+    System.out.println("xxxxxxxxxx");
     
     if (twoFactorRequired) {
+      System.out.println("1");
       token = twoFactorTokenPort.generateTwoFactorToken(user.getUsername(),
         profile.getPermissions());
     } else {
+      System.out.println("2");
       token = accessTokenPort.generateToken(user.getUsername(), profile.getPermissions());
     }
+    
+    System.out.println("asdasd");
     
     return authMapper.toLoginResponse(user, token);
   }

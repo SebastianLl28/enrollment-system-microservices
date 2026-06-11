@@ -13,25 +13,24 @@ public class RouterConfig {
   
   @Bean
   public RouteLocator routes(RouteLocatorBuilder builder, AuthFilter authFilter,
-    EventFilter eventFilter) {
+      EventFilter eventFilter) {
     return builder.routes()
-      
-      .route("auth-service-route", r -> r.path("/auth/**")
-        .filters(f -> f.stripPrefix(1).filter(eventFilter.apply(new EventFilter.Config())))
-        .uri("lb://authorization-server"))
-      
-      
-      .route("auth-service-docs", r -> r.path("/v3/api-docs/auth-service")
-        .filters(f -> f.rewritePath("/v3/api-docs/auth-service", "/v3/api-docs"))
-        .uri("lb://authorization-server"))
-      
-      .route("enrollment-service-docs", r -> r.path("/v3/api-docs/enrollment-service")
-        .filters(f -> f.rewritePath("/v3/api-docs/enrollment-service", "/v3/api-docs"))
-        .uri("lb://enrollment-server"))
-      
-      .route("enrollment-service",
-        r -> r.path("/api/**").filters(f -> f.filter(authFilter.apply(new AuthFilter.Config())))
-          .uri("lb://enrollment-server")).build();
+        
+        .route("auth-service-route", r -> r.path("/auth/**")
+            .filters(f -> f.filter(eventFilter.apply(new EventFilter.Config())))
+            .uri("lb://authorization-server"))
+        
+        .route("auth-service-docs", r -> r.path("/v3/api-docs/auth-service")
+            .filters(f -> f.rewritePath("/v3/api-docs/auth-service", "/v3/api-docs"))
+            .uri("lb://authorization-server"))
+        
+        .route("enrollment-service-docs", r -> r.path("/v3/api-docs/enrollment-service")
+            .filters(f -> f.rewritePath("/v3/api-docs/enrollment-service", "/v3/api-docs"))
+            .uri("lb://enrollment-server"))
+        
+        .route("enrollment-service",
+            r -> r.path("/api/**").filters(f -> f.filter(authFilter.apply(new AuthFilter.Config())))
+                .uri("lb://enrollment-server")).build();
     
   }
 }

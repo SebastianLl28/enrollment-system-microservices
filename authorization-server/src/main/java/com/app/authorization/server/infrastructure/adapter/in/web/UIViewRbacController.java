@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Alonso
  */
 @RestController
-@RequestMapping("/rbac/views")
+@RequestMapping("/auth/rbac/views")
 public class UIViewRbacController {
   
   private final RbacViewUseCase viewUseCase;
