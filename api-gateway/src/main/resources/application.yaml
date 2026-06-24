@@ -66,3 +66,7 @@ audit:
     - /swagger-ui
     - /v3/api-docs
     - /auth/validateToken
+#logging:
+#  level:
+#    org.springframework.cloud.gateway: DEBUG
+#    reactor.netty.http.client: DEBUG

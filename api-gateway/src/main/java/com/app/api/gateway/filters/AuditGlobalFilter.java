@@ -44,24 +44,20 @@ public class AuditGlobalFilter implements GlobalFilter, Ordered {
     ServerHttpRequest request = exchange.getRequest();
     String path = request.getURI().getPath();
     
-    // 1. Verificar exclusiones
+    // 1. exclude paths e.g. /api/health
     if (props.excludedPaths() != null && props.excludedPaths().stream()
         .anyMatch(path::startsWith)) {
       return chain.filter(exchange);
     }
     
-    // 2. Decidir si leemos el body (Solo para POST/PUT y si es JSON/Texto)
+    // 2. Check if we should read the body (POST, PUT, PATCH with JSON or text)
     if (shouldReadBody(request)) {
       return ServerWebExchangeUtils.cacheRequestBody(
           exchange,
-          (serverHttpRequest) -> {
-            // Aquí el body ya está cacheado y es seguro leerlo
-            // IMPORTANTE: Usamos 'serverHttpRequest' que es el decorado
-            return processAudit(exchange.mutate().request(serverHttpRequest).build(), chain);
-          }
+          (serverHttpRequest) ->
+             processAudit(exchange.mutate().request(serverHttpRequest).build(), chain)
       );
     } else {
-      // Si es GET o un archivo, no tocamos el body
       return processAudit(exchange, chain);
     }
   }
@@ -71,12 +67,10 @@ public class AuditGlobalFilter implements GlobalFilter, Ordered {
     ServerHttpRequest request = exchange.getRequest();
     URI uri = request.getURI();
     
-    // Capturamos datos iniciales
     String path = uri.getPath();
     String method = request.getMethod().name();
     String userAgent = request.getHeaders().getFirst(HttpHeaders.USER_AGENT);
     
-    // Intentamos obtener el body ya cacheado
     String requestBody = getCachedBody(exchange);
     
     return chain.filter(exchange)
@@ -85,7 +79,6 @@ public class AuditGlobalFilter implements GlobalFilter, Ordered {
   }
   
   private String getCachedBody(ServerWebExchange exchange) {
-    // Spring guarda el body en un atributo tras llamar a cacheRequestBody
     Object cachedBody = exchange.getAttribute(ServerWebExchangeUtils.CACHED_REQUEST_BODY_ATTR);
     if (cachedBody instanceof DataBuffer) {
       DataBuffer buffer = (DataBuffer) cachedBody;
@@ -122,9 +115,7 @@ public class AuditGlobalFilter implements GlobalFilter, Ordered {
         new AuditEvent(start, serviceId, path, method, status, userId, query, userAgent, body));
   }
   
-  // ... getServiceId y getOrder iguales ...
   private String getServiceId(String path) {
-    // Tu lógica original o la mejora que sugerí antes
     if (path.startsWith("/auth")) {
       return "authorization-server";
     } else if (path.startsWith("/api")) {

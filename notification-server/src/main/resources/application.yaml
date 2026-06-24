@@ -22,3 +22,4 @@ topic:
 notification:
   mail:
     from: ${MAIL_FROM:no-reply@enrollment.app}
+

@@ -37,9 +37,6 @@ public class KafkaAuditPublisher implements AuditPublisher {
   public void publish(AuditEvent event) {
     try {
       String payload = objectMapper.writeValueAsString(event);
-      System.out.println("-----------------");
-      System.out.println(payload);
-      System.out.println("-----------------");
       String key = UUID.randomUUID().toString();
       kafkaTemplate.send(topic, key, payload);
     } catch (Exception e) {
