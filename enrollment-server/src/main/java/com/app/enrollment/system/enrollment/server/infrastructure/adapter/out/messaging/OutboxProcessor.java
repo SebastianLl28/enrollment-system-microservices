@@ -42,7 +42,7 @@ public class OutboxProcessor {
     ENROLLMENT_ASSIGNED_TOPIC = enrollmentAssignedTopic;
   }
   
-  @Scheduled(fixedDelay = 5000)
+//  @Scheduled(fixedDelay = 5000)
   @Transactional
   public void processPendingEvents() {
     
@@ -79,7 +79,7 @@ public class OutboxProcessor {
     }
   }
   
-  @Scheduled(fixedDelay = 20000)
+//  @Scheduled(fixedDelay = 20000)
   @Transactional
   public void retryFailedEvents() {
     List<OutboxEventJpaEntity> failedEvents =

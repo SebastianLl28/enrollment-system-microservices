@@ -1,15 +1,11 @@
 package com.app.api.gateway.filters;
 
-import com.app.api.gateway.filters.EventFilter.Config;
+import com.app.api.gateway.dto.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.HandlerFilterFunction;
-import org.springframework.web.reactive.function.server.HandlerFunction;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 /**
@@ -39,6 +35,4 @@ public class EventFilter extends AbstractGatewayFilterFactory<Config> {
       }));
     };
   }
-  
-  public static class Config {}
 }

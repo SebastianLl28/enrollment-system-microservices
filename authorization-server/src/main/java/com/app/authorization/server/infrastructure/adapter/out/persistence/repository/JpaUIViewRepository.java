@@ -21,7 +21,7 @@ public interface JpaUIViewRepository extends JpaRepository<UIViewJpaEntity, Stri
     inner join role r on rv.role_id  = r.id
     inner join user_role ur on r.id = ur.role_id
     inner join "user" u  on ur.user_id = u.id
-    where u.id = :userId;
+    where u.id = :userId
     """, nativeQuery = true)
   List<UIViewJpaEntity> findByUserId(Integer userId);
 }

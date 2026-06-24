@@ -45,19 +45,20 @@ public class AuditGlobalFilter implements GlobalFilter, Ordered {
     String path = request.getURI().getPath();
     
     // 1. Verificar exclusiones
-    if (props.excludedPaths() != null && props.excludedPaths().stream().anyMatch(path::startsWith)) {
+    if (props.excludedPaths() != null && props.excludedPaths().stream()
+        .anyMatch(path::startsWith)) {
       return chain.filter(exchange);
     }
     
     // 2. Decidir si leemos el body (Solo para POST/PUT y si es JSON/Texto)
     if (shouldReadBody(request)) {
       return ServerWebExchangeUtils.cacheRequestBody(
-        exchange,
-        (serverHttpRequest) -> {
-          // Aquí el body ya está cacheado y es seguro leerlo
-          // IMPORTANTE: Usamos 'serverHttpRequest' que es el decorado
-          return processAudit(exchange.mutate().request(serverHttpRequest).build(), chain);
-        }
+          exchange,
+          (serverHttpRequest) -> {
+            // Aquí el body ya está cacheado y es seguro leerlo
+            // IMPORTANTE: Usamos 'serverHttpRequest' que es el decorado
+            return processAudit(exchange.mutate().request(serverHttpRequest).build(), chain);
+          }
       );
     } else {
       // Si es GET o un archivo, no tocamos el body
@@ -73,15 +74,14 @@ public class AuditGlobalFilter implements GlobalFilter, Ordered {
     // Capturamos datos iniciales
     String path = uri.getPath();
     String method = request.getMethod().name();
-    String userId = request.getHeaders().getFirst(ApiConstants.HEADER_USER_ID);
     String userAgent = request.getHeaders().getFirst(HttpHeaders.USER_AGENT);
     
     // Intentamos obtener el body ya cacheado
     String requestBody = getCachedBody(exchange);
     
     return chain.filter(exchange)
-      .doOnSuccess(v -> publish(exchange, start, path, method, userId, uri.getQuery(), userAgent, requestBody))
-      .doOnError(err -> publish(exchange, start, path, method, userId, uri.getQuery(), userAgent, requestBody));
+      .doOnSuccess(v -> publish(exchange, start, path, method, uri.getQuery(), userAgent, requestBody))
+      .doOnError(err -> publish(exchange, start, path, method, uri.getQuery(), userAgent, requestBody));
   }
   
   private String getCachedBody(ServerWebExchange exchange) {
@@ -98,35 +98,40 @@ public class AuditGlobalFilter implements GlobalFilter, Ordered {
     HttpMethod method = request.getMethod();
     MediaType contentType = request.getHeaders().getContentType();
     
-    boolean isModifyMethod = HttpMethod.POST.equals(method) || HttpMethod.PUT.equals(method) || HttpMethod.PATCH.equals(method);
+    boolean isModifyMethod =
+        HttpMethod.POST.equals(method) || HttpMethod.PUT.equals(method) || HttpMethod.PATCH.equals(
+            method);
     boolean isJsonCompatible = contentType != null && (
-      contentType.includes(MediaType.APPLICATION_JSON) ||
-        contentType.includes(MediaType.TEXT_PLAIN)
+        contentType.includes(MediaType.APPLICATION_JSON) ||
+            contentType.includes(MediaType.TEXT_PLAIN)
     );
     
     return isModifyMethod && isJsonCompatible;
   }
   
   private void publish(ServerWebExchange exchange, Instant start, String path, String method,
-    String userId, String query, String userAgent, String body) {
+      String query, String userAgent, String body) {
     
     int status = exchange.getResponse().getStatusCode() != null
-      ? exchange.getResponse().getStatusCode().value() : 500;
+        ? exchange.getResponse().getStatusCode().value() : 500;
     
     String serviceId = getServiceId(path);
+    String userId = exchange.getAttribute(ApiConstants.HEADER_USER_ID);
     
-    // OJO: Limpieza de seguridad (opcional pero recomendada)
-//     body = maskSensitiveData(body);
-    
-    auditPublisher.publish(new AuditEvent(start, serviceId, path, method, status, userId, query, userAgent, body));
+    auditPublisher.publish(
+        new AuditEvent(start, serviceId, path, method, status, userId, query, userAgent, body));
   }
   
   // ... getServiceId y getOrder iguales ...
   private String getServiceId(String path) {
     // Tu lógica original o la mejora que sugerí antes
-    if (path.startsWith("/auth")) return "authorization-server";
-    else if (path.startsWith("/api")) return "enrollment-server";
-    else return "api-gateway";
+    if (path.startsWith("/auth")) {
+      return "authorization-server";
+    } else if (path.startsWith("/api")) {
+      return "enrollment-server";
+    } else {
+      return "api-gateway";
+    }
   }
   
   @Override

@@ -7,10 +7,9 @@
 
   <!-- Padre: Spring Boot 3.2.x (compatible con Spring Cloud 2023.0.x) -->
   <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.2.5</version> <!-- o cualquier 3.2.x estable -->
-    <relativePath/>
+    <groupId>com.app.enrollment.system</groupId>
+    <artifactId>enrollment-system</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
   </parent>
 
   <groupId>com.app.enrollment.system</groupId>
@@ -112,6 +111,13 @@
           <mainClass>com.app.enrollment.system.event.store.server.EventStoreServerApplication
           </mainClass>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build-info</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

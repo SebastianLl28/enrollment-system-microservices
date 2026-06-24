@@ -1,5 +1,6 @@
 package com.app.api.gateway.config;
 
+import com.app.api.gateway.dto.Config;
 import com.app.api.gateway.filters.AuthFilter;
 import com.app.api.gateway.filters.EventFilter;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -17,7 +18,7 @@ public class RouterConfig {
     return builder.routes()
         
         .route("auth-service-route", r -> r.path("/auth/**")
-            .filters(f -> f.filter(eventFilter.apply(new EventFilter.Config())))
+            .filters(f -> f.filter(eventFilter.apply(new Config())))
             .uri("lb://authorization-server"))
         
         .route("auth-service-docs", r -> r.path("/v3/api-docs/auth-service")
@@ -29,7 +30,7 @@ public class RouterConfig {
             .uri("lb://enrollment-server"))
         
         .route("enrollment-service",
-            r -> r.path("/api/**").filters(f -> f.filter(authFilter.apply(new AuthFilter.Config())))
+            r -> r.path("/api/**").filters(f -> f.filter(authFilter.apply(new Config())))
                 .uri("lb://enrollment-server")).build();
     
   }
