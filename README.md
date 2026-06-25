@@ -17,6 +17,9 @@ El sistema permite administrar **facultades, carreras, cursos, periodos académi
 * **Seguridad centralizada** (OAuth2 + JWT + MFA)
 * **Arquitectura orientada a eventos** para auditoría y notificaciones
 
+![architecture.png](assets/architecture.png)
+
+
 ---
 
 ## 🛠️ Tecnologías Utilizadas
@@ -138,6 +141,7 @@ DB_AUTH_HOST=db-postgres-auth
 DB_AUTH_PORT=5432
 DB_AUTH_PORT_EXTERNAL=5433
 
+
 # ================== POSTGRES EVENTS ==================
 DB_EVENTS_USER=events_user
 DB_EVENTS_PASSWORD=events_password
@@ -146,52 +150,67 @@ DB_EVENTS_HOST=db-postgres-events
 DB_EVENTS_PORT=5432
 DB_EVENTS_PORT_EXTERNAL=5434
 
-# ================== DISCOVERY ==================
+
 EUREKA_PORT=8761
 DISCOVERY_HOST=discovery-server
-EUREKA_URI=http://discovery-server:8761/eureka
 
-# ================== API GATEWAY ==================
+EUREKA_URI=http://discovery-server:${EUREKA_PORT}/eureka
+
 API_GATEWAY_PORT=8080
 
 # ================== JWT / SEGURIDAD ==================
-JWT_SECRET=CAMBIA_ESTE_SECRET_EN_PRODUCCION
+JWT_SECRET=
 JWT_EXPIRATION=36000000
 TWO_FACTOR_EXPIRATION=300000
 TWO_FACTOR_ISSUER=EnrollmentApp
 
-# ================== OAUTH2 ==================
-FRONTEND_URL=http://localhost:5173
-OAUTH2_PUBLIC_BASE_URL=http://localhost:8080
+#FRONTEND_URL=http://localhost:5173
+#OAUTH2_PUBLIC_BASE_URL=http://localhost:${API_GATEWAY_PORT}
 
-GITHUB_CLIENT_ID=TU_CLIENT_ID
-GITHUB_CLIENT_SECRET=TU_CLIENT_SECRET
-GITHUB_REDIRECT_URI=http://localhost:8080/login/oauth2/code/github
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+#GITHUB_REDIRECT_URI=http://localhost:${API_GATEWAY_PORT}/login/oauth2/code/github
 
-GOOGLE_CLIENT_ID=TU_CLIENT_ID
-GOOGLE_CLIENT_SECRET=TU_CLIENT_SECRET
-GOOGLE_REDIRECT_URI=http://localhost:8080/login/oauth2/code/google
+GOOGLE_CLIENT_ID=asdasd
+GOOGLE_CLIENT_SECRET=asdasdasdasd
+#GOOGLE_REDIRECT_URI=http://localhost:${API_GATEWAY_PORT}/login/oauth2/code/google
 
-# ================== KAFKA ==================
+
+
 KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
 KAFKA_ENROLLMENT_EVENTS_TOPIC=enrollment.notifications
 KAFKA_AUDIT_LOGS_TOPIC=audit.requests
-KAFKA_CONSUMER_GROUP_ID=event-store-consumer
-KAFKA_AUTO_OFFSET_RESET=earliest
 
-# ================== OBSERVABILIDAD (OPCIONAL) ==================
+
 PROMETHEUS_PORT=9090
 GRAFANA_PORT=3000
-GRAFANA_ADMIN_USER=admin
-GRAFANA_ADMIN_PASSWORD=admin
-GRAFANA_SERVER_ROOT_URL=http://localhost:3000
 
-# ================== EMAIL ==================
 MAIL_HOST=sandbox.smtp.mailtrap.io
 MAIL_PORT=2525
 MAIL_USERNAME=
 MAIL_PASSWORD=
-MAIL_FROM=no-reply@enrollment.app
+MAIL_FROM=admin@coursehub.com
+
+KAFKA_CONSUMER_GROUP_ID=event-store-consumer
+KAFKA_AUTO_OFFSET_RESET=earliest
+
+
+FRONTEND_URL=http://localhost
+OAUTH2_PUBLIC_BASE_URL=http://localhost
+GITHUB_REDIRECT_URI=http://localhost/login/oauth2/code/github
+GOOGLE_REDIRECT_URI=http://localhost/login/oauth2/code/google
+
+GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_PASSWORD=admin
+GRAFANA_SERVER_ROOT_URL=http://localhost/grafana/
+
+PROMETHEUS_EXTERNAL_URL=http://localhost/prometheus
+AUTH_DB_HOST=db-postgres-auth
+AUTH_DB_PORT=5432
+AUTH_DB_USER=auth_user
+AUTH_DB_PASSWORD=auth_password
+AUTH_DB_NAME=auth_db
 ```
 
 ---
@@ -205,7 +224,7 @@ make up
 O directamente:
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
 ---
@@ -213,11 +232,11 @@ docker compose up -d
 ### 4️⃣ Accesos principales
 
 | Servicio          | URL                                                                            |
-| ----------------- | ------------------------------------------------------------------------------ |
+| ----------------- |--------------------------------------------------------------------------------|
 | API Gateway       | [http://localhost:8080](http://localhost:8080)                                 |
 | Eureka            | [http://localhost:8761](http://localhost:8761)                                 |
 | Swagger (Gateway) | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) |
-| Frontend          | [http://localhost:5173](http://localhost:5173)                                 |
+| Frontend          | [http://localhost:5173](http://localhost)                                      |
 | Grafana           | [http://localhost:3000](http://localhost:3000)                                 |
 
 ---
