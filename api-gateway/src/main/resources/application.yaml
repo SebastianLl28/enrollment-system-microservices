@@ -19,6 +19,7 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: ${EUREKA_URI:http://discovery-server:8761/eureka/}
+    registry-fetch-interval-seconds: 5
 
 springdoc:
   api-docs:
@@ -46,6 +47,9 @@ management:
     metrics:
       export:
         enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 info:
   app:

@@ -18,7 +18,8 @@ public class RouterConfig {
     return builder.routes()
         
         .route("auth-service-route", r -> r.path("/auth/**")
-            .filters(f -> f.filter(eventFilter.apply(new Config())))
+            .filters(f -> f.filter(eventFilter.apply(new Config()))
+                .retry(config -> config.setRetries(3)))
             .uri("lb://authorization-server"))
         
         .route("auth-service-docs", r -> r.path("/v3/api-docs/auth-service")
@@ -30,7 +31,8 @@ public class RouterConfig {
             .uri("lb://enrollment-server"))
         
         .route("enrollment-service",
-            r -> r.path("/api/**").filters(f -> f.filter(authFilter.apply(new Config())))
+            r -> r.path("/api/**").filters(f -> f.filter(authFilter.apply(new Config()))
+                    .retry(retryConfig -> retryConfig.setRetries(3)))
                 .uri("lb://enrollment-server")).build();
     
   }

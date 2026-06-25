@@ -171,6 +171,12 @@ services:
     networks:
       - backend-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   enrollment-server:
     build:
@@ -198,6 +204,12 @@ services:
     networks:
       - backend-network
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   api-gateway:
     build:
@@ -212,9 +224,19 @@ services:
     depends_on:
       discovery-server:
         condition: service_healthy
+      authorization-server:
+        condition: service_healthy
+      enrollment-server:
+        condition: service_healthy
     networks:
       - backend-network
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   notification-server:
     build:
@@ -238,6 +260,12 @@ services:
     networks:
       - backend-network
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   event-store-server:
     build:
@@ -266,6 +294,12 @@ services:
     networks:
       - backend-network
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   # ---------- Observer ----------
   prometheus:
