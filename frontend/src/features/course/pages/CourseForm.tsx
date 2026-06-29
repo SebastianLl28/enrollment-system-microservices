@@ -26,7 +26,7 @@ const CourseForm = ({ onSubmit }: CourseFormProps) => {
     },
   });
 
-  const { data: careers, isPending: isLoadingCareers } = useGetCareers();
+  const { data: careers, isPending: isLoadingCareers } = useGetCareers({ includeInactive: false });
 
   const careerOptions =
     careers?.map((career) => ({

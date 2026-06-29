@@ -8,5 +8,5 @@ import java.util.List;
  * @author Alonso
  */
 public interface GetAllFacultyUseCase {
-  List<FacultyResponse> findAll();
+  List<FacultyResponse> findAll(Boolean includeInactive);
 }

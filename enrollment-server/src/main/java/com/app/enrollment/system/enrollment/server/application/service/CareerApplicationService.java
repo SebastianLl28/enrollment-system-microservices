@@ -42,9 +42,9 @@ public class CareerApplicationService implements GetAllCareerUseCase, CreateCare
   }
   
   @Override
-  public List<CareerResponse> findAll() {
+  public List<CareerResponse> findAll(Boolean includeInactive) {
     
-    List<Career> careerList = careerRepository.findAll();
+    List<Career> careerList = includeInactive ? careerRepository.findAll() : careerRepository.findAllActive();
     
     Set<Integer> facultyIds = careerList.stream().map(c -> c.getFacultyId().getValue())
       .collect(Collectors.toSet());

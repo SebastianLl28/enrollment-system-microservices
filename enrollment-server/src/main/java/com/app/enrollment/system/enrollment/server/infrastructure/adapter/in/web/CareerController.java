@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -29,8 +30,9 @@ public class CareerController {
   }
   
   @GetMapping("/career")
-  public ResponseEntity<List<CareerResponse>> findAll() {
-    List<CareerResponse> careerList = getAllCareerUseCase.findAll();
+  public ResponseEntity<List<CareerResponse>> findAll(
+      @RequestParam(defaultValue = "false") Boolean includeInactive) {
+    List<CareerResponse> careerList = getAllCareerUseCase.findAll(includeInactive);
     return ResponseEntity.ok(careerList);
   }
   

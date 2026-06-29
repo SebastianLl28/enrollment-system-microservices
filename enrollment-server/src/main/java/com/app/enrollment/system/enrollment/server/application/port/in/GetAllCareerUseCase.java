@@ -9,6 +9,6 @@ import java.util.List;
  */
 public interface GetAllCareerUseCase {
   
-  List<CareerResponse> findAll();
+  List<CareerResponse> findAll(Boolean includeInactive);
   
 }

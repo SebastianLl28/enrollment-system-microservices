@@ -22,5 +22,6 @@ public interface FacultyRepository {
   boolean existsByNameIgnoreCase(String name);
   
   boolean existsByNameIgnoreCaseAndFacultyIdNot(String name, FacultyID facultyId);
-
+  
+  List<Faculty> findAllActive();
 }

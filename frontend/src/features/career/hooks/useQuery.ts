@@ -1,9 +1,10 @@
 import { CAREER_LIST_QUERY } from "@/config/keys";
 import { useQuery } from "@tanstack/react-query";
-import { getCareerList } from "../services/careerService";
+import {getCareerList, type getCareerListParams} from "../services/careerService";
 
-export const useGetCareers = () =>
+
+export const useGetCareers = (params: getCareerListParams) =>
   useQuery({
     queryKey: CAREER_LIST_QUERY,
-    queryFn: getCareerList,
+    queryFn: () => getCareerList(params),
   });

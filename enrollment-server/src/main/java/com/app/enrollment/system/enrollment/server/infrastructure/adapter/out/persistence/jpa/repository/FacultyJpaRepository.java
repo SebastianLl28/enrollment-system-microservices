@@ -15,4 +15,6 @@ public interface FacultyJpaRepository extends JpaRepository<FacultyJpaEntity, In
   boolean existsByNameIgnoreCase(String name);
 
   boolean existsByNameIgnoreCaseAndFacultyIdNot(String name, Integer facultyId);
+  
+  Collection<FacultyJpaEntity> findAllByActiveIsTrue();
 }

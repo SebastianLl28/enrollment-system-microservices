@@ -60,4 +60,10 @@ public class FacultyRepositoryAdapter implements FacultyRepository {
     return facultyJpaRepository.existsByNameIgnoreCaseAndFacultyIdNot(name, facultyId.getValue());
   }
   
+  @Override
+  public List<Faculty> findAllActive() {
+    return facultyJpaRepository.findAllByActiveIsTrue().stream()
+      .map(facultyJpaMapper::toDomainFaculty).toList();
+  }
+  
 }

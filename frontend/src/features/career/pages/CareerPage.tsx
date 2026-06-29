@@ -19,7 +19,7 @@ const CareerPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data, isPending, isError, error, refetch, isRefetching } =
-    useGetCareers();
+    useGetCareers({ includeInactive: true });
 
   const careers = useMemo(() => data ?? [], [data]);
 

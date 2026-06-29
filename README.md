@@ -206,11 +206,6 @@ GRAFANA_ADMIN_PASSWORD=admin
 GRAFANA_SERVER_ROOT_URL=http://localhost/grafana/
 
 PROMETHEUS_EXTERNAL_URL=http://localhost/prometheus
-AUTH_DB_HOST=db-postgres-auth
-AUTH_DB_PORT=5432
-AUTH_DB_USER=auth_user
-AUTH_DB_PASSWORD=auth_password
-AUTH_DB_NAME=auth_db
 ```
 
 ---

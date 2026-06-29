@@ -44,19 +44,12 @@ public class CareerRepositoryAdapter implements CareerRepository {
         careerJpaMapper::toDomainCareer
     ).toList();
   }
-
-//  @Override
-//  public List<Career> findByFacultyId(Integer facultyId) {
-//    return List.of();
-//  }
-//
-//  @Override
-//  public List<Career> findByActive(boolean active) {
-//    return List.of();
-//  }
-//
-//  @Override
-//  public long countActiveCourses(Integer careerId) {
-//    return 0;
-//  }
+  
+  @Override
+  public List<Career> findAllActive() {
+    return careerJpaRepository.findAllByActiveIsTrue().stream().map(
+        careerJpaMapper::toDomainCareer
+    ).toList();
+  }
+  
 }

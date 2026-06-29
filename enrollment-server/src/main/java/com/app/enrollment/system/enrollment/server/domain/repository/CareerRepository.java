@@ -12,4 +12,6 @@ public interface CareerRepository {
   Optional<Career> findById(CareerID careerID);
   Career save(Career career);
   List<Career> findAll();
+  
+  List<Career> findAllActive();
 }

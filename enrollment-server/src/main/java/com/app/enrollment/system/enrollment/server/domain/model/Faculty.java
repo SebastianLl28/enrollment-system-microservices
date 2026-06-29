@@ -14,7 +14,7 @@ public class Faculty {
   private String description;
   private String location;
   private String dean;
-  private final Instant registrationDate;
+  private Instant registrationDate;
   private Boolean active;
 
   public static Faculty create(String name, String description, String location, String dean, Clock clock) {
@@ -103,22 +103,6 @@ public class Faculty {
   public void activate() {
     if (this.active) return;
     this.active = true;
-  }
-  public Faculty update(
-      String name,
-      String description,
-      String location,
-      String dean,
-      Boolean active
-  ) {
-    validateRequired(name, location);
-    this.name = trim(name);
-    this.description = trimOrNull(description);
-    this.location = trim(location);
-    this.dean = trimOrNull(dean);
-    this.active = active;
-    validateInvariants();
-    return this;
   }
 
   public FacultyID getId() { return id; }

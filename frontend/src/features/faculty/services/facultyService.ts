@@ -2,8 +2,14 @@ import { apiClient } from "@/config/apiClient";
 import type { Faculty } from "../types/Faculty";
 import { FACULTY_ENDPOINT } from "@/config/endpoints";
 
-export const getFacultyList = async (): Promise<Faculty[]> =>
-  await apiClient.get<Faculty[]>(FACULTY_ENDPOINT.base).then((res) => res.data);
+export interface getFacultyListParams {
+  includeInactive?: boolean;
+}
+
+export const getFacultyList = async (
+{ includeInactive }: getFacultyListParams
+): Promise<Faculty[]> =>
+  await apiClient.get<Faculty[]>(FACULTY_ENDPOINT.base, { params: { includeInactive } }).then((res) => res.data);
 
 export const postFaculty = async (
   faculty: Omit<Faculty, "id">

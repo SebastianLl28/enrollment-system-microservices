@@ -15,7 +15,7 @@ const FacultiesPage = () => {
   const [editingFaculty, setEditingFaculty] = useState<Faculty | null>(null);
 
   const { data, isPending, isError, error, refetch, isRefetching } =
-    useGetFaculties();
+    useGetFaculties({ includeInactive: true });
 
   const faculties = useMemo(() => data ?? [], [data]);
 
