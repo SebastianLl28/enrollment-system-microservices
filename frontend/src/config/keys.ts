@@ -9,12 +9,15 @@ export const FACULTY_PUT_MUTATION = ["faculty", "put"] as const;
 
 export const CAREER_LIST_QUERY = ["career", "list"] as const;
 export const CAREER_POST_MUTATION = ["career", "post"] as const;
+export const CAREER_PUT_MUTATION = ["career", "put"] as const;
 
 export const COURSE_LIST_QUERY = ["course", "list"] as const;
 export const COURSE_POST_MUTATION = ["course", "post"] as const;
+export const COURSE_PUT_MUTATION = ["course", "put"] as const;
 
 export const STUDENT_LIST_QUERY = ["student", "list"] as const;
 export const STUDENT_POST_MUTATION = ["student", "post"] as const;
+export const STUDENT_PUT_MUTATION = ["student", "put"] as const;
 
 export const PROFILE_QUERY = ["profile", "data"] as const;
 

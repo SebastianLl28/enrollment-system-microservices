@@ -47,7 +47,12 @@ public class StudentJpaMapper {
     studentJpaEntity.setPhoneNumber(student.getPhoneNumber());
     studentJpaEntity.setDateOfBirth(student.getDateOfBirth());
     studentJpaEntity.setAddress(student.getAddress());
-    studentJpaEntity.setCreatedAt(LocalDateTime.now(clock));
+    if (student.getCreatedAt() != null) {
+      studentJpaEntity.setCreatedAt(
+          LocalDateTime.ofInstant(student.getCreatedAt(), clock.getZone()));
+    } else {
+      studentJpaEntity.setCreatedAt(LocalDateTime.now(clock));
+    }
     studentJpaEntity.setActive(student.isActive());
 
     return studentJpaEntity;

@@ -1,5 +1,6 @@
 import { useTermColumns } from "@/config/columns";
 import { useMemo, useState } from "react";
+import { useHasPermission } from "@/features/auth/hooks/usePermissions";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { ROUTE_PATHS } from "@/app/route/path";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { useGetTerms } from "../hooks/useQuery";
 import { usePostTerm } from "../hooks/useMutation";
 
 const TermsPage = () => {
+  const canCreate = useHasPermission("UI_VIEW", "CREATE");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTerm] = useState<TermResponse | null>(null);
 
@@ -29,8 +31,9 @@ const TermsPage = () => {
   };
 
   const onSubmit = (values: TermRequest) => {
-    createTerm(values);
-    setDialogOpen(false);
+    createTerm(values, {
+      onSuccess: () => setDialogOpen(false),
+    });
   };
 
   return (
@@ -54,7 +57,7 @@ const TermsPage = () => {
               realizan console.log para que luego conectes tus servicios.
             </p>
           </div>
-          <Button onClick={handleCreate}>Crear vigencia</Button>
+          {canCreate && <Button onClick={handleCreate}>Crear vigencia</Button>}
         </div>
 
         <Card>

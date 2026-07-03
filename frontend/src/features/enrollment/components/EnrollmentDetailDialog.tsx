@@ -19,6 +19,7 @@ import Select from "react-select";
 import type { EnrollmentResponse } from "../types/response";
 import type { EnrollmentRequestQuery } from "../types/request";
 import { usePutEnrollment } from "../hooks/useMutation";
+import { useHasPermission } from "@/features/auth/hooks/usePermissions";
 
 interface EnrollmentDetailDialogProps {
   dialogOpen: boolean;
@@ -35,8 +36,9 @@ const EnrollmentDetailDialog = ({
   const [selectedStatus, setSelectedStatus] = useState<
     "PENDING" | "PAID" | "CANCELLED" | "COMPLETED"
   >("PENDING");
-  const [isUpdating, setIsUpdating] = useState(false);
-  const { mutate: updateEnrollment } = usePutEnrollment();
+  const { mutate: updateEnrollment, isPending: isUpdating } =
+    usePutEnrollment();
+  const canUpdate = useHasPermission("ENROLLMENT", "UPDATE");
 
   if (!enrollment) return null;
 
@@ -74,18 +76,16 @@ const EnrollmentDetailDialog = ({
     });
   };
 
-  const handleStatusChange = async () => {
+  const handleStatusChange = () => {
     if (!selectedStatus || selectedStatus === enrollment.status) return;
 
-    setIsUpdating(true);
-
-    updateEnrollment({
-      id: enrollment.id,
-      status: selectedStatus,
-    });
-
-    setDialogOpen(false);
-    setIsUpdating(false);
+    updateEnrollment(
+      {
+        id: enrollment.id,
+        status: selectedStatus,
+      },
+      { onSuccess: () => setDialogOpen(false) }
+    );
   };
 
   return (
@@ -110,6 +110,7 @@ const EnrollmentDetailDialog = ({
           </div>
 
           {/* Cambiar Estado */}
+          {canUpdate && (
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 className="font-semibold text-gray-800 mb-3">Cambiar Estado</h3>
             <div className="space-y-3">
@@ -151,6 +152,7 @@ const EnrollmentDetailDialog = ({
               </Button>
             </div>
           </div>
+          )}
 
           {/* Información del Estudiante */}
           <div className="p-4 bg-gray-50 rounded-lg">

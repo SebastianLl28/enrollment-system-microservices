@@ -28,8 +28,14 @@ export interface CareerFormValues {
   description?: string;
   semesterLength: number;
   degreeAwarded: string;
+  active?: boolean;
 }
 
-export type CreateCareerPayload = Omit<CareerFormValues, "facultyId"> & {
+export type CreateCareerPayload = Omit<CareerFormValues, "facultyId" | "active"> & {
   facultyId: number;
+};
+
+export type UpdateCareerPayload = Omit<CareerFormValues, "facultyId" | "active"> & {
+  facultyId: number;
+  active: boolean;
 };

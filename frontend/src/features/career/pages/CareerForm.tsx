@@ -2,27 +2,39 @@ import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import type { CareerFormValues } from "../types/Career";
+import type { Career, CareerFormValues } from "../types/Career";
 import { useGetFaculties } from "@/features/faculty/hooks/useQuery";
 
 interface CareerFormProps {
   onSubmit: (values: CareerFormValues) => void;
+  defaultValues?: Career | null;
 }
 
-const CareerForm = ({ onSubmit }: CareerFormProps) => {
+const CareerForm = ({ onSubmit, defaultValues }: CareerFormProps) => {
+  const isEditing = !!defaultValues;
+
   const {
     handleSubmit,
     register,
     control,
     formState: { errors },
   } = useForm<CareerFormValues>({
-    defaultValues: {
-      facultyId: null,
-      name: "",
-      description: "",
-      semesterLength: 8,
-      degreeAwarded: "",
-    },
+    defaultValues: defaultValues
+      ? {
+          facultyId: defaultValues.faculty.id,
+          name: defaultValues.name,
+          description: defaultValues.description ?? "",
+          semesterLength: defaultValues.semesterLength,
+          degreeAwarded: defaultValues.degreeAwarded,
+          active: defaultValues.active,
+        }
+      : {
+          facultyId: null,
+          name: "",
+          description: "",
+          semesterLength: 8,
+          degreeAwarded: "",
+        },
   });
 
   const { data: faculties, isPending: isLoadingFaculties } = useGetFaculties({ includeInactive: false });
@@ -123,6 +135,18 @@ const CareerForm = ({ onSubmit }: CareerFormProps) => {
           </p>
         )}
       </div>
+
+      {isEditing && (
+        <div className="flex items-center gap-2">
+          <input
+            id="active"
+            type="checkbox"
+            {...register("active")}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <Label htmlFor="active">Activo</Label>
+        </div>
+      )}
     </form>
   );
 };

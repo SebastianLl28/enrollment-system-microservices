@@ -1,14 +1,18 @@
 package com.app.enrollment.system.enrollment.server.application.service;
 
 import com.app.enrollment.system.enrollment.server.application.dto.command.CreateCourseCommand;
+import com.app.enrollment.system.enrollment.server.application.dto.command.UpdateCourseCommand;
 import com.app.enrollment.system.enrollment.server.application.dto.response.CourseResponse;
 import com.app.enrollment.system.enrollment.server.application.mapper.CourseMapper;
 import com.app.enrollment.system.enrollment.server.application.port.in.CreateCourseUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.GetAllCourseUseCase;
+import com.app.enrollment.system.enrollment.server.application.port.in.UpdateCourseUseCase;
+import com.app.enrollment.system.enrollment.server.domain.exception.CourseNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.model.Course;
 import com.app.enrollment.system.enrollment.server.domain.model.Student;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CareerID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CourseCode;
+import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CourseID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.Credits;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.SemesterLevel;
 import com.app.enrollment.system.enrollment.server.domain.repository.CourseRepository;
@@ -21,7 +25,7 @@ import org.springframework.stereotype.Service;
  * @author Alonso
  */
 @Service
-public class CourseApplicationService implements GetAllCourseUseCase, CreateCourseUseCase {
+public class CourseApplicationService implements GetAllCourseUseCase, CreateCourseUseCase, UpdateCourseUseCase {
 
   private final CourseRepository courseRepository;
   private final CourseMapper courseMapper;
@@ -46,6 +50,25 @@ public class CourseApplicationService implements GetAllCourseUseCase, CreateCour
           return courseMapper.toResponse(course, enrolledStudents);
         })
         .toList();
+  }
+
+  @Override
+  public CourseResponse updateCourse(UpdateCourseCommand command, Integer courseId) {
+    CourseID courseID = new CourseID(courseId);
+    Course existing = courseRepository.findById(courseID).orElseThrow(() ->
+        new CourseNotFoundException("Course with ID " + courseId + " not found"));
+
+    CareerID careerID = new CareerID(command.careerId());
+    CourseCode courseCode = new CourseCode(command.code());
+    Credits credits = new Credits(command.credits());
+    SemesterLevel semesterLevel = new SemesterLevel(command.semesterLevel());
+
+    Course updated = Course.rehydrate(courseID, careerID, courseCode, command.name(),
+        command.description(), credits, semesterLevel, existing.getRegistrationDate(), command.active());
+
+    Course savedCourse = courseRepository.save(updated);
+    List<Student> enrolledStudents = studentRepository.findAllByCourseId(savedCourse.getId().getValue());
+    return courseMapper.toResponse(savedCourse, enrolledStudents);
   }
 
   @Override

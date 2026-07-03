@@ -162,43 +162,6 @@ const DashboardPage = () => {
           </Button>
         </div>
 
-        {/* Solo para debug - eliminar en producción */}
-        <details className="rounded border bg-gray-50 p-3 text-xs">
-          <summary className="cursor-pointer font-semibold text-gray-700">
-            Debug: Permisos y Vistas (click para expandir)
-          </summary>
-          <div className="mt-2 space-y-2">
-            <div>
-              <p className="font-semibold">
-                Permisos ({permissions?.length || 0}):
-              </p>
-              <pre className="overflow-auto rounded bg-white p-2 max-h-40">
-                {JSON.stringify(permissions, null, 2)}
-              </pre>
-            </div>
-            <div>
-              <p className="font-semibold">
-                Vistas UI ({uiViews?.length || 0}):
-              </p>
-              <pre className="overflow-auto rounded bg-white p-2 max-h-40">
-                {JSON.stringify(uiViews, null, 2)}
-              </pre>
-            </div>
-            <div className="mt-3 rounded bg-yellow-50 p-2 border border-yellow-200">
-              <p className="font-semibold text-yellow-800">
-                ℹ️ Lógica de filtrado:
-              </p>
-              <ul className="text-xs text-yellow-700 mt-1 space-y-1 list-disc list-inside">
-                <li>
-                  ✅ Módulos con vista + permiso válido (STUDENT, ENROLLMENT)
-                </li>
-                <li>✅ Módulos solo con vista (FACULTY, CAREER, etc.)</li>
-                <li>❌ Módulos sin vista asignada</li>
-              </ul>
-            </div>
-          </div>
-        </details>
-
         <p className="text-gray-600">
           Esta vista está protegida. Usa los accesos rápidos para navegar a los
           módulos disponibles según tus permisos.

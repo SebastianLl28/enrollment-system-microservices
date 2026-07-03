@@ -6,6 +6,7 @@ export interface CourseStudent {
 
 export interface Course {
   id: number;
+  careerId: number;
   code: string;
   name: string;
   description?: string;
@@ -22,8 +23,14 @@ export interface CourseFormValues {
   description?: string;
   credits: number;
   semesterLevel: number;
+  active?: boolean;
 }
 
-export type CreateCoursePayload = Omit<CourseFormValues, "careerId"> & {
+export type CreateCoursePayload = Omit<CourseFormValues, "careerId" | "active"> & {
   careerId: number;
+};
+
+export type UpdateCoursePayload = Omit<CourseFormValues, "careerId" | "active"> & {
+  careerId: number;
+  active: boolean;
 };

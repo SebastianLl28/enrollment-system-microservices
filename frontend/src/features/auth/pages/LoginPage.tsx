@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Eye, EyeOff, LogIn, Github } from "lucide-react";
+import { Eye, EyeOff, LogIn, Github, Info } from "lucide-react";
 import { loginSchema, type LoginFormData } from "../schemas/loginSchema";
 import { useLoginMutation } from "../hooks/mutation";
 import { Link, useNavigate } from "react-router-dom";
@@ -23,6 +23,13 @@ import {
 import { toast } from "sonner";
 import GoogleImage from "@/assets/icon-google.png";
 
+// Cuenta compartida de demostración: solo puede ver los módulos,
+// sin crear ni editar (rol VIEWER del seed).
+const DEMO_ACCOUNT = {
+  username: "viewer123",
+  password: "password123",
+};
+
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -31,10 +38,16 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
+
+  const fillDemoAccount = () => {
+    setValue("username", DEMO_ACCOUNT.username, { shouldValidate: true });
+    setValue("password", DEMO_ACCOUNT.password, { shouldValidate: true });
+  };
 
   const onSubmit = async (data: LoginFormData) => {
     login(data, {
@@ -80,6 +93,33 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Cuenta demo de solo lectura */}
+          <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
+            <div className="flex gap-2">
+              <Info className="h-4 w-4 shrink-0 text-blue-600 mt-0.5" />
+              <div className="text-sm text-blue-800">
+                <p className="font-medium">Cuenta de invitado</p>
+                <p className="text-blue-700">
+                  Explora el sistema en modo solo lectura:{" "}
+                  <span className="font-mono font-semibold">
+                    {DEMO_ACCOUNT.username}
+                  </span>{" "}
+                  /{" "}
+                  <span className="font-mono font-semibold">
+                    {DEMO_ACCOUNT.password}
+                  </span>
+                </p>
+                <button
+                  type="button"
+                  onClick={fillDemoAccount}
+                  className="mt-1 font-medium text-blue-600 underline hover:text-blue-500"
+                >
+                  Usar esta cuenta
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* Login normal */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">

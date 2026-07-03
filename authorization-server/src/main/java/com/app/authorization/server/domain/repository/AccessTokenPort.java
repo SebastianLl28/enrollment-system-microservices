@@ -8,6 +8,7 @@ import java.util.Set;
 public interface AccessTokenPort {
   String generateToken(String username, Set<String> permissions);
   String extractUsername(String token);
+  Set<String> extractPermissions(String token);
   boolean validateToken(String token);
-  
+
 }

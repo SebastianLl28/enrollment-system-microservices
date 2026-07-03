@@ -1,0 +1,25 @@
+package com.app.enrollment.system.enrollment.server.infrastructure.server.config;
+
+import com.app.enrollment.system.enrollment.server.infrastructure.server.security.PermissionInterceptor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+/**
+ * @author Alonso
+ */
+@Configuration
+public class WebMvcConfig implements WebMvcConfigurer {
+
+  private final PermissionInterceptor permissionInterceptor;
+
+  public WebMvcConfig(PermissionInterceptor permissionInterceptor) {
+    this.permissionInterceptor = permissionInterceptor;
+  }
+
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(permissionInterceptor)
+        .addPathPatterns("/api/**");
+  }
+}

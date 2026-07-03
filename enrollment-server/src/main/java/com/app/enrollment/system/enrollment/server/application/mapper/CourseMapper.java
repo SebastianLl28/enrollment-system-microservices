@@ -20,6 +20,7 @@ public class CourseMapper {
   public CourseResponse toResponse(Course course, List<Student> studentList) {
     CourseResponse response = new CourseResponse();
     response.setId(course.getId().getValue());
+    response.setCareerId(course.getCareerId() != null ? course.getCareerId().getValue() : null);
     response.setCode(course.getCode().getValue());
     response.setName(course.getName());
     response.setDescription(course.getDescription());

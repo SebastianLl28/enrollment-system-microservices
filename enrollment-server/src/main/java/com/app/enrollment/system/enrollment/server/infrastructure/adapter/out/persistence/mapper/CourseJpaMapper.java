@@ -1,6 +1,7 @@
 package com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.mapper;
 
 import com.app.enrollment.system.enrollment.server.domain.model.Course;
+import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CareerID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CourseCode;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CourseID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.Credits;
@@ -29,7 +30,8 @@ public class CourseJpaMapper {
     Credits credits = new Credits(courseJpaEntity.getCredits());
     Instant registrationDate = courseJpaEntity.getRegistrationDate().atZone(clock.getZone())
       .toInstant();
-    return Course.rehydrate(courseID, null, courseCode, courseJpaEntity.getName(),
+    CareerID careerID = new CareerID(courseJpaEntity.getCareerId());
+    return Course.rehydrate(courseID, careerID, courseCode, courseJpaEntity.getName(),
       courseJpaEntity.getDescription(), credits, semesterLevel, registrationDate,
       courseJpaEntity.getActive());
   }

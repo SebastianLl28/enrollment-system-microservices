@@ -1,4 +1,5 @@
 import { ROUTE_PATHS } from "@/app/route/path";
+import { useHasPermission } from "@/features/auth/hooks/usePermissions";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -17,6 +18,7 @@ import type { EnrollmentResponse } from "../types/response";
 import EnrollmentDetailDialog from "../components/EnrollmentDetailDialog";
 
 const EnrollmentsPage = () => {
+  const canCreate = useHasPermission("ENROLLMENT", "CREATE");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogDetailOpen, setDialogDetailOpen] = useState(false);
   const [selectedEnrollment, setSelectedEnrollment] =
@@ -41,8 +43,9 @@ const EnrollmentsPage = () => {
     usePostEnrollment(query);
 
   const onSubmit = (courseOffering: EnrollmentRequest) => {
-    setDialogOpen(false);
-    createEnrollment(courseOffering);
+    createEnrollment(courseOffering, {
+      onSuccess: () => setDialogOpen(false),
+    });
   };
 
   return (
@@ -65,9 +68,11 @@ const EnrollmentsPage = () => {
               Gestiona las inscripciones de los estudiantes
             </p>
           </div>
-          <Button onClick={() => setDialogOpen(true)} disabled={isCreating}>
-            Crear inscripción
-          </Button>
+          {canCreate && (
+            <Button onClick={() => setDialogOpen(true)} disabled={isCreating}>
+              Crear inscripción
+            </Button>
+          )}
         </div>
 
         <div>

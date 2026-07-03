@@ -1,22 +1,25 @@
 import { useCallback, useMemo, useState } from "react";
+import { useHasPermission } from "@/features/auth/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useGetCareers } from "../hooks/useQuery";
 import { useCareerColumns } from "@/config/columns";
 import CareerDialog from "./CareerDialog";
-import type {
-  Career,
-  CareerFormValues,
-  CreateCareerPayload,
-} from "../types/Career";
-import { usePostCareer } from "../hooks/useMutation";
+import CareerDetailDialog from "./CareerDetailDialog";
+import type { Career, CareerFormValues, CreateCareerPayload, UpdateCareerPayload } from "../types/Career";
+import { usePostCareer, usePutCareer } from "../hooks/useMutation";
 import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/apiError";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { ROUTE_PATHS } from "@/app/route/path";
 
 const CareerPage = () => {
+  const canCreate = useHasPermission("UI_VIEW", "CREATE");
+  const canEdit = useHasPermission("UI_VIEW", "UPDATE");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingCareer, setEditingCareer] = useState<Career | null>(null);
+  const [detailCareer, setDetailCareer] = useState<Career | null>(null);
 
   const { data, isPending, isError, error, refetch, isRefetching } =
     useGetCareers({ includeInactive: true });
@@ -24,10 +27,21 @@ const CareerPage = () => {
   const careers = useMemo(() => data ?? [], [data]);
 
   const handleView = useCallback((career: Career) => {
-    console.log("Ver carrera", career);
+    setDetailCareer(career);
+  }, []);
+
+  const handleEdit = useCallback((career: Career) => {
+    setEditingCareer(career);
+    setDialogOpen(true);
+  }, []);
+
+  const handleCreate = useCallback(() => {
+    setEditingCareer(null);
+    setDialogOpen(true);
   }, []);
 
   const { mutate: createCareer, isPending: isCreating } = usePostCareer();
+  const { mutate: updateCareer, isPending: isUpdating } = usePutCareer();
 
   const onSubmit = (values: CareerFormValues) => {
     if (!values.facultyId) {
@@ -35,22 +49,47 @@ const CareerPage = () => {
       return;
     }
 
-    const payload: CreateCareerPayload = {
-      ...values,
-      facultyId: values.facultyId,
-    };
-
-    createCareer(payload, {
-      onSuccess: () => {
-        setDialogOpen(false);
-      },
-      onError: () => {
-        toast.error("No se pudo crear la carrera");
-      },
-    });
+    if (editingCareer) {
+      const payload: UpdateCareerPayload = {
+        facultyId: values.facultyId,
+        name: values.name,
+        description: values.description,
+        semesterLength: values.semesterLength,
+        degreeAwarded: values.degreeAwarded,
+        active: values.active ?? editingCareer.active,
+      };
+      updateCareer(
+        { id: editingCareer.id, career: payload },
+        {
+          onSuccess: () => {
+            setDialogOpen(false);
+            setEditingCareer(null);
+          },
+          onError: (error) => {
+            toast.error(getApiErrorMessage(error, "No se pudo actualizar la carrera"));
+          },
+        }
+      );
+    } else {
+      const payload: CreateCareerPayload = {
+        facultyId: values.facultyId,
+        name: values.name,
+        description: values.description,
+        semesterLength: values.semesterLength,
+        degreeAwarded: values.degreeAwarded,
+      };
+      createCareer(payload, {
+        onSuccess: () => {
+          setDialogOpen(false);
+        },
+        onError: (error) => {
+          toast.error(getApiErrorMessage(error, "No se pudo crear la carrera"));
+        },
+      });
+    }
   };
 
-  const columns = useCareerColumns(handleView);
+  const columns = useCareerColumns(handleView, handleEdit, canEdit);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -73,9 +112,11 @@ const CareerPage = () => {
               duración y grado otorgado.
             </p>
           </div>
-          <Button onClick={() => setDialogOpen(true)} disabled={isCreating}>
-            Crear carrera
-          </Button>
+          {canCreate && (
+            <Button onClick={handleCreate} disabled={isCreating || isUpdating}>
+              Crear carrera
+            </Button>
+          )}
         </div>
 
         <Card>
@@ -91,9 +132,18 @@ const CareerPage = () => {
 
         <CareerDialog
           dialogOpen={dialogOpen}
-          setDialogOpen={setDialogOpen}
+          setDialogOpen={(open) => {
+            setDialogOpen(open);
+            if (!open) setEditingCareer(null);
+          }}
           onSubmit={onSubmit}
-          isSubmitting={isCreating}
+          editingCareer={editingCareer}
+          isSubmitting={isCreating || isUpdating}
+        />
+        <CareerDetailDialog
+          career={detailCareer}
+          open={detailCareer !== null}
+          onOpenChange={(open) => { if (!open) setDetailCareer(null); }}
         />
       </div>
     </div>

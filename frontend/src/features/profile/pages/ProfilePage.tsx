@@ -1,4 +1,3 @@
-// features/profile/pages/ProfilePage.tsx
 import { ROUTE_PATHS } from "@/app/route/path";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { useGetProfile } from "../hooks/useQuery";
@@ -7,9 +6,12 @@ import { User, Shield, ChevronRight, Lock } from "lucide-react";
 import { useState } from "react";
 import TwoFactorSetupModal from "../components/TwoFactorSetupModal";
 import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/apiError";
+import { useCanManageOwnAccount } from "@/features/auth/hooks/usePermissions";
 
 const ProfilePage = () => {
   const { data: profileData, isError, isLoading } = useGetProfile();
+  const canManageAccount = useCanManageOwnAccount();
   const initTwoFactorMutation = useInitTwoFactor();
   const confirmTwoFactorMutation = useConfirmTwoFactor();
 
@@ -25,6 +27,13 @@ const ProfilePage = () => {
   };
 
   const handleTwoFactorClick = async () => {
+    if (!canManageAccount) {
+      toast.info(
+        "Esta cuenta es de solo lectura y no permite modificar la configuración de seguridad."
+      );
+      return;
+    }
+
     // Verificar si el usuario tiene contraseña
     if (!profileData?.hasPassword) {
       toast.info(
@@ -45,8 +54,7 @@ const ProfilePage = () => {
       setTwoFactorData(data);
       setShowTwoFactorModal(true);
     } catch (error) {
-      toast.error("No se pudo inicializar la autenticación de dos factores.");
-      console.error("Error al inicializar 2FA:", error);
+      toast.error(getApiErrorMessage(error, "No se pudo inicializar la autenticación de dos factores."));
     }
   };
 
@@ -70,6 +78,16 @@ const ProfilePage = () => {
 
   // Determinar el estado del 2FA
   const getTwoFactorStatus = () => {
+    if (!canManageAccount) {
+      return {
+        badge: "No disponible",
+        badgeColor: "bg-gray-100 text-gray-600",
+        description:
+          "Cuenta de solo lectura: no se puede modificar la configuración de seguridad",
+        disabled: true,
+      };
+    }
+
     if (!profileData?.hasPassword) {
       return {
         badge: "GitHub",

@@ -1,9 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
+import { useHasPermission } from "@/features/auth/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useGetFaculties } from "../hooks/useQuery";
 import type { Faculty, FacultyFormValues } from "../types/Faculty";
 import FacultyDialog from "./FacultyDialog";
+import FacultyDetailDialog from "./FacultyDetailDialog";
 import { useFacultyColumns } from "@/config/columns";
 import { usePostFaculty, usePutFaculty } from "../hooks/useMutation";
 import { DataTable } from "@/components/common/table/DataTable";
@@ -11,8 +13,11 @@ import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { ROUTE_PATHS } from "@/app/route/path";
 
 const FacultiesPage = () => {
+  const canCreate = useHasPermission("UI_VIEW", "CREATE");
+  const canEdit = useHasPermission("UI_VIEW", "UPDATE");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingFaculty, setEditingFaculty] = useState<Faculty | null>(null);
+  const [detailFaculty, setDetailFaculty] = useState<Faculty | null>(null);
 
   const { data, isPending, isError, error, refetch, isRefetching } =
     useGetFaculties({ includeInactive: true });
@@ -30,23 +35,26 @@ const FacultiesPage = () => {
   }, []);
 
   const handleView = useCallback((faculty: Faculty) => {
-    console.log("Ver facultad", faculty);
+    setDetailFaculty(faculty);
   }, []);
 
-  const { mutate: createFaculty } = usePostFaculty();
-  const { mutate: updateFaculty } = usePutFaculty();
+  const { mutate: createFaculty, isPending: isCreating } = usePostFaculty();
+  const { mutate: updateFaculty, isPending: isUpdating } = usePutFaculty();
+
+  const closeDialog = useCallback(() => {
+    setDialogOpen(false);
+    setEditingFaculty(null);
+  }, []);
 
   const onSubmit = (values: FacultyFormValues) => {
     if (editingFaculty) {
-      updateFaculty({ id: editingFaculty.id, faculty: values });
+      updateFaculty({ id: editingFaculty.id, faculty: values }, { onSuccess: closeDialog });
     } else {
-      createFaculty(values);
+      createFaculty(values, { onSuccess: closeDialog });
     }
-    setDialogOpen(false);
-    setEditingFaculty(null);
   };
 
-  const columns = useFacultyColumns(handleEdit, handleView);
+  const columns = useFacultyColumns(handleEdit, handleView, canEdit);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -69,7 +77,11 @@ const FacultiesPage = () => {
               console.log para que luego conectes tus servicios.
             </p>
           </div>
-          <Button onClick={handleCreate}>Crear facultad</Button>
+          {canCreate && (
+            <Button onClick={handleCreate} disabled={isCreating || isUpdating}>
+              Crear facultad
+            </Button>
+          )}
         </div>
 
         <Card>
@@ -88,6 +100,11 @@ const FacultiesPage = () => {
           editingFaculty={editingFaculty}
           onSubmit={onSubmit}
           defaultFormValues={editingFaculty}
+        />
+        <FacultyDetailDialog
+          faculty={detailFaculty}
+          open={detailFaculty !== null}
+          onOpenChange={(open) => { if (!open) setDetailFaculty(null); }}
         />
       </div>
     </div>

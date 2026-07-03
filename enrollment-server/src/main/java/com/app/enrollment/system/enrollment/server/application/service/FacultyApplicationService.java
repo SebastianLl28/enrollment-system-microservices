@@ -6,6 +6,7 @@ import com.app.enrollment.system.enrollment.server.application.dto.response.Facu
 import com.app.enrollment.system.enrollment.server.application.mapper.FacultyMapper;
 import com.app.enrollment.system.enrollment.server.application.port.in.CreateFacultyUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.GetAllFacultyUseCase;
+import com.app.enrollment.system.enrollment.server.application.port.in.GetFacultyByIdUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.UpdateFacultyUseCase;
 import com.app.enrollment.system.enrollment.server.domain.exception.FacultyAlreadyExistsException;
 import com.app.enrollment.system.enrollment.server.domain.exception.FacultyNotFoundException;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class FacultyApplicationService implements GetAllFacultyUseCase, CreateFacultyUseCase,
-    UpdateFacultyUseCase {
+    UpdateFacultyUseCase, GetFacultyByIdUseCase {
   
   private final FacultyRepository facultyRepository;
   private final FacultyMapper facultyMapper;
@@ -40,6 +41,14 @@ public class FacultyApplicationService implements GetAllFacultyUseCase, CreateFa
     return facultyList.stream().map(facultyMapper::toResponse).toList();
   }
   
+  @Override
+  public FacultyResponse findById(Integer id) {
+    FacultyID facultyID = new FacultyID(id);
+    Faculty faculty = facultyRepository.findById(facultyID).orElseThrow(() ->
+        new FacultyNotFoundException("Faculty with ID " + id + " not found"));
+    return facultyMapper.toResponse(faculty);
+  }
+
   @Override
   public FacultyResponse createFaculty(CreateFacultyCommand command) {
     Faculty faculty = Faculty.create(command.name(), command.description(), command.location(),

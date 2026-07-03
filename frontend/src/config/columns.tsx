@@ -31,7 +31,8 @@ import type {
 
 export const useFacultyColumns = (
   handleEdit: (faculty: Faculty) => void,
-  handleView: (faculty: Faculty) => void
+  handleView: (faculty: Faculty) => void,
+  canWrite = true
 ): ColumnDef<Faculty>[] =>
   useMemo(
     () => [
@@ -76,23 +77,27 @@ export const useFacultyColumns = (
               >
                 Ver
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleEdit(faculty)}
-              >
-                Editar
-              </Button>
+              {canWrite && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEdit(faculty)}
+                >
+                  Editar
+                </Button>
+              )}
             </div>
           );
         },
       },
     ],
-    [handleEdit, handleView]
+    [handleEdit, handleView, canWrite]
   );
 
 export const useCareerColumns = (
-  handleView: (career: Career) => void
+  handleView: (career: Career) => void,
+  handleEdit: (career: Career) => void,
+  canWrite = true
 ): ColumnDef<Career>[] =>
   useMemo(
     () => [
@@ -145,16 +150,27 @@ export const useCareerColumns = (
               >
                 Ver
               </Button>
+              {canWrite && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEdit(career)}
+                >
+                  Editar
+                </Button>
+              )}
             </div>
           );
         },
       },
     ],
-    [handleView]
+    [handleView, handleEdit, canWrite]
   );
 
 export const useStudentColumns = (
-  handleView: (student: Student) => void
+  handleView: (student: Student) => void,
+  handleEdit: (student: Student) => void,
+  canWrite = true
 ): ColumnDef<Student>[] =>
   useMemo(
     () => [
@@ -207,16 +223,27 @@ export const useStudentColumns = (
               >
                 Ver
               </Button>
+              {canWrite && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEdit(student)}
+                >
+                  Editar
+                </Button>
+              )}
             </div>
           );
         },
       },
     ],
-    [handleView]
+    [handleView, handleEdit, canWrite]
   );
 
 export const useCourseColumns = (
-  handleView: (course: Course) => void
+  handleView: (course: Course) => void,
+  handleEdit: (course: Course) => void,
+  canWrite = true
 ): ColumnDef<Course>[] =>
   useMemo(
     () => [
@@ -269,12 +296,21 @@ export const useCourseColumns = (
               >
                 Ver
               </Button>
+              {canWrite && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEdit(course)}
+                >
+                  Editar
+                </Button>
+              )}
             </div>
           );
         },
       },
     ],
-    [handleView]
+    [handleView, handleEdit, canWrite]
   );
 
 export const useTermColumns = (): ColumnDef<TermRequest>[] =>
@@ -458,7 +494,8 @@ export const useEnrollmentColumns = (
 
 export const useRbacRoleColumns = (
   handleEdit: (role: RoleResponse) => void,
-  handleDelete: (id: number) => void
+  handleDelete: (id: number) => void,
+  canManage = true
 ): ColumnDef<RoleResponse>[] =>
   useMemo(
     () => [
@@ -509,35 +546,37 @@ export const useRbacRoleColumns = (
       {
         header: "Acciones",
         id: "actions",
-        cell: ({ row }) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleEdit(row.original)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Editar
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleDelete(row.original.id)}
-                className="text-red-600"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Eliminar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ),
+        cell: ({ row }) =>
+          canManage ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleEdit(row.original)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleDelete(row.original.id)}
+                  className="text-red-600"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Eliminar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null,
       },
     ],
-    [handleEdit, handleDelete]
+    [handleEdit, handleDelete, canManage]
   );
 
 export const useRbacUserColumns = (
-  handleAssignRoles: (user: UserRbacResponse) => void
+  handleAssignRoles: (user: UserRbacResponse) => void,
+  canManage = true
 ): ColumnDef<UserRbacResponse>[] =>
   useMemo(
     () => [
@@ -613,19 +652,20 @@ export const useRbacUserColumns = (
       {
         header: "Acciones",
         id: "actions",
-        cell: ({ row }) => (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleAssignRoles(row.original)}
-          >
-            <Shield className="mr-2 h-4 w-4" />
-            Gestionar roles
-          </Button>
-        ),
+        cell: ({ row }) =>
+          canManage ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleAssignRoles(row.original)}
+            >
+              <Shield className="mr-2 h-4 w-4" />
+              Gestionar roles
+            </Button>
+          ) : null,
       },
     ],
-    [handleAssignRoles]
+    [handleAssignRoles, canManage]
   );
 
 export const useRbacPermissionColumns = (): ColumnDef<PermissionResponse>[] =>

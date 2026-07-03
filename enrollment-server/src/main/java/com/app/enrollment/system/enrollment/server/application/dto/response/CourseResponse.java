@@ -5,6 +5,7 @@ import java.util.List;
 public class CourseResponse {
 
   private Integer id;
+  private Integer careerId;
   private String code;
   private String name;
   private String description;
@@ -22,6 +23,14 @@ public class CourseResponse {
 
   public void setId(Integer id) {
     this.id = id;
+  }
+
+  public Integer getCareerId() {
+    return careerId;
+  }
+
+  public void setCareerId(Integer careerId) {
+    this.careerId = careerId;
   }
 
   public String getCode() {

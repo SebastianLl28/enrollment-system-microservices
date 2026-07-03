@@ -2,28 +2,41 @@ import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import type { CourseFormValues } from "../types/Course";
+import type { Course, CourseFormValues } from "../types/Course";
 import { useGetCareers } from "@/features/career/hooks/useQuery";
 
 interface CourseFormProps {
   onSubmit: (values: CourseFormValues) => void;
+  defaultValues?: Course | null;
 }
 
-const CourseForm = ({ onSubmit }: CourseFormProps) => {
+const CourseForm = ({ onSubmit, defaultValues }: CourseFormProps) => {
+  const isEditing = !!defaultValues;
+
   const {
     handleSubmit,
     register,
     control,
     formState: { errors },
   } = useForm<CourseFormValues>({
-    defaultValues: {
-      careerId: null,
-      code: "",
-      name: "",
-      description: "",
-      credits: 3,
-      semesterLevel: 1,
-    },
+    defaultValues: defaultValues
+      ? {
+          careerId: defaultValues.careerId,
+          code: defaultValues.code,
+          name: defaultValues.name,
+          description: defaultValues.description ?? "",
+          credits: defaultValues.credits,
+          semesterLevel: defaultValues.semesterLevel,
+          active: defaultValues.active,
+        }
+      : {
+          careerId: null,
+          code: "",
+          name: "",
+          description: "",
+          credits: 3,
+          semesterLevel: 1,
+        },
   });
 
   const { data: careers, isPending: isLoadingCareers } = useGetCareers({ includeInactive: false });
@@ -140,6 +153,18 @@ const CourseForm = ({ onSubmit }: CourseFormProps) => {
           )}
         </div>
       </div>
+
+      {isEditing && (
+        <div className="flex items-center gap-2">
+          <input
+            id="active"
+            type="checkbox"
+            {...register("active")}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <Label htmlFor="active">Activo</Label>
+        </div>
+      )}
     </form>
   );
 };

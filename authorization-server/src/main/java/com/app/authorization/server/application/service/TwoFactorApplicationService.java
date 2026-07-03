@@ -8,6 +8,7 @@ import com.app.authorization.server.application.dto.response.VerifyTwoFactorResp
 import com.app.authorization.server.application.port.in.TwoFactorSetupUseCase;
 import com.app.authorization.server.application.port.in.TwoFactorValidateUseCase;
 import com.app.authorization.server.application.port.in.VerifyTwoFactorUseCase;
+import com.app.authorization.server.domain.exception.InvalidOperationException;
 import com.app.authorization.server.domain.exception.InvalidTwoFactorCodeException;
 import com.app.authorization.server.domain.exception.InvalidTwoFactorTokenException;
 import com.app.authorization.server.domain.exception.TwoFactorNotInitiatedException;
@@ -52,7 +53,25 @@ public class TwoFactorApplicationService implements TwoFactorSetupUseCase, TwoFa
     
     User user = userRepository.findByUsername(username)
       .orElseThrow(() -> new UserNotFoundException(username));
-    
+
+    // Un re-init rotaría el secreto y dejaría inservible la app de
+    // autenticación ya vinculada.
+    if (user.requiresTwoFactorAuth()) {
+      throw new InvalidOperationException("2FA ya está activo para este usuario");
+    }
+
+    // Las cuentas de solo lectura (p. ej. el invitado de demostración) no
+    // pueden modificar la seguridad de la cuenta compartida. Se evalúa contra
+    // los permisos frescos de la BD, no contra el claim del token.
+    UserAccessProfile profile = userAccessProfilePort.loadByUsername(username);
+    boolean isReadOnly = profile.getPermissions().stream()
+      .noneMatch(p -> p.contains(":CREATE:") || p.contains(":UPDATE:")
+        || p.contains(":DELETE:"));
+    if (isReadOnly) {
+      throw new InvalidOperationException(
+        "Esta cuenta es de solo lectura y no permite activar 2FA");
+    }
+
     String secret = twoFactorPort.generateSecret(user.getUsername());
     
     user.initTwoFactor(secret);

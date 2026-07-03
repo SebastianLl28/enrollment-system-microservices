@@ -1,50 +1,87 @@
 import { useCallback, useMemo, useState } from "react";
+import { useHasPermission } from "@/features/auth/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useGetStudents } from "../hooks/useQuery";
 import { useStudentColumns } from "@/config/columns";
 import StudentDialog from "./StudentDialog";
+import StudentDetailDialog from "./StudentDetailDialog";
 import type {
   CreateStudentPayload,
   Student,
   StudentFormValues,
+  UpdateStudentPayload,
 } from "../types/Student";
-import { usePostStudent } from "../hooks/useMutation";
-import { toast } from "sonner";
+import { usePostStudent, usePutStudent } from "../hooks/useMutation";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { ROUTE_PATHS } from "@/app/route/path";
 
 const StudentsPage = () => {
+  const canCreate = useHasPermission("STUDENT", "CREATE");
+  const canEdit = useHasPermission("STUDENT", "UPDATE");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [detailStudent, setDetailStudent] = useState<Student | null>(null);
 
   const { data, isPending, isError, error, refetch, isRefetching } =
     useGetStudents();
 
   const students = useMemo(() => data ?? [], [data]);
 
-  const handleView = useCallback((student: Student) => {
-    console.log("Ver estudiante", student);
+  const { mutate: createStudent, isPending: isCreating } = usePostStudent();
+  const { mutate: updateStudent, isPending: isUpdating } = usePutStudent();
+
+  const handleCreate = useCallback(() => {
+    setEditingStudent(null);
+    setDialogOpen(true);
   }, []);
 
-  const { mutate: createStudent, isPending: isCreating } = usePostStudent();
+  const handleEdit = useCallback((student: Student) => {
+    setEditingStudent(student);
+    setDialogOpen(true);
+  }, []);
+
+  const handleView = useCallback((student: Student) => {
+    setDetailStudent(student);
+  }, []);
+
+  const closeDialog = useCallback(() => {
+    setDialogOpen(false);
+    setEditingStudent(null);
+  }, []);
 
   const onSubmit = (values: StudentFormValues) => {
-    const payload: CreateStudentPayload = {
-      ...values,
-    };
-
-    createStudent(payload, {
-      onSuccess: () => {
-        setDialogOpen(false);
-      },
-      onError: () => {
-        toast.error("No se pudo crear el estudiante");
-      },
-    });
+    if (editingStudent) {
+      const payload: UpdateStudentPayload = {
+        name: values.name,
+        lastName: values.lastName,
+        email: values.email,
+        documentNumber: values.documentNumber,
+        phoneNumber: values.phoneNumber,
+        birthDate: values.birthDate,
+        address: values.address,
+        active: values.active ?? editingStudent.active,
+      };
+      updateStudent(
+        { id: editingStudent.id, student: payload },
+        { onSuccess: closeDialog }
+      );
+    } else {
+      const payload: CreateStudentPayload = {
+        name: values.name,
+        lastName: values.lastName,
+        email: values.email,
+        documentNumber: values.documentNumber,
+        phoneNumber: values.phoneNumber,
+        birthDate: values.birthDate,
+        address: values.address,
+      };
+      createStudent(payload, { onSuccess: closeDialog });
+    }
   };
 
-  const columns = useStudentColumns(handleView);
+  const columns = useStudentColumns(handleView, handleEdit, canEdit);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -66,9 +103,11 @@ const StudentsPage = () => {
               Gestiona estudiantes y sus datos de contacto.
             </p>
           </div>
-          <Button onClick={() => setDialogOpen(true)} disabled={isCreating}>
-            Crear estudiante
-          </Button>
+          {canCreate && (
+            <Button onClick={handleCreate} disabled={isCreating || isUpdating}>
+              Crear estudiante
+            </Button>
+          )}
         </div>
 
         <Card>
@@ -84,9 +123,18 @@ const StudentsPage = () => {
 
         <StudentDialog
           dialogOpen={dialogOpen}
-          setDialogOpen={setDialogOpen}
+          setDialogOpen={closeDialog}
           onSubmit={onSubmit}
-          isSubmitting={isCreating}
+          editingStudent={editingStudent}
+          isSubmitting={isCreating || isUpdating}
+        />
+
+        <StudentDetailDialog
+          student={detailStudent}
+          open={detailStudent !== null}
+          onOpenChange={(open) => {
+            if (!open) setDetailStudent(null);
+          }}
         />
       </div>
     </div>

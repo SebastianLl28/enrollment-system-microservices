@@ -19,9 +19,14 @@ export interface StudentFormValues {
   phoneNumber?: string;
   birthDate: string;
   address?: string;
+  active?: boolean;
 }
 
-export type CreateStudentPayload = StudentFormValues;
+export type CreateStudentPayload = Omit<StudentFormValues, "active">;
+
+export type UpdateStudentPayload = Omit<StudentFormValues, "active"> & {
+  active: boolean;
+};
 
 export interface StudentResponse {
   id: number;

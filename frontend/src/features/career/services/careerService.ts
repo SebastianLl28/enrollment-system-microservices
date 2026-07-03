@@ -1,6 +1,6 @@
 import { apiClient } from "@/config/apiClient";
 import { CAREER_ENDPOINT } from "@/config/endpoints";
-import type { Career, CreateCareerPayload } from "../types/Career";
+import type { Career, CreateCareerPayload, UpdateCareerPayload } from "../types/Career";
 
 export interface getCareerListParams {
   includeInactive?: boolean;
@@ -16,4 +16,13 @@ export const postCareer = async (
 ): Promise<Career> =>
   await apiClient
     .post<Career>(CAREER_ENDPOINT.base, career)
+    .then((res) => res.data);
+
+interface PutCareerParams {
+  id: number;
+  career: UpdateCareerPayload;
+}
+export const putCareer = async ({ id, career }: PutCareerParams): Promise<Career> =>
+  await apiClient
+    .put<Career>(`${CAREER_ENDPOINT.base}/${id}`, career)
     .then((res) => res.data);

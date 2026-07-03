@@ -14,6 +14,7 @@ import {
   RBAC_USERS_QUERY,
 } from "@/config/keys";
 import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/apiError";
 import type { UpdateRoleCommand } from "../types/request";
 
 export const useCreateRole = () => {
@@ -26,8 +27,8 @@ export const useCreateRole = () => {
       toast.success("Rol creado exitosamente");
       queryClient.invalidateQueries({ queryKey: RBAC_ROLES_QUERY });
     },
-    onError: () => {
-      toast.error("Error al crear el rol");
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "Error al crear el rol"));
     },
   });
 };
@@ -43,8 +44,8 @@ export const useUpdateRole = () => {
       toast.success("Rol actualizado exitosamente");
       queryClient.invalidateQueries({ queryKey: RBAC_ROLES_QUERY });
     },
-    onError: () => {
-      toast.error("Error al actualizar el rol");
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "Error al actualizar el rol"));
     },
   });
 };
@@ -59,8 +60,8 @@ export const useDeleteRole = () => {
       toast.success("Rol eliminado exitosamente");
       queryClient.invalidateQueries({ queryKey: RBAC_ROLES_QUERY });
     },
-    onError: () => {
-      toast.error("Error al eliminar el rol");
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "Error al eliminar el rol"));
     },
   });
 };
@@ -76,8 +77,8 @@ export const useAssignRoles = () => {
       toast.success("Roles asignados exitosamente");
       queryClient.invalidateQueries({ queryKey: RBAC_USERS_QUERY });
     },
-    onError: () => {
-      toast.error("Error al asignar roles");
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "Error al asignar roles"));
     },
   });
 };

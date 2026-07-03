@@ -1,27 +1,41 @@
 import { useForm } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import type { StudentFormValues } from "../types/Student";
+import type { Student, StudentFormValues } from "../types/Student";
 
 interface StudentFormProps {
   onSubmit: (values: StudentFormValues) => void;
+  defaultValues?: Student | null;
 }
 
-const StudentForm = ({ onSubmit }: StudentFormProps) => {
+const StudentForm = ({ onSubmit, defaultValues }: StudentFormProps) => {
+  const isEditing = !!defaultValues;
+
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm<StudentFormValues>({
-    defaultValues: {
-      name: "",
-      lastName: "",
-      email: "",
-      documentNumber: "",
-      phoneNumber: "",
-      birthDate: "",
-      address: "",
-    },
+    defaultValues: defaultValues
+      ? {
+          name: defaultValues.name,
+          lastName: defaultValues.lastName,
+          email: defaultValues.email,
+          documentNumber: defaultValues.documentNumber,
+          phoneNumber: defaultValues.phoneNumber ?? "",
+          birthDate: defaultValues.birthDate,
+          address: defaultValues.address ?? "",
+          active: defaultValues.active,
+        }
+      : {
+          name: "",
+          lastName: "",
+          email: "",
+          documentNumber: "",
+          phoneNumber: "",
+          birthDate: "",
+          address: "",
+        },
   });
 
   return (
@@ -120,6 +134,18 @@ const StudentForm = ({ onSubmit }: StudentFormProps) => {
           placeholder="123 Main St"
         />
       </div>
+
+      {isEditing && (
+        <div className="flex items-center gap-2">
+          <input
+            id="active"
+            type="checkbox"
+            {...register("active")}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <Label htmlFor="active">Activo</Label>
+        </div>
+      )}
     </form>
   );
 };

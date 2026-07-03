@@ -215,3 +215,38 @@ SELECT (SELECT id FROM role WHERE name = 'STAFF'),
           AND operation = 'READ'
           AND scope = 'ALL')
 ON CONFLICT DO NOTHING;
+
+-- ============================================
+-- ROL VIEWER
+-- ============================================
+
+INSERT INTO role (name, description)
+VALUES ('VIEWER', 'Solo lectura: puede ver todos los módulos pero no crear ni editar');
+
+INSERT INTO role_permission (role_id, permission_id)
+SELECT (SELECT id FROM role WHERE name = 'VIEWER'), id
+FROM permission
+WHERE operation = 'READ'
+  AND scope = 'ALL'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO role_view (role_id, view_code)
+SELECT (SELECT id FROM role WHERE name = 'VIEWER'), code
+FROM ui_view
+WHERE code IN (
+               'MY_PROFILE',
+               'STUDENT_LIST',
+               'ENROLLMENT_ADMIN',
+               'FACULTY_LIST',
+               'CAREER_LIST',
+               'COURSE_LIST',
+               'TERM_LIST',
+               'COURSE_OFFERING_LIST'
+    );
+
+INSERT INTO "user" (email, full_name, password, two_factor_enabled, username)
+VALUES ('viewer@gmail.com', 'Usuario Invitado',
+        '$2a$12$WfHUIVXCuD.nqJwAws146e3KgWQTNV.r7.nlzJcIxz0k1q5kd/OAC', false, 'viewer123');
+
+INSERT INTO user_role (user_id, role_id)
+SELECT (SELECT id FROM "user" WHERE username='viewer123'), (SELECT id FROM role WHERE name='VIEWER');

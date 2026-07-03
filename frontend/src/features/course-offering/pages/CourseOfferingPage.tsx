@@ -1,4 +1,5 @@
 import { ROUTE_PATHS } from "@/app/route/path";
+import { useHasPermission } from "@/features/auth/hooks/usePermissions";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { DataTable } from "@/components/common/table/DataTable";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { useCourseOfferingColumns } from "@/config/columns";
 import { usePostCourseOffering } from "../hooks/useMutation";
 
 const CourseOfferingPage = () => {
+  const canCreate = useHasPermission("UI_VIEW", "CREATE");
   const [dialogOpen, setDialogOpen] = useState(false);
   const {
     data: courseOfferings,
@@ -24,9 +26,9 @@ const CourseOfferingPage = () => {
   const columns = useCourseOfferingColumns();
 
   const onSubmit = (courseOffering: CourseOfferingRequest) => {
-    // console.log(courseOffering);
-    createCourseOffering(courseOffering);
-    setDialogOpen(false);
+    createCourseOffering(courseOffering, {
+      onSuccess: () => setDialogOpen(false),
+    });
   };
 
   return (
@@ -51,9 +53,11 @@ const CourseOfferingPage = () => {
               Gestiona los cursos en vigencia
             </p>
           </div>
-          <Button onClick={() => setDialogOpen(true)} disabled={isCreating}>
-            Crear curso en vigencia
-          </Button>
+          {canCreate && (
+            <Button onClick={() => setDialogOpen(true)} disabled={isCreating}>
+              Crear curso en vigencia
+            </Button>
+          )}
         </div>
 
         <Card>

@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { EnrollmentRequestQuery } from "../types/request";
 import { postEnrollment, putEnrollment } from "../services/EnrollmentService";
 import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/apiError";
 
 export const usePostEnrollment = (query: EnrollmentRequestQuery) => {
   const queryClient = useQueryClient();
@@ -17,6 +18,9 @@ export const usePostEnrollment = (query: EnrollmentRequestQuery) => {
         queryKey: generateEnrollmentQueryKey(query),
       });
       toast.success("Inscripción creada con éxito");
+    },
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "No se pudo crear la inscripción"));
     },
   });
 };
@@ -31,6 +35,9 @@ export const usePutEnrollment = () => {
         queryKey: ["enrollment", "list"],
       });
       toast.success("Inscripción actualizada con éxito");
+    },
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "No se pudo actualizar la inscripción"));
     },
   });
 };

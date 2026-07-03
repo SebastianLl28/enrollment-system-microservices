@@ -4,6 +4,7 @@ import static com.app.common.constant.ApiConstants.PUBLIC_ENDPOINTS;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -52,6 +53,13 @@ public class SecurityConfig {
       .authorizeHttpRequests(auth -> auth
         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
         .requestMatchers("/oauth2/**", "/login/oauth2/**", "/login/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "/auth/rbac/**").hasAuthority("UI_VIEW:READ:ALL")
+        .requestMatchers("/auth/rbac/**").hasAuthority("UI_VIEW:UPDATE:ALL")
+        .requestMatchers(HttpMethod.GET, "/auth/user", "/auth/user/**")
+          .hasAuthority("UI_VIEW:READ:ALL")
+        // La restricción de 2FA para cuentas de solo lectura se valida en
+        // TwoFactorApplicationService leyendo los permisos frescos de la BD,
+        // no del claim del token (que puede quedar desactualizado).
         .anyRequest().authenticated()
       )
       .oauth2Login(oauth2 -> oauth2

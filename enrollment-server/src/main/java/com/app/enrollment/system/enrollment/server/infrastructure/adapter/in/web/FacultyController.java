@@ -6,6 +6,7 @@ import com.app.enrollment.system.enrollment.server.application.dto.command.Updat
 import com.app.enrollment.system.enrollment.server.application.dto.response.FacultyResponse;
 import com.app.enrollment.system.enrollment.server.application.port.in.CreateFacultyUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.GetAllFacultyUseCase;
+import com.app.enrollment.system.enrollment.server.application.port.in.GetFacultyByIdUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.UpdateFacultyUseCase;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -27,12 +28,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class FacultyController {
   
   private final GetAllFacultyUseCase getAllFacultyUseCase;
+  private final GetFacultyByIdUseCase getFacultyByIdUseCase;
   private final CreateFacultyUseCase createFacultyUseCase;
   private final UpdateFacultyUseCase updateFacultyUseCase;
-  
+
   public FacultyController(GetAllFacultyUseCase getAllFacultyUseCase,
+      GetFacultyByIdUseCase getFacultyByIdUseCase,
       CreateFacultyUseCase createFacultyUseCase, UpdateFacultyUseCase updateFacultyUseCase) {
     this.getAllFacultyUseCase = getAllFacultyUseCase;
+    this.getFacultyByIdUseCase = getFacultyByIdUseCase;
     this.createFacultyUseCase = createFacultyUseCase;
     this.updateFacultyUseCase = updateFacultyUseCase;
   }
@@ -42,6 +46,12 @@ public class FacultyController {
       @RequestParam(defaultValue = "false") Boolean includeInactive) {
     List<FacultyResponse> facultyResponseList = getAllFacultyUseCase.findAll(includeInactive);
     return ResponseEntity.ok(facultyResponseList);
+  }
+
+  @GetMapping("/faculty/{id}")
+  public ResponseEntity<FacultyResponse> findById(@PathVariable Integer id) {
+    FacultyResponse facultyResponse = getFacultyByIdUseCase.findById(id);
+    return ResponseEntity.ok(facultyResponse);
   }
   
   @PostMapping("/faculty")

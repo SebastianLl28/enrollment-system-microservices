@@ -14,8 +14,10 @@ import {
   useDeleteRole,
 } from "../hooks/useMutation";
 import { useRbacRoleColumns } from "@/config/columns";
+import { useHasPermission } from "@/features/auth/hooks/usePermissions";
 
 const RolesPage = () => {
+  const canManage = useHasPermission("UI_VIEW", "UPDATE");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<RoleResponse | null>(null);
 
@@ -50,19 +52,23 @@ const RolesPage = () => {
     }
   };
 
-  const onSubmit = (values: CreateRoleCommand) => {
-    if (editingRole) {
-      updateRole({
-        id: editingRole.id,
-        data: { ...values, id: editingRole.id },
-      });
-    } else {
-      createRole(values);
-    }
+  const closeDialog = () => {
     setDialogOpen(false);
+    setEditingRole(null);
   };
 
-  const columns = useRbacRoleColumns(handleEdit, handleDelete);
+  const onSubmit = (values: CreateRoleCommand) => {
+    if (editingRole) {
+      updateRole(
+        { id: editingRole.id, data: { ...values, id: editingRole.id } },
+        { onSuccess: closeDialog }
+      );
+    } else {
+      createRole(values, { onSuccess: closeDialog });
+    }
+  };
+
+  const columns = useRbacRoleColumns(handleEdit, handleDelete, canManage);
 
   const rolesList = useMemo(() => roles ?? [], [roles]);
 
@@ -89,7 +95,7 @@ const RolesPage = () => {
               Crea y configura roles asignando permisos y vistas del sistema.
             </p>
           </div>
-          <Button onClick={handleCreate}>Crear rol</Button>
+          {canManage && <Button onClick={handleCreate}>Crear rol</Button>}
         </div>
 
         <Card>

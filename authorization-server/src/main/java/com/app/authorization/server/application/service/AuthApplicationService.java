@@ -59,43 +59,40 @@ public class AuthApplicationService implements LoginUseCase, ValidateTokenUseCas
   public LoginResponse login(LoginCommand command) {
     String username = command.username();
     String password = command.password();
-    
-    System.out.println(username);
-    System.out.println(password);
-    
+
     User user = userRepository.findByUsername(username)
       .orElseThrow(InvalidCredentialsException::new);
-    
+
     if (!passwordHasher.verify(password, user.getPassword().getValue())) {
-      System.out.println("Password does not match");
       throw new InvalidCredentialsException();
     }
-    System.out.println("si pasaron");
+
     UserAccessProfile profile = userAccessProfilePort.loadByUsername(username);
-    System.out.println("asdssssss");
     Boolean twoFactorRequired = user.requiresTwoFactorAuth();
-    String token = "";
-    System.out.println("xxxxxxxxxx");
-    
+    String token;
+
     if (twoFactorRequired) {
-      System.out.println("1");
       token = twoFactorTokenPort.generateTwoFactorToken(user.getUsername(),
         profile.getPermissions());
     } else {
-      System.out.println("2");
       token = accessTokenPort.generateToken(user.getUsername(), profile.getPermissions());
     }
-    
-    System.out.println("asdasd");
-    
+
     return authMapper.toLoginResponse(user, token);
   }
   
   @Override
   public ValidateTokenResponse validateToken(String token) {
-    
+
     boolean isValid = accessTokenPort.validateToken(token);
-    
+
+    // El token temporal de 2FA solo sirve para /auth/2fa/verify: si el gateway
+    // lo aceptara aquí, un atacante con solo la contraseña (sin código TOTP)
+    // tendría acceso completo a /api/**.
+    if (isValid && twoFactorTokenPort.isTwoFactorToken(token)) {
+      isValid = false;
+    }
+
     if (!isValid) {
       return authMapper.toValidateTokenResponse(null, Set.of(), Set.of());
     }

@@ -3,8 +3,10 @@ package com.app.authorization.server.infrastructure.adapter.out.token;
 import com.app.authorization.server.domain.repository.AccessTokenPort;
 import com.app.common.annotation.Adapter;
 import io.jsonwebtoken.Jwts;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -51,6 +53,20 @@ public class AccessTokenPortAdapter implements AccessTokenPort {
     }
   }
   
+  @Override
+  public Set<String> extractPermissions(String token) {
+    try {
+      Object claim = jwt.parseClaims(token).getPayload().get("permissions");
+      if (claim instanceof Collection<?> values) {
+        return values.stream().map(String::valueOf).collect(Collectors.toSet());
+      }
+      return Set.of();
+    } catch (Exception ex) {
+      logger.error("Error extracting permissions from token: {}", ex.getMessage());
+      return Set.of();
+    }
+  }
+
   @Override
   public boolean validateToken(String token) {
     return jwt.isValid(token);

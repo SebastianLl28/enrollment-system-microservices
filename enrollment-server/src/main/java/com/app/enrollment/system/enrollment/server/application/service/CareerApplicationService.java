@@ -2,14 +2,18 @@ package com.app.enrollment.system.enrollment.server.application.service;
 
 import com.app.common.annotation.UseCase;
 import com.app.enrollment.system.enrollment.server.application.dto.command.CreateCareerCommand;
+import com.app.enrollment.system.enrollment.server.application.dto.command.UpdateCareerCommand;
 import com.app.enrollment.system.enrollment.server.application.dto.response.CareerResponse;
 import com.app.enrollment.system.enrollment.server.application.mapper.CareerMapper;
 import com.app.enrollment.system.enrollment.server.application.port.in.CreateCareerUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.GetAllCareerUseCase;
+import com.app.enrollment.system.enrollment.server.application.port.in.UpdateCareerUseCase;
+import com.app.enrollment.system.enrollment.server.domain.exception.CareerNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.FacultyNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.model.Career;
 import com.app.enrollment.system.enrollment.server.domain.model.Course;
 import com.app.enrollment.system.enrollment.server.domain.model.Faculty;
+import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CareerID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.DegreeTitle;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.FacultyID;
 import com.app.enrollment.system.enrollment.server.domain.repository.CareerRepository;
@@ -24,7 +28,7 @@ import java.util.stream.Collectors;
  * @author Alonso
  */
 @UseCase
-public class CareerApplicationService implements GetAllCareerUseCase, CreateCareerUseCase {
+public class CareerApplicationService implements GetAllCareerUseCase, CreateCareerUseCase, UpdateCareerUseCase {
   
   private final CareerRepository careerRepository;
   private final FacultyRepository facultyRepository;
@@ -64,6 +68,26 @@ public class CareerApplicationService implements GetAllCareerUseCase, CreateCare
     }).toList();
   }
   
+  @Override
+  public CareerResponse updateCareer(UpdateCareerCommand command, Integer careerId) {
+    CareerID careerID = new CareerID(careerId);
+    Career existing = careerRepository.findById(careerID).orElseThrow(() ->
+        new CareerNotFoundException("Career with ID " + careerId + " not found"));
+
+    FacultyID facultyID = new FacultyID(command.facultyId());
+    Faculty faculty = facultyRepository.findById(facultyID).orElseThrow(() ->
+        new FacultyNotFoundException("Faculty with ID " + command.facultyId() + " not found"));
+
+    DegreeTitle degreeTitle = new DegreeTitle(command.degreeAwarded());
+    Career updated = Career.rehydrate(careerID, facultyID, command.name(), command.description(),
+        command.semesterLength(), degreeTitle, existing.getRegistrationDate(), command.active());
+
+    Career savedCareer = careerRepository.save(updated);
+
+    List<Course> courseList = courseRepository.findByCareerIdWithActiveCourses(savedCareer.getId().getValue());
+    return careerMapper.toResponse(savedCareer, faculty, courseList);
+  }
+
   @Override
   public CareerResponse createCareer(CreateCareerCommand command) {
     FacultyID facultyID = new FacultyID(command.facultyId());

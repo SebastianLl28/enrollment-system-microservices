@@ -6,11 +6,12 @@ import { ROUTE_PATHS } from "@/app/route/path";
 import UserRoleDialog from "../components/UserRoleDialog";
 import type { UserRbacResponse } from "../types/response";
 import { useGetUsers, useGetRoles } from "../hooks/useQuery";
-import { toast } from "sonner";
 import { useRbacUserColumns } from "@/config/columns";
 import { useAssignRoles } from "../hooks/useMutation";
+import { useHasPermission } from "@/features/auth/hooks/usePermissions";
 
 const UsersRbacPage = () => {
+  const canManage = useHasPermission("UI_VIEW", "UPDATE");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserRbacResponse | null>(
     null
@@ -34,12 +35,13 @@ const UsersRbacPage = () => {
   const { mutate: assignRoles } = useAssignRoles();
 
   const handleRoleAssignment = (userId: number, roleIds: number[]) => {
-    assignRoles({ userId, roleIds });
-    toast.success("Roles asignados exitosamente");
-    refetch();
+    assignRoles(
+      { userId, roleIds },
+      { onSuccess: () => setDialogOpen(false) }
+    );
   };
 
-  const columns = useRbacUserColumns(handleAssignRoles);
+  const columns = useRbacUserColumns(handleAssignRoles, canManage);
 
   const usersList = useMemo(() => users ?? [], [users]);
 

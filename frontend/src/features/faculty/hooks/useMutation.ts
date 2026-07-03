@@ -6,6 +6,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postFaculty, putFaculty } from "../services/facultyService";
 import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/apiError";
 
 export const usePostFaculty = () => {
   const queryClient = useQueryClient();
@@ -15,6 +16,9 @@ export const usePostFaculty = () => {
     onSuccess: () => {
       toast.success("Facultad creada exitosamente");
       queryClient.invalidateQueries({ queryKey: FACULTY_LIST_QUERY });
+    },
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "No se pudo crear la facultad"));
     },
   });
 };
@@ -27,6 +31,9 @@ export const usePutFaculty = () => {
     onSuccess: () => {
       toast.success("Facultad actualizada exitosamente");
       queryClient.invalidateQueries({ queryKey: FACULTY_LIST_QUERY });
+    },
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "No se pudo actualizar la facultad"));
     },
   });
 };

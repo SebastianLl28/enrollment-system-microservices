@@ -2,6 +2,11 @@ package com.app.authorization.server.infrastructure.adapter.in.web;
 
 import com.app.authorization.server.application.dto.response.ErrorResponse;
 import com.app.authorization.server.domain.exception.InvalidCredentialsException;
+import com.app.authorization.server.domain.exception.InvalidOperationException;
+import com.app.authorization.server.domain.exception.InvalidTwoFactorCodeException;
+import com.app.authorization.server.domain.exception.InvalidTwoFactorTokenException;
+import com.app.authorization.server.domain.exception.TwoFactorNotInitiatedException;
+import com.app.authorization.server.domain.exception.TwoFactorNotInitializedException;
 import com.app.authorization.server.domain.exception.UserAlreadyExistsException;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
@@ -92,9 +97,9 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(InvalidCredentialsException.class)
   public ResponseEntity<ErrorResponse> handleInvalidCredentialsException(
     InvalidCredentialsException ex, HttpServletRequest request) {
-    
+
     logger.warn("Credenciales inválidas: {}", ex.getMessage());
-    
+
     ErrorResponse errorResponse = new ErrorResponse(
       LocalDateTime.now(),
       HttpStatus.UNAUTHORIZED.value(),
@@ -102,7 +107,42 @@ public class GlobalExceptionHandler {
       ex.getMessage(),
       request.getRequestURI()
     );
-    
+
+    return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler({InvalidTwoFactorCodeException.class, TwoFactorNotInitiatedException.class,
+    TwoFactorNotInitializedException.class, InvalidOperationException.class})
+  public ResponseEntity<ErrorResponse> handleTwoFactorBadRequest(RuntimeException ex,
+    HttpServletRequest request) {
+
+    logger.warn("Error 2FA: {}", ex.getMessage());
+
+    ErrorResponse errorResponse = new ErrorResponse(
+      LocalDateTime.now(),
+      HttpStatus.BAD_REQUEST.value(),
+      HttpStatus.BAD_REQUEST.getReasonPhrase(),
+      ex.getMessage(),
+      request.getRequestURI()
+    );
+
+    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(InvalidTwoFactorTokenException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidTwoFactorToken(
+    InvalidTwoFactorTokenException ex, HttpServletRequest request) {
+
+    logger.warn("Token temporal 2FA inválido: {}", ex.getMessage());
+
+    ErrorResponse errorResponse = new ErrorResponse(
+      LocalDateTime.now(),
+      HttpStatus.UNAUTHORIZED.value(),
+      HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+      ex.getMessage(),
+      request.getRequestURI()
+    );
+
     return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
   }
 }
