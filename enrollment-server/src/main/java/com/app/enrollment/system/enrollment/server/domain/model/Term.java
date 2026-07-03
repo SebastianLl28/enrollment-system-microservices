@@ -59,6 +59,17 @@ public class Term {
   }
   
   
+  /**
+   * Dos vigencias se solapan cuando sus rangos de fechas se cruzan; el sistema
+   * no permite dos vigencias vigentes al mismo tiempo.
+   */
+  public boolean overlaps(LocalDate otherStart, LocalDate otherEnd) {
+    if (startDate == null || endDate == null || otherStart == null || otherEnd == null) {
+      return false;
+    }
+    return !startDate.isAfter(otherEnd) && !otherStart.isAfter(endDate);
+  }
+
   public TermID getId() {
     return id;
   }

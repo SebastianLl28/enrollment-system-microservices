@@ -16,6 +16,7 @@ import com.app.enrollment.system.enrollment.server.domain.exception.IllegalCours
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCarreerException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCourseCodeException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCourseNameException;
+import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCourseOfferingException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCreditsException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidDegreeTitleException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidDocumentNumberException;
@@ -26,6 +27,8 @@ import com.app.enrollment.system.enrollment.server.domain.exception.InvalidSemes
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidStudentAttributeException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidStudentIDException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidStudentNameException;
+import com.app.enrollment.system.enrollment.server.domain.exception.InvalidTermException;
+import com.app.enrollment.system.enrollment.server.domain.exception.OverlappingTermException;
 import com.app.enrollment.system.enrollment.server.domain.exception.StudentAlreadyEnrolledException;
 import com.app.enrollment.system.enrollment.server.domain.exception.StudentNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.TermNotFoundException;
@@ -74,7 +77,8 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({
       FacultyAlreadyExistsException.class,
       StudentAlreadyEnrolledException.class,
-      CannotChangeStatusOfCancelledEnrollmentException.class
+      CannotChangeStatusOfCancelledEnrollmentException.class,
+      OverlappingTermException.class
   })
   public ResponseEntity<ErrorResponse> handleConflict(RuntimeException ex,
       HttpServletRequest request) {
@@ -102,7 +106,9 @@ public class GlobalExceptionHandler {
       InvalidSemesterLevelException.class,
       InvalidStudentAttributeException.class,
       InvalidStudentIDException.class,
-      InvalidStudentNameException.class
+      InvalidStudentNameException.class,
+      InvalidTermException.class,
+      InvalidCourseOfferingException.class
   })
   public ResponseEntity<ErrorResponse> handleDomainValidation(RuntimeException ex,
       HttpServletRequest request) {

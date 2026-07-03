@@ -1,7 +1,10 @@
 import { apiClient } from "@/config/apiClient";
 import type { CourseOfferingResponse } from "../types/response";
 import { COURSE_OFFERING_ENDPOINT } from "@/config/endpoints";
-import type { CourseOfferingRequest } from "../types/request";
+import type {
+  CourseOfferingRequest,
+  UpdateCourseOfferingRequest,
+} from "../types/request";
 
 export const getAllCourseOfferings = async () => {
   return apiClient
@@ -14,5 +17,20 @@ export const postCourseOffering = async (
 ) => {
   return apiClient
     .post<CourseOfferingResponse>(COURSE_OFFERING_ENDPOINT.base, courseOffering)
+    .then((res) => res.data);
+};
+
+export const putCourseOffering = async ({
+  id,
+  courseOffering,
+}: {
+  id: number;
+  courseOffering: UpdateCourseOfferingRequest;
+}) => {
+  return apiClient
+    .put<CourseOfferingResponse>(
+      `${COURSE_OFFERING_ENDPOINT.base}/${id}`,
+      courseOffering
+    )
     .then((res) => res.data);
 };

@@ -17,6 +17,7 @@ interface TermDialogProps {
   editingTerm: TermResponse | null;
   onSubmit: (values: TermRequest) => void;
   defaultFormValues: TermRequest | null;
+  isSubmitting?: boolean;
 }
 
 const TermDialog = ({
@@ -25,6 +26,7 @@ const TermDialog = ({
   editingTerm,
   onSubmit,
   defaultFormValues,
+  isSubmitting = false,
 }: TermDialogProps) => {
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -34,8 +36,8 @@ const TermDialog = ({
             {editingTerm ? "Editar vigencia" : "Crear vigencia"}
           </DialogTitle>
           <DialogDescription>
-            Completa los datos de la vigencia. Este formulario solo hace
-            console.log por ahora.
+            Define el código y el rango de fechas. No pueden existir dos
+            vigencias en el mismo rango de fechas.
           </DialogDescription>
         </DialogHeader>
 
@@ -45,8 +47,14 @@ const TermDialog = ({
           <Button variant="outline" onClick={() => setDialogOpen(false)}>
             Cancelar
           </Button>
-          <Button type="submit" form="term-form">
-            {editingTerm ? "Guardar cambios" : "Crear"}
+          <Button type="submit" form="term-form" disabled={isSubmitting}>
+            {isSubmitting
+              ? editingTerm
+                ? "Guardando..."
+                : "Creando..."
+              : editingTerm
+              ? "Guardar cambios"
+              : "Crear"}
           </Button>
         </DialogFooter>
       </DialogContent>

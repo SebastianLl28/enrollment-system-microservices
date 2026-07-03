@@ -2,6 +2,7 @@ package com.app.enrollment.system.enrollment.server.application.service;
 
 import com.app.common.annotation.UseCase;
 import com.app.enrollment.system.enrollment.server.application.dto.command.CreateCourseOfferingCommand;
+import com.app.enrollment.system.enrollment.server.application.dto.command.UpdateCourseOfferingCommand;
 import com.app.enrollment.system.enrollment.server.application.dto.response.CourseOfferingResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.CourseSummaryResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.TermResponse;
@@ -10,12 +11,16 @@ import com.app.enrollment.system.enrollment.server.application.mapper.CourseOffe
 import com.app.enrollment.system.enrollment.server.application.mapper.TermMapper;
 import com.app.enrollment.system.enrollment.server.application.port.in.CreateCourseOfferingUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.GetAllCourseOfferingUseCase;
+import com.app.enrollment.system.enrollment.server.application.port.in.UpdateCourseOfferingUseCase;
 import com.app.enrollment.system.enrollment.server.domain.exception.CourseNotFoundException;
+import com.app.enrollment.system.enrollment.server.domain.exception.CourseOfferingNotFoundException;
+import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCourseOfferingException;
 import com.app.enrollment.system.enrollment.server.domain.exception.TermNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.model.Course;
 import com.app.enrollment.system.enrollment.server.domain.model.CourseOffering;
 import com.app.enrollment.system.enrollment.server.domain.model.Term;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CourseID;
+import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CourseOfferingID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.TermID;
 import com.app.enrollment.system.enrollment.server.domain.repository.CourseOfferingRepository;
 import com.app.enrollment.system.enrollment.server.domain.repository.CourseRepository;
@@ -28,7 +33,7 @@ import java.util.List;
  */
 @UseCase
 public class CourseOfferingApplicationService implements CreateCourseOfferingUseCase,
-  GetAllCourseOfferingUseCase {
+  GetAllCourseOfferingUseCase, UpdateCourseOfferingUseCase {
   
   private final CourseRepository courseRepository;
   private final TermRepository termRepository;
@@ -80,6 +85,45 @@ public class CourseOfferingApplicationService implements CreateCourseOfferingUse
     return courseOfferingMapper.toCourseOfferingResponse(savedCourseOffering, courseSummaryResponse, termResponse);
   }
   
+  @Override
+  public CourseOfferingResponse updateCourseOffering(UpdateCourseOfferingCommand command,
+    Integer courseOfferingId) {
+    CourseOfferingID courseOfferingID = new CourseOfferingID(courseOfferingId);
+    CourseOffering existing = courseOfferingRepository.findById(courseOfferingID).orElseThrow(
+      () -> new CourseOfferingNotFoundException(
+        "Course offering with ID " + courseOfferingId + " not found.")
+    );
+
+    CourseID courseID = new CourseID(command.courseId());
+    TermID termID = new TermID(command.termId());
+
+    Course course = courseRepository.findById(courseID).orElseThrow(
+      () -> new CourseNotFoundException("Course with ID " + command.courseId() + " not found.")
+    );
+
+    Term term = termRepository.findById(termID).orElseThrow(
+      () -> new TermNotFoundException("Term with ID " + command.termId() + " not found.")
+    );
+
+    // La capacidad no puede quedar por debajo de los estudiantes ya inscritos.
+    Integer enrolledCount = existing.getEnrolledCount() != null ? existing.getEnrolledCount() : 0;
+    if (command.capacity() < enrolledCount) {
+      throw new InvalidCourseOfferingException(
+        "La capacidad (" + command.capacity() + ") no puede ser menor a los inscritos actuales ("
+          + enrolledCount + ").");
+    }
+
+    CourseOffering updated = CourseOffering.rehydrate(courseOfferingID, courseID, termID,
+      command.sectionCode(), command.capacity(), enrolledCount, command.active(),
+      existing.getCreatedAt());
+
+    CourseOffering saved = courseOfferingRepository.save(updated);
+
+    CourseSummaryResponse courseSummaryResponse = courseMapper.toSummaryResponse(course);
+    TermResponse termResponse = termMapper.toTermResponse(term);
+    return courseOfferingMapper.toCourseOfferingResponse(saved, courseSummaryResponse, termResponse);
+  }
+
   @Override
   public List<CourseOfferingResponse> getAllCourseOfferings() {
     List<CourseOffering> courseOfferingList = courseOfferingRepository.findAll();

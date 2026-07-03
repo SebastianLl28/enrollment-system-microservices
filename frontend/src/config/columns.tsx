@@ -6,7 +6,7 @@ import type { Course } from "@/features/course/types/Course";
 import type { Student } from "@/features/students/types/Student";
 import type { CellContext, ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
-import type { TermRequest } from "@/features/term/types/request";
+import type { TermResponse } from "@/features/term/types/response";
 import type { CourseOfferingResponse } from "@/features/course-offering/types/response";
 import type { EnrollmentResponse } from "@/features/enrollment/types/response";
 import {
@@ -313,7 +313,11 @@ export const useCourseColumns = (
     [handleView, handleEdit, canWrite]
   );
 
-export const useTermColumns = (): ColumnDef<TermRequest>[] =>
+export const useTermColumns = (
+  handleView: (term: TermResponse) => void,
+  handleEdit: (term: TermResponse) => void,
+  canWrite = true
+): ColumnDef<TermResponse>[] =>
   useMemo(
     () => [
       {
@@ -331,7 +335,7 @@ export const useTermColumns = (): ColumnDef<TermRequest>[] =>
       {
         header: "Activo",
         accessorKey: "active",
-        cell: ({ getValue }: CellContext<TermRequest, unknown>) => {
+        cell: ({ getValue }: CellContext<TermResponse, unknown>) => {
           const active = getValue() as boolean;
           return (
             <Badge variant={active ? "success" : "destructive"}>
@@ -340,8 +344,34 @@ export const useTermColumns = (): ColumnDef<TermRequest>[] =>
           );
         },
       },
+      {
+        header: "Acciones",
+        cell: ({ row }) => {
+          const term = row.original;
+          return (
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => handleView(term)}
+              >
+                Ver
+              </Button>
+              {canWrite && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEdit(term)}
+                >
+                  Editar
+                </Button>
+              )}
+            </div>
+          );
+        },
+      },
     ],
-    []
+    [handleView, handleEdit, canWrite]
   );
 
 export const useCourseOfferingColumns =

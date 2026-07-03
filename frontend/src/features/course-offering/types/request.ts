@@ -4,3 +4,11 @@ export interface CourseOfferingRequest {
   sectionCode: string;
   capacity: number;
 }
+
+export interface UpdateCourseOfferingRequest {
+  courseId: number;
+  termId: number;
+  sectionCode: string;
+  capacity: number;
+  active: boolean;
+}

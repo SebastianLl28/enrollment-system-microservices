@@ -14,3 +14,15 @@ export const postTerm = async (term: TermRequest) => {
     .post<TermResponse>(TERM_ENDPOINT.base, term)
     .then((res) => res.data);
 };
+
+export const putTerm = async ({
+  id,
+  term,
+}: {
+  id: number;
+  term: TermRequest;
+}) => {
+  return apiClient
+    .put<TermResponse>(`${TERM_ENDPOINT.base}/${id}`, term)
+    .then((res) => res.data);
+};
