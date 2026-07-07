@@ -3,6 +3,6 @@ WORKDIR /workspace
 COPY . .
 RUN mvn -DskipTests -pl notification-server -am package
 
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre-jammy
 COPY --from=build /workspace/notification-server/target/*.jar /app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
