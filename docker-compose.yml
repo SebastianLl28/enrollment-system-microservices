@@ -1,6 +1,7 @@
 services:
 
   frontend-client:
+    image: sllamuca/frontend-client:${TAG:-latest}
     build:
       context: ./frontend
       args:
@@ -20,6 +21,7 @@ services:
 
   # ---------- Discovery (Eureka) ----------
   discovery-server:
+    image: sllamuca/discovery-server:${TAG:-latest}
     build:
       context: .
       dockerfile: ./discovery-server/Dockerfile
@@ -140,6 +142,7 @@ services:
 
   # ---------- Microservices ----------
   authorization-server:
+    image: sllamuca/authorization-server:${TAG:-latest}
     build:
       context: .
       dockerfile: ./authorization-server/Dockerfile
@@ -181,6 +184,7 @@ services:
       start_period: 40s
 
   enrollment-server:
+    image: sllamuca/enrollment-server:${TAG:-latest}
     build:
       context: .
       dockerfile: ./enrollment-server/Dockerfile
@@ -214,6 +218,7 @@ services:
       start_period: 40s
 
   api-gateway:
+    image: sllamuca/api-gateway:${TAG:-latest}
     build:
       context: .
       dockerfile: ./api-gateway/Dockerfile
@@ -241,6 +246,7 @@ services:
       start_period: 40s
 
   notification-server:
+    image: sllamuca/notification-server:${TAG:-latest}
     build:
       context: .
       dockerfile: ./notification-server/Dockerfile
@@ -270,6 +276,7 @@ services:
       start_period: 40s
 
   event-store-server:
+    image: sllamuca/event-store-server:${TAG:-latest}
     build:
       context: .
       dockerfile: ./event-store-server/Dockerfile
