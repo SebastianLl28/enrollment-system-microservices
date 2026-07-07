@@ -481,7 +481,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-slate-900 text-slate-400 py-8">
         <div className="container mx-auto px-6 text-center">
-          <p>&copy; 2026 CourseHub. Sistema de Inscripción de Cursos.</p>
+          <p>&copy; 2026 CourseHub. Sistema de Inscripción.</p>
         </div>
       </footer>
     </div>
