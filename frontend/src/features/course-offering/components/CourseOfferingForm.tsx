@@ -5,12 +5,24 @@ import Select from "react-select";
 import { useGetCourses } from "@/features/course/hooks/useQuery";
 import { useGetTerms } from "@/features/term/hooks/useQuery";
 
+export type CourseOfferingFormValues = CourseOfferingRequest & {
+  active?: boolean;
+};
+
 interface CourseOfferingFormProps {
-  onSubmit: (values: CourseOfferingRequest) => void;
+  onSubmit: (values: CourseOfferingFormValues) => void;
+  defaultFormValues?: Partial<CourseOfferingFormValues> | null;
+  isEditing?: boolean;
 }
 
-const CourseOfferingForm = ({ onSubmit }: CourseOfferingFormProps) => {
-  const { register, handleSubmit, control } = useForm<CourseOfferingRequest>();
+const CourseOfferingForm = ({
+  onSubmit,
+  defaultFormValues = null,
+  isEditing = false,
+}: CourseOfferingFormProps) => {
+  const { register, handleSubmit, control } = useForm<CourseOfferingFormValues>({
+    defaultValues: defaultFormValues ?? { active: true },
+  });
 
   const { data: courses, isLoading: isLoadingCourses } = useGetCourses();
   const { data: terms, isLoading: isLoadingTerms } = useGetTerms();
@@ -120,6 +132,19 @@ const CourseOfferingForm = ({ onSubmit }: CourseOfferingFormProps) => {
           placeholder="150.00"
         />
       </div>
+      {isEditing && (
+        <div className="flex items-center gap-3">
+          <input
+            id="active"
+            type="checkbox"
+            className="h-4 w-4 rounded border-gray-300"
+            {...register("active")}
+          />
+          <Label htmlFor="active" className="m-0!">
+            Activo
+          </Label>
+        </div>
+      )}
     </form>
   );
 };

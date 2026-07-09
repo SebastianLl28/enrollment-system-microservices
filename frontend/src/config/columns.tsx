@@ -374,8 +374,10 @@ export const useTermColumns = (
     [handleView, handleEdit, canWrite]
   );
 
-export const useCourseOfferingColumns =
-  (): ColumnDef<CourseOfferingResponse>[] =>
+export const useCourseOfferingColumns = (
+  handleEdit?: (offering: CourseOfferingResponse) => void,
+  canEdit = false
+): ColumnDef<CourseOfferingResponse>[] =>
     useMemo(
       () => [
         {
@@ -440,8 +442,25 @@ export const useCourseOfferingColumns =
             );
           },
         },
+        ...(canEdit && handleEdit
+          ? [
+              {
+                header: "Acciones",
+                id: "actions",
+                cell: ({ row }: CellContext<CourseOfferingResponse, unknown>) => (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleEdit(row.original)}
+                  >
+                    Editar
+                  </Button>
+                ),
+              } satisfies ColumnDef<CourseOfferingResponse>,
+            ]
+          : []),
       ],
-      []
+      [handleEdit, canEdit]
     );
 
 export const useEnrollmentColumns = (
