@@ -51,6 +51,7 @@ All client traffic enters through **api-gateway** (Spring Cloud Gateway, port 80
 
 - `/auth/**` → `authorization-server`
 - `/api/**` → `enrollment-server`, guarded by `AuthFilter`, which validates the JWT by calling `authorization-server` `/auth/validateToken` (centralized auth — downstream services trust the gateway)
+- `/webhooks/**` → `enrollment-server`, deliberately WITHOUT `AuthFilter` (external callers like Mercado Pago cannot present a JWT); authenticity is enforced downstream via HMAC signature validation. nginx (`frontend/nginx.conf`) also proxies this path.
 - `/v3/api-docs/*` routes aggregate Swagger docs at the gateway (`/swagger-ui.html`)
 
 Authentication is OAuth2 (GitHub/Google) + JWT + TOTP-based MFA, all owned by `authorization-server`.
@@ -60,6 +61,12 @@ Authentication is OAuth2 (GitHub/Google) + JWT + TOTP-based MFA, all owned by `a
 - **Audit trail**: `AuditGlobalFilter` in the gateway publishes every request as an `AuditEvent` (defined in `common`) to the `audit.requests` topic; `event-store-server` consumes and persists it.
 - **Domain events with Outbox pattern**: `enrollment-server` writes enrollment events to an `OutboxEventJpaEntity` table in the same transaction as the domain change; `OutboxProcessor` (scheduled) publishes them to the `enrollment.notifications` topic. Only critical domain events use Outbox — audit events do not.
 - **notification-server** consumes `enrollment.notifications` and sends email (Mailtrap SMTP in dev).
+
+### Payments (Mercado Pago Checkout Pro)
+
+Enrollments are created `PENDING`; payment confirms them. On enrollment, `EnrollmentApplicationService` calls `PaymentGatewayPort` (adapter: `MercadoPagoPaymentAdapter`, official `com.mercadopago:sdk-java`) to create a Checkout Pro preference with `external_reference` = enrollment id and the `CourseOffering.price` (fallback: `MP_ENROLLMENT_FEE` config). The `init_point` travels in `EnrollmentAssignedEvent.paymentUrl` through the outbox so notification-server emails a "Pagar inscripción" button. Preference creation is fail-soft: if MP is down the enrollment is still created and the email goes out without the link.
+
+`POST /webhooks/mercadopago` (`MercadoPagoWebhookController`, outside `/api` so it skips JWT and `PermissionInterceptor`) validates the `x-signature` HMAC (`MercadoPagoSignatureValidator`, secret `MP_WEBHOOK_SECRET`; skipped with a warning if unset), fetches the payment from the MP API, and if `approved` transitions the enrollment `PENDING → PAID` (`Enrollment.markAsPaid`, idempotent — repeated notifications are no-ops) storing `payment_id`/`payment_status`/`paid_at`, then emits a PAID outbox event (confirmation email). Nonexistent payments (MP 404, e.g. the panel's webhook simulator) and missing enrollments return 200 so MP stops retrying; transient errors return 500 so MP retries. `back_urls` point to the public frontend route `/payments/:status` (registered at router root, outside `PublicRoute`/`ProtectedRoute`). MP env vars: `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`, `MP_NOTIFICATION_URL` (public https), `MP_BACK_URLS_BASE`, `MP_ENROLLMENT_FEE`, `MP_CURRENCY_ID` (see `.env.example`). In the MP panel subscribe to the **payment** topic ("Pagos"), not merchant orders.
 
 ### Database per service
 

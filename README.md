@@ -2,7 +2,7 @@
 
 Sistema de **gestión académica y matrícula universitaria** implementado como una **arquitectura de microservicios**, con enfoque en seguridad, desacoplamiento por eventos y buenas prácticas de diseño.
 
-El sistema permite administrar **facultades, carreras, cursos, periodos académicos (terms), cursos en vigencia (course offerings)** y la **inscripción de estudiantes**, integrando autenticación segura y comunicación asíncrona basada en eventos.
+El sistema permite administrar **facultades, carreras, cursos, periodos académicos (terms), cursos en vigencia (course offerings)** y la **inscripción de estudiantes**, integrando autenticación segura, **pagos en línea con Mercado Pago (Checkout Pro)** y comunicación asíncrona basada en eventos.
 
 ---
 
@@ -16,6 +16,7 @@ El sistema permite administrar **facultades, carreras, cursos, periodos académi
 * **Persistencia por servicio** (Database per Service)
 * **Seguridad centralizada** (OAuth2 + JWT + MFA)
 * **Arquitectura orientada a eventos** para auditoría y notificaciones
+* **Pasarela de pagos** con Mercado Pago Checkout Pro (webhooks firmados)
 
 ![architecture.png](assets/architecture.png)
 
@@ -34,6 +35,7 @@ El sistema permite administrar **facultades, carreras, cursos, periodos académi
 * **Spring Cloud Gateway**
 * **Spring Cloud Netflix Eureka**
 * **Spring Kafka**
+* **Mercado Pago SDK (Checkout Pro)**
 
 ### Frontend
 
@@ -64,7 +66,7 @@ El sistema permite administrar **facultades, carreras, cursos, periodos académi
 | ------------------------ | -------------------------------------- |
 | **api-gateway**          | Punto de entrada, routing, seguridad   |
 | **authorization-server** | Autenticación, OAuth2, JWT, MFA, roles |
-| **enrollment-server**    | Dominio académico y matrículas         |
+| **enrollment-server**    | Dominio académico, matrículas y pagos (Mercado Pago) |
 | **event-store-server**   | Almacenamiento de eventos/auditoría    |
 | **notification-server**  | Envío de notificaciones                |
 | **discovery-server**     | Registro y descubrimiento de servicios |
@@ -91,6 +93,27 @@ Se utiliza **Kafka** para desacoplar procesos secundarios:
 
 **No todos los eventos usan Outbox**, solo los críticos del dominio.
 Los eventos técnicos (auditoría) se generan mediante interceptores/filtros.
+
+---
+
+## 💳 Pagos con Mercado Pago (Checkout Pro)
+
+La inscripción a un curso **no queda pagada de inmediato**: se registra con estado `PENDING` y el pago se completa por Mercado Pago.
+
+**Flujo:**
+
+1. El estudiante se inscribe → la inscripción se crea con estado **PENDING**.
+2. El `enrollment-server` crea una **Preferencia de Pago** (Checkout Pro) con `external_reference` = ID de la inscripción y el **precio definido en el course offering** (curso + periodo). Si el offering no tiene precio, se usa la tarifa por defecto (`MP_ENROLLMENT_FEE`).
+3. El `init_point` viaja en el evento de dominio (Outbox → Kafka) y el `notification-server` envía el correo con el botón **"Pagar inscripción"**.
+4. Mercado Pago notifica el pago al webhook público `POST /webhooks/mercadopago` (fuera de `/api` porque no requiere JWT; la autenticidad se valida con la **firma HMAC** del header `x-signature`).
+5. El servidor consulta el pago en la API oficial de MP; si está `approved`, la inscripción pasa de **PENDING → PAID** (guardando `payment_id`, estado y fecha) y se envía el correo de confirmación. El webhook es **idempotente**.
+6. Las `back_urls` redirigen al estudiante a la vista pública `/payments/success|pending|failure` del frontend.
+
+**Configuración en el panel de Mercado Pago** (Tus integraciones → Webhooks):
+
+* URL: `https://<tu-dominio>/webhooks/mercadopago` (debe ser **https** público)
+* Evento: **Pagos** (topic `payment`)
+* La **clave secreta** que muestra el panel va en `MP_WEBHOOK_SECRET`
 
 ---
 
@@ -206,6 +229,14 @@ GRAFANA_ADMIN_PASSWORD=admin
 GRAFANA_SERVER_ROOT_URL=http://localhost/grafana/
 
 PROMETHEUS_EXTERNAL_URL=http://localhost/prometheus
+
+# ================== MERCADO PAGO (Checkout Pro) ==================
+MP_ACCESS_TOKEN=TEST-xxxxxxxxxxxxxxxx
+MP_WEBHOOK_SECRET=clave-secreta-del-panel-de-webhooks
+MP_NOTIFICATION_URL=https://midominio.com/webhooks/mercadopago
+MP_BACK_URLS_BASE=https://midominio.com/payments
+MP_ENROLLMENT_FEE=150.00
+MP_CURRENCY_ID=PEN
 ```
 
 ---

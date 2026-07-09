@@ -21,6 +21,7 @@ import {
   ScrollText,
   KeyRound,
   Radio,
+  CreditCard,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -123,8 +124,8 @@ export default function HomePage() {
           </h2>
           <p className="text-xl text-slate-600 mb-8">
             Plataforma universitaria construida con microservicios: gestión
-            académica, inscripciones con notificaciones en tiempo real y
-            seguridad basada en roles
+            académica, inscripciones con pago en línea vía Mercado Pago,
+            notificaciones en tiempo real y seguridad basada en roles
           </p>
           <div className="flex gap-4 justify-center">
             <Link
@@ -142,14 +143,14 @@ export default function HomePage() {
         <h3 className="text-3xl font-bold text-center text-slate-800 mb-12">
           ¿Qué hace nuestro sistema?
         </h3>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="hover:shadow-lg transition">
             <CardHeader>
               <BookOpen className="w-12 h-12 text-green-600 mb-4" />
               <CardTitle>Gestión Académica</CardTitle>
               <CardDescription>
                 Facultades, carreras, cursos, periodos académicos y cursos en
-                vigencia con control de cupos y secciones
+                vigencia con control de cupos, secciones y precios
               </CardDescription>
             </CardHeader>
           </Card>
@@ -162,6 +163,18 @@ export default function HomePage() {
                 Registro de estudiantes, inscripción a cursos con validación de
                 cupos y duplicados, historial académico y notificaciones por
                 email
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="hover:shadow-lg transition">
+            <CardHeader>
+              <CreditCard className="w-12 h-12 text-sky-600 mb-4" />
+              <CardTitle>Pagos en Línea</CardTitle>
+              <CardDescription>
+                Integración con Mercado Pago Checkout Pro: la inscripción queda
+                pendiente, el estudiante paga desde el enlace del correo y el
+                webhook confirma la matrícula automáticamente
               </CardDescription>
             </CardHeader>
           </Card>
@@ -215,8 +228,14 @@ export default function HomePage() {
                   <FlowStep
                     n={4}
                     color="blue"
-                    title="Confirmación y Notificación"
-                    detail="La inscripción genera un evento que dispara un correo de confirmación al estudiante"
+                    title="Registro Pendiente + Enlace de Pago"
+                    detail="La inscripción se crea en estado PENDIENTE y se genera una preferencia de Mercado Pago; el estudiante recibe un correo con el botón 'Pagar inscripción'"
+                  />
+                  <FlowStep
+                    n={5}
+                    color="blue"
+                    title="Confirmación del Pago (Webhook)"
+                    detail="Mercado Pago notifica el pago aprobado al webhook firmado; la inscripción pasa a PAGADA y se envía el correo de confirmación"
                   />
                 </div>
               </CardContent>
@@ -267,8 +286,8 @@ export default function HomePage() {
         </h3>
         <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
           Spring Boot 3 + Spring Cloud, servicios con arquitectura hexagonal,
-          base de datos por servicio y comunicación asíncrona con Kafka. Todo
-          orquestado con Docker Compose.
+          base de datos por servicio, comunicación asíncrona con Kafka y pagos
+          con Mercado Pago Checkout Pro. Todo orquestado con Docker Compose.
         </p>
         <Card className="max-w-5xl mx-auto">
           <CardContent className="p-8">
@@ -311,6 +330,7 @@ export default function HomePage() {
                     <Chip color="amber">Validación JWT centralizada</Chip>
                     <Chip color="amber">Autorización RBAC</Chip>
                     <Chip color="amber">Auditoría → Kafka</Chip>
+                    <Chip color="amber">Webhooks de pago</Chip>
                     <Chip color="amber">Swagger agregado</Chip>
                   </div>
                 </div>
@@ -329,7 +349,7 @@ export default function HomePage() {
               </div>
 
               <div className="flex justify-center">
-                <FlowArrow label="rutas /auth/** y /api/**" />
+                <FlowArrow label="rutas /auth/**, /api/** y /webhooks/**" />
               </div>
 
               {/* Servicios core */}
@@ -360,11 +380,12 @@ export default function HomePage() {
                   </div>
                   <p className="text-slate-600 mb-3 text-sm">
                     Núcleo académico: facultades, carreras, cursos, periodos,
-                    estudiantes e inscripciones
+                    estudiantes, inscripciones y pagos (PENDIENTE → PAGADA)
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <Chip color="green">Arquitectura hexagonal</Chip>
                     <Chip color="green">Patrón Outbox</Chip>
+                    <Chip color="green">Mercado Pago Checkout Pro</Chip>
                     <Chip color="green">PostgreSQL propia</Chip>
                   </div>
                 </div>
@@ -405,8 +426,8 @@ export default function HomePage() {
                     </h4>
                   </div>
                   <p className="text-slate-600 mb-3 text-sm">
-                    Consume eventos de inscripción y envía correos de
-                    confirmación al estudiante
+                    Consume eventos de inscripción y envía al estudiante el
+                    correo con el enlace de pago y la confirmación de matrícula
                   </p>
                   <Chip>SMTP</Chip>
                 </div>
