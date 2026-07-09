@@ -2,6 +2,7 @@ package com.app.enrollment.system.enrollment.server.infrastructure.adapter.in.we
 
 import com.app.enrollment.system.enrollment.server.application.port.in.ProcessPaymentNotificationUseCase;
 import com.app.enrollment.system.enrollment.server.domain.exception.EnrollmentNotFoundException;
+import com.app.enrollment.system.enrollment.server.domain.exception.PaymentNotFoundException;
 import com.app.enrollment.system.enrollment.server.infrastructure.adapter.in.web.security.MercadoPagoSignatureValidator;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Set;
@@ -81,6 +82,9 @@ public class MercadoPagoWebhookController {
       // Reintentar no lo va a arreglar: respondemos 200 para que MP no reenvíe eternamente
       log.error("Webhook for payment {} references a missing enrollment: {}", paymentId,
         e.getMessage());
+    } catch (PaymentNotFoundException e) {
+      // Pago inexistente en MP (p. ej. "Simular notificación" del panel): 200 y a otra cosa
+      log.warn("Webhook for a payment that does not exist in Mercado Pago: {}", e.getMessage());
     }
 
     return ResponseEntity.ok().build();

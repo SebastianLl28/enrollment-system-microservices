@@ -6,6 +6,7 @@ import com.app.enrollment.system.enrollment.server.application.dto.response.Paym
 import com.app.enrollment.system.enrollment.server.application.dto.response.PaymentPreferenceResponse;
 import com.app.enrollment.system.enrollment.server.application.port.out.PaymentGatewayPort;
 import com.app.enrollment.system.enrollment.server.domain.exception.PaymentGatewayException;
+import com.app.enrollment.system.enrollment.server.domain.exception.PaymentNotFoundException;
 import com.app.enrollment.system.enrollment.server.infrastructure.server.config.MercadoPagoProperties;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
@@ -104,6 +105,10 @@ public class MercadoPagoPaymentAdapter implements PaymentGatewayPort {
         dateApproved
       );
     } catch (MPApiException e) {
+      if (e.getApiResponse() != null && e.getApiResponse().getStatusCode() == 404) {
+        throw new PaymentNotFoundException(
+          "Payment " + paymentId + " does not exist in Mercado Pago");
+      }
       throw new PaymentGatewayException(
         "Mercado Pago rejected the payment lookup " + paymentId + ": "
           + e.getApiResponse().getContent(), e);
