@@ -70,7 +70,9 @@ audit:
     - /swagger-ui
     - /v3/api-docs
     - /auth/validateToken
+# INFO/WARN a propósito: en DEBUG el gateway y netty vuelcan los headers completos
+# de cada request (incluido Authorization: Bearer <token>) a los logs.
 logging:
   level:
-    org.springframework.cloud.gateway: DEBUG
-    reactor.netty.http.client: DEBUG
+    org.springframework.cloud.gateway: INFO
+    reactor.netty.http.client: WARN

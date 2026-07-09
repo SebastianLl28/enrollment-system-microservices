@@ -6,8 +6,11 @@ import com.app.common.constant.ApiConstants;
 import com.app.common.events.AuditEvent;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
@@ -26,7 +29,9 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class AuditGlobalFilter implements GlobalFilter, Ordered {
-  
+
+  private static final Logger log = LoggerFactory.getLogger(AuditGlobalFilter.class);
+
   private final AuditPublisher auditPublisher;
   private final AuditProperties props;
   
@@ -104,15 +109,38 @@ public class AuditGlobalFilter implements GlobalFilter, Ordered {
   
   private void publish(ServerWebExchange exchange, Instant start, String path, String method,
       String query, String userAgent, String body) {
-    
+
     int status = exchange.getResponse().getStatusCode() != null
         ? exchange.getResponse().getStatusCode().value() : 500;
-    
+
     String serviceId = getServiceId(path);
     String userId = exchange.getAttribute(ApiConstants.HEADER_USER_ID);
-    
+
+    logAccess(path, method, query, status, start, userAgent, body);
+
     auditPublisher.publish(
         new AuditEvent(start, serviceId, path, method, status, userId, query, userAgent, body));
+  }
+
+  /**
+   * Access log estilo morgan: una línea por request (método, ruta, status, duración).
+   * Solo los webhooks de pago loguean además query, user-agent y body, porque ahí
+   * no hay usuario autenticado que rastrear y el payload es lo único que permite
+   * diagnosticar una notificación perdida.
+   */
+  private void logAccess(String path, String method, String query, int status, Instant start,
+      String userAgent, String body) {
+
+    long durationMs = Duration.between(start, Instant.now()).toMillis();
+
+    log.info("{} {} {} {}ms", method, path, status, durationMs);
+
+    if (path.startsWith("/webhooks")) {
+      log.info("[webhook] {} {}{} ua=\"{}\" body={}", method, path,
+          query != null ? "?" + query : "",
+          userAgent != null ? userAgent : "-",
+          body != null ? body : "-");
+    }
   }
   
   private String getServiceId(String path) {

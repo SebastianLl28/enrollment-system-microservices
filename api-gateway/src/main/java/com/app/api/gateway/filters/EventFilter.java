@@ -24,12 +24,12 @@ public class EventFilter extends AbstractGatewayFilterFactory<Config> {
   public GatewayFilter apply(Config config) {
     return (exchange, chain) -> {
       long startTime = System.currentTimeMillis();
-      logger.info("📡 [Event Filter] Iniciando evento...");
-      
+      logger.debug("[Event Filter] Iniciando evento...");
+
       return chain.filter(exchange).then(Mono.fromRunnable(() -> {
-        
+
         long duration = System.currentTimeMillis() - startTime;
-        logger.info("🏁 [Event Filter] Respuesta recibida: "
+        logger.debug("[Event Filter] Respuesta recibida: "
           + exchange.getResponse().getStatusCode()
           + " (Tiempo: " + duration + "ms)");
       }));
