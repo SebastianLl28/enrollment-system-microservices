@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.math.BigDecimal;
 import java.time.Instant;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -63,7 +64,10 @@ public class CourseOfferingJpaEntity {
   
   @Column(nullable = false)
   private boolean active;
-  
+
+  @Column(precision = 10, scale = 2)
+  private BigDecimal price;
+
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
@@ -77,7 +81,7 @@ public class CourseOfferingJpaEntity {
   
   public CourseOfferingJpaEntity(Integer id, Integer courseId, Integer termId, String sectionCode,
     Integer capacity, Integer enrolledCount, Boolean active,
-    Instant createdAt) {
+    Instant createdAt, BigDecimal price) {
     this.id = id;
     this.courseId = courseId;
     this.termId = termId;
@@ -86,6 +90,7 @@ public class CourseOfferingJpaEntity {
     this.enrolledCount = enrolledCount;
     this.active = active;
     this.createdAt = createdAt;
+    this.price = price;
   }
   
   public Integer getId() {
@@ -173,8 +178,16 @@ public class CourseOfferingJpaEntity {
   public Instant getUpdatedAt() {
     return updatedAt;
   }
-  
+
   public void setUpdatedAt(Instant updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public BigDecimal getPrice() {
+    return price;
+  }
+
+  public void setPrice(BigDecimal price) {
+    this.price = price;
   }
 }

@@ -52,6 +52,15 @@ public class EnrollmentJpaEntity {
   @Column(nullable = false, length = 20)
   private EnrollmentStatus status;
 
+  @Column(name = "payment_id", length = 64)
+  private String paymentId;
+
+  @Column(name = "payment_status", length = 30)
+  private String paymentStatus;
+
+  @Column(name = "paid_at")
+  private LocalDateTime paidAt;
+
   @UpdateTimestamp
   @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
@@ -167,8 +176,32 @@ public class EnrollmentJpaEntity {
   public Integer getCourseOfferingId() {
     return courseOfferingId;
   }
-  
+
   public void setCourseOfferingId(Integer courseOfferingId) {
     this.courseOfferingId = courseOfferingId;
+  }
+
+  public String getPaymentId() {
+    return paymentId;
+  }
+
+  public void setPaymentId(String paymentId) {
+    this.paymentId = paymentId;
+  }
+
+  public String getPaymentStatus() {
+    return paymentStatus;
+  }
+
+  public void setPaymentStatus(String paymentStatus) {
+    this.paymentStatus = paymentStatus;
+  }
+
+  public LocalDateTime getPaidAt() {
+    return paidAt;
+  }
+
+  public void setPaidAt(LocalDateTime paidAt) {
+    this.paidAt = paidAt;
   }
 }

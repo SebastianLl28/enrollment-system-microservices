@@ -73,6 +73,7 @@ public class CourseOfferingApplicationService implements CreateCourseOfferingUse
       termID,
       command.sectionCode(),
       command.capacity(),
+      command.price(),
       clock.instant()
     );
     
@@ -115,7 +116,7 @@ public class CourseOfferingApplicationService implements CreateCourseOfferingUse
 
     CourseOffering updated = CourseOffering.rehydrate(courseOfferingID, courseID, termID,
       command.sectionCode(), command.capacity(), enrolledCount, command.active(),
-      existing.getCreatedAt());
+      existing.getCreatedAt(), command.price());
 
     CourseOffering saved = courseOfferingRepository.save(updated);
 

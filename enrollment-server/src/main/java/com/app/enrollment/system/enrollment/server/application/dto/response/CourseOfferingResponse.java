@@ -1,12 +1,13 @@
 package com.app.enrollment.system.enrollment.server.application.dto.response;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
  * @author Alonso
  */
 public class CourseOfferingResponse {
-  
+
   private Integer id;
   private CourseSummaryResponse course;
   private TermResponse term;
@@ -15,12 +16,14 @@ public class CourseOfferingResponse {
   private Integer enrolledCount;
   private Boolean active;
   private Instant createdAt;
-  
+  private BigDecimal price;
+
   public CourseOfferingResponse() {
   }
-  
+
   public CourseOfferingResponse(Integer id, CourseSummaryResponse course, TermResponse term,
-    String section, Integer capacity, Integer enrolledCount, Boolean active, Instant createdAt) {
+    String section, Integer capacity, Integer enrolledCount, Boolean active, Instant createdAt,
+    BigDecimal price) {
     this.id = id;
     this.course = course;
     this.term = term;
@@ -29,6 +32,7 @@ public class CourseOfferingResponse {
     this.enrolledCount = enrolledCount;
     this.active = active;
     this.createdAt = createdAt;
+    this.price = price;
   }
   
   
@@ -93,8 +97,16 @@ public class CourseOfferingResponse {
   public Instant getCreatedAt() {
     return createdAt;
   }
-  
+
   public void setCreatedAt(Instant createdAt) {
     this.createdAt = createdAt;
+  }
+
+  public BigDecimal getPrice() {
+    return price;
+  }
+
+  public void setPrice(BigDecimal price) {
+    this.price = price;
   }
 }

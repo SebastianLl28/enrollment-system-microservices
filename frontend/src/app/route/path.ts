@@ -3,6 +3,7 @@ export const ROUTE_PATHS = {
   login: "/login",
   register: "/register",
   twoFactorVerify: "/2fa-verify",
+  paymentResult: "/payments/:status",
   notFound: "*",
   dashboard: "/app",
   faculty: "/app/faculty",

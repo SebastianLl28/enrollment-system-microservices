@@ -4,12 +4,14 @@ import com.app.common.annotation.UseCase;
 import com.app.common.enums.SourceServiceType;
 import com.app.common.events.EnrollmentAssignedEvent;
 import com.app.enrollment.system.enrollment.server.application.dto.command.CreateEnrollmentCommand;
+import com.app.enrollment.system.enrollment.server.application.dto.command.CreatePaymentPreferenceCommand;
 import com.app.enrollment.system.enrollment.server.application.dto.command.SendEnrollmentEvent;
 import com.app.enrollment.system.enrollment.server.application.dto.command.UnenrollStudentCommand;
 import com.app.enrollment.system.enrollment.server.application.dto.command.UpdateEnrollmentCommand;
 import com.app.enrollment.system.enrollment.server.application.dto.query.EnrollmentQuery;
 import com.app.enrollment.system.enrollment.server.application.dto.response.CourseSummaryResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.EnrollmentResponse;
+import com.app.enrollment.system.enrollment.server.application.dto.response.PaymentPreferenceResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.TermResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.UserSummaryResponse;
 import com.app.enrollment.system.enrollment.server.application.mapper.CourseMapper;
@@ -21,6 +23,7 @@ import com.app.enrollment.system.enrollment.server.application.port.in.GetEnroll
 import com.app.enrollment.system.enrollment.server.application.port.in.UnenrollStudentUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.UpdateEnrollmentUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.out.OutboxEventPort;
+import com.app.enrollment.system.enrollment.server.application.port.out.PaymentGatewayPort;
 import com.app.enrollment.system.enrollment.server.domain.event.EventType;
 import com.app.enrollment.system.enrollment.server.domain.exception.CourseNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.CourseOfferingNotFoundException;
@@ -48,6 +51,8 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -57,7 +62,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class EnrollmentApplicationService implements CreateEnrollmentUseCase,
   UnenrollStudentUseCase, GetAllEnrollmentCourseUseCase, GetEnrollmentByIdUseCase,
   UpdateEnrollmentUseCase {
-  
+
+  private static final Logger log = LoggerFactory.getLogger(EnrollmentApplicationService.class);
+
   private final EnrollmentRepository enrollmentRepository;
   private final Clock clock;
   private final EnrollmentMapper enrollmentMapper;
@@ -68,12 +75,13 @@ public class EnrollmentApplicationService implements CreateEnrollmentUseCase,
   private final CourseMapper courseMapper;
   private final TermRepository termRepository;
   private final TermMapper termMapper;
-  
+  private final PaymentGatewayPort paymentGatewayPort;
+
   public EnrollmentApplicationService(EnrollmentRepository enrollmentRepository, Clock clock,
     EnrollmentMapper enrollmentMapper, CourseOfferingRepository courseOfferingRepository,
     StudentRepository studentRepository, OutboxEventPort outboxEventPort,
     CourseRepository courseRepository, CourseMapper courseMapper, TermRepository termRepository,
-    TermMapper termMapper) {
+    TermMapper termMapper, PaymentGatewayPort paymentGatewayPort) {
     this.enrollmentRepository = enrollmentRepository;
     this.clock = clock;
     this.enrollmentMapper = enrollmentMapper;
@@ -84,6 +92,7 @@ public class EnrollmentApplicationService implements CreateEnrollmentUseCase,
     this.courseMapper = courseMapper;
     this.termRepository = termRepository;
     this.termMapper = termMapper;
+    this.paymentGatewayPort = paymentGatewayPort;
   }
   
   @Override
@@ -126,11 +135,35 @@ public class EnrollmentApplicationService implements CreateEnrollmentUseCase,
     Course course = courseRepository.findById(courseOffering.getCourseId()).orElseThrow(
       () -> new CourseNotFoundException(
         "Course not found with id: " + courseOffering.getCourseId().getValue()));
-    
-    saveOutboxEvent(savedEnrollment, userID, now, student, course);
-    
+
+    String paymentUrl = createPaymentPreference(savedEnrollment, student, course, courseOffering);
+
+    saveOutboxEvent(savedEnrollment, userID, now, student, course, paymentUrl);
+
     return getEnrollmentResponse(courseOffering, student, savedEnrollment);
-    
+
+  }
+
+  /**
+   * Crea la Preferencia de Pago (Checkout Pro) y devuelve el init_point. Si Mercado Pago
+   * falla, la inscripción igual se registra (queda PENDING) y el correo sale sin enlace.
+   */
+  private String createPaymentPreference(Enrollment savedEnrollment, Student student, Course course,
+    CourseOffering courseOffering) {
+    try {
+      PaymentPreferenceResponse preference = paymentGatewayPort.createPreference(
+        new CreatePaymentPreferenceCommand(
+          savedEnrollment.getID().getValue(),
+          course.getName(),
+          student.getFullName(),
+          student.getEmail().getValue(),
+          courseOffering.getPrice()));
+      return preference.initPoint();
+    } catch (Exception e) {
+      log.error("Could not create Mercado Pago preference for enrollment {}: {}",
+        savedEnrollment.getID().getValue(), e.getMessage());
+      return null;
+    }
   }
   
   private EnrollmentResponse getEnrollmentResponse(CourseOffering courseOffering, Student student,
@@ -152,12 +185,16 @@ public class EnrollmentApplicationService implements CreateEnrollmentUseCase,
   
   
   private void saveOutboxEvent(Enrollment savedEnrollment, UserID userID, Instant now, Student student, Course course) {
-    
+    saveOutboxEvent(savedEnrollment, userID, now, student, course, null);
+  }
+
+  private void saveOutboxEvent(Enrollment savedEnrollment, UserID userID, Instant now, Student student, Course course, String paymentUrl) {
+
     CourseOffering courseOffering = courseOfferingRepository.findById(
       savedEnrollment.getCourseOfferingID()).orElseThrow(
       () -> new CourseOfferingNotFoundException(
         "Course offering not found with id: " + savedEnrollment.getCourseOfferingID().getValue()));
-    
+
     EnrollmentAssignedEvent event = new EnrollmentAssignedEvent(
       savedEnrollment.getID().getValue().toString(),
       savedEnrollment.getStudentID().getValue().toString(),
@@ -167,7 +204,9 @@ public class EnrollmentApplicationService implements CreateEnrollmentUseCase,
       userID.getValue(),
       course.getName()
     );
-    
+
+    event.setPaymentUrl(paymentUrl);
+
     SendEnrollmentEvent sendEnrollmentEvent = new SendEnrollmentEvent(
       SourceServiceType.ENROLLMENT_SERVICE.name(),
       savedEnrollment.getID().getValue().toString(),

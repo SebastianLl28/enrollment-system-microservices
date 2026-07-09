@@ -22,7 +22,8 @@ public class CourseOfferingMapper {
       courseOffering.getCapacity(),
       courseOffering.getEnrolledCount(),
       courseOffering.isActive(),
-      courseOffering.getCreatedAt()
+      courseOffering.getCreatedAt(),
+      courseOffering.getPrice()
     );
   }
   

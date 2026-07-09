@@ -3,6 +3,7 @@ import { ROUTE_PATHS, AUTH_ROUTE_PATHS } from "@/app/route/path";
 import HomePage from "@/pages/HomePage";
 import DashboardPage from "@/pages/DashboardPage";
 import NotFoundPage from "@/pages/NotFoundPage";
+import PaymentResultPage from "@/pages/PaymentResultPage";
 import PublicRoute from "@/features/auth/components/PublicRoute";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import { OAuth2RedirectHandler } from "@/features/auth/pages/OAuth2RedirectHandler";
@@ -99,6 +100,12 @@ export const router = createBrowserRouter([
         element: <PermissionsPage />,
       },
     ],
+  },
+  // Retorno de Mercado Pago (back_urls): pública y sin PublicRoute, para que
+  // un usuario con sesión activa no sea redirigido al dashboard sin ver el mensaje.
+  {
+    path: ROUTE_PATHS.paymentResult,
+    element: <PaymentResultPage />,
   },
   {
     path: ROUTE_PATHS.notFound,

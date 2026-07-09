@@ -3,13 +3,14 @@ package com.app.enrollment.system.enrollment.server.domain.model;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CourseID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CourseOfferingID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.TermID;
+import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
  * @author Alonso
  */
 public class CourseOffering {
-  
+
   private final CourseOfferingID id;
   private final CourseID courseId;
   private final TermID termId;
@@ -18,9 +19,10 @@ public class CourseOffering {
   private Integer enrolledCount;
   private final Boolean active;
   private final Instant createdAt;
-  
+  private final BigDecimal price; // precio de la inscripción para este curso-periodo
+
   private CourseOffering(CourseOfferingID id, CourseID courseId, TermID termId, String sectionCode,
-    Integer capacity, Integer enrolledCount, Boolean active, Instant createdAt) {
+    Integer capacity, Integer enrolledCount, Boolean active, Instant createdAt, BigDecimal price) {
     this.id = id;
     this.courseId = courseId;
     this.termId = termId;
@@ -29,18 +31,19 @@ public class CourseOffering {
     this.enrolledCount = enrolledCount;
     this.active = active;
     this.createdAt = createdAt;
+    this.price = price;
   }
-  
+
   public static CourseOffering create(CourseID courseId, TermID termId, String sectionCode,
-    Integer capacity, Instant now) {
-    return new CourseOffering(null, courseId, termId, sectionCode, capacity, 0, true, now);
+    Integer capacity, BigDecimal price, Instant now) {
+    return new CourseOffering(null, courseId, termId, sectionCode, capacity, 0, true, now, price);
   }
-  
+
   public static CourseOffering rehydrate(CourseOfferingID id, CourseID courseId, TermID termId,
     String sectionCode, Integer capacity, Integer enrolledCount, Boolean active,
-    Instant createdAt) {
+    Instant createdAt, BigDecimal price) {
     return new CourseOffering(id, courseId, termId, sectionCode, capacity, enrolledCount, active,
-      createdAt);
+      createdAt, price);
   }
   
   public void incrementEnrolledCount() {
@@ -100,5 +103,9 @@ public class CourseOffering {
   
   public Boolean getActive() {
     return active;
+  }
+
+  public BigDecimal getPrice() {
+    return price;
   }
 }

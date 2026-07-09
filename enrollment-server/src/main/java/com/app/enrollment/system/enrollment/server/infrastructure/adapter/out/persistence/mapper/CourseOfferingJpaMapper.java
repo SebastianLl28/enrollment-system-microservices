@@ -28,7 +28,7 @@ public class CourseOfferingJpaMapper {
     return CourseOffering.rehydrate(courseOfferingID, courseID, termID,
       courseOfferingJpaEntity.getSectionCode(), courseOfferingJpaEntity.getCapacity(),
       courseOfferingJpaEntity.getEnrolledCount(), courseOfferingJpaEntity.isActive(),
-      courseOfferingJpaEntity.getCreatedAt());
+      courseOfferingJpaEntity.getCreatedAt(), courseOfferingJpaEntity.getPrice());
   }
   
   public CourseOfferingJpaEntity toJpaEntity(CourseOffering courseOffering) {
@@ -42,7 +42,7 @@ public class CourseOfferingJpaMapper {
     
     return new CourseOfferingJpaEntity(id, courseId, termId, courseOffering.getSectionCode(),
       courseOffering.getCapacity(), courseOffering.getEnrolledCount(), courseOffering.isActive(),
-      courseOffering.getCreatedAt());
+      courseOffering.getCreatedAt(), courseOffering.getPrice());
     
   }
   

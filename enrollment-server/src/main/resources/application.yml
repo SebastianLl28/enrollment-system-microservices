@@ -66,3 +66,11 @@ springdoc:
 
 topic:
   enrollment-events: ${KAFKA_ENROLLMENT_EVENTS_TOPIC:enrollment-events}
+
+mercadopago:
+  access-token: ${MP_ACCESS_TOKEN:}
+  webhook-secret: ${MP_WEBHOOK_SECRET:}
+  notification-url: ${MP_NOTIFICATION_URL:}
+  back-urls-base: ${MP_BACK_URLS_BASE:http://localhost:5173/payments}
+  enrollment-fee: ${MP_ENROLLMENT_FEE:150.00}
+  currency-id: ${MP_CURRENCY_ID:PEN}

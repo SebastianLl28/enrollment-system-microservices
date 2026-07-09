@@ -407,6 +407,16 @@ export const useCourseOfferingColumns =
           accessorKey: "enrolledCount",
         },
         {
+          header: "Precio",
+          accessorKey: "price",
+          cell: ({
+            getValue,
+          }: CellContext<CourseOfferingResponse, unknown>) => {
+            const price = getValue() as number | null;
+            return price != null ? `S/ ${price.toFixed(2)}` : "—";
+          },
+        },
+        {
           header: "Creación",
           accessorKey: "createdAt",
           cell: ({

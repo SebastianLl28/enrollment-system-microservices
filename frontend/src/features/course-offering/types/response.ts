@@ -10,4 +10,5 @@ export interface CourseOfferingResponse {
   enrolledCount: number;
   active: boolean;
   createdAt: Date;
+  price: number | null;
 }

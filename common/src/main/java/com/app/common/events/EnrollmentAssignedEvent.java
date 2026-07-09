@@ -14,8 +14,9 @@ public class EnrollmentAssignedEvent {
   private EnrollmentStatus enrollmentStatus;
   private Integer userId;
   private String courseName;
-  
-  
+  private String paymentUrl;
+
+
   public EnrollmentAssignedEvent() {}
   
   public EnrollmentAssignedEvent(String enrollmentId, String studentId, String courseId,
@@ -80,9 +81,17 @@ public class EnrollmentAssignedEvent {
   public String getCourseName() {
     return courseName;
   }
-  
+
   public void setCourseName(String courseName) {
     this.courseName = courseName;
+  }
+
+  public String getPaymentUrl() {
+    return paymentUrl;
+  }
+
+  public void setPaymentUrl(String paymentUrl) {
+    this.paymentUrl = paymentUrl;
   }
   
   @Override
@@ -95,6 +104,7 @@ public class EnrollmentAssignedEvent {
       ", enrollmentStatus=" + enrollmentStatus +
       ", userId=" + userId +
       ", courseName='" + courseName + '\'' +
+      ", paymentUrl='" + paymentUrl + '\'' +
       '}';
   }
 }

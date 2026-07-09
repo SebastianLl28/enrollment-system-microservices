@@ -43,24 +43,34 @@ public class EnrollmentJpaMapper {
         .toInstant() : null;
     
     UserID userID = new UserID(entity.getUserId());
-    
+
+    Instant paidAt =
+      entity.getPaidAt() != null ? entity.getPaidAt().atZone(clock.getZone()).toInstant() : null;
+
     return Enrollment.rehydrate(enrollmentID, studentID, courseOfferingID, enrollmentDate, unrolledAt,
-      entity.getStatus(), userID);
+      entity.getStatus(), userID, entity.getPaymentId(), entity.getPaymentStatus(), paidAt);
   }
-  
+
   public EnrollmentJpaEntity toJpaEntity(Enrollment enrollment) {
-    
+
     LocalDateTime enrollmentDate = LocalDateTime.ofInstant(enrollment.getEnrollmentDate(),
       clock.getZone());
-    
+
     LocalDateTime unenrollmentDate =
       enrollment.getUnenrollmentDate() != null ? LocalDateTime.ofInstant(
         enrollment.getUnenrollmentDate(), clock.getZone()) : null;
-    
+
     Integer enrollmentID = enrollment.getID() != null ? enrollment.getID().getValue() : null;
-    
-    return new EnrollmentJpaEntity(enrollmentID, enrollment.getStudentID().getValue(),
+
+    EnrollmentJpaEntity entity = new EnrollmentJpaEntity(enrollmentID, enrollment.getStudentID().getValue(),
       enrollment.getCourseOfferingID().getValue(), enrollmentDate, unenrollmentDate, enrollment.getStatus(),
       enrollment.getUserID().getValue());
+
+    entity.setPaymentId(enrollment.getPaymentId());
+    entity.setPaymentStatus(enrollment.getPaymentStatus());
+    entity.setPaidAt(enrollment.getPaidAt() != null
+      ? LocalDateTime.ofInstant(enrollment.getPaidAt(), clock.getZone()) : null);
+
+    return entity;
   }
 }

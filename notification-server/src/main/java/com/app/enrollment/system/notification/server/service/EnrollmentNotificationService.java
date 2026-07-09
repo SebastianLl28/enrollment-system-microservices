@@ -54,12 +54,13 @@ public class EnrollmentNotificationService {
           name,
           "Tu inscripción al curso <strong>\"" + course + "\"</strong> ya fue registrada correctamente.",
           "Estado: <span style='color: #FFA500; font-weight: bold;'>PENDIENTE DE PAGO</span>",
-          "Cuando se confirme el pago, te avisaremos inmediatamente por este medio.",
+          "Debes completar el pago para confirmar tu matrícula. Cuando se confirme el pago, te avisaremos inmediatamente por este medio.",
+          buildPaymentButton(event.getPaymentUrl()),
           enrollmentId,
           occurredAt
         )
       );
-      
+
       case PAID -> new EmailContent(
         "Pago confirmado - " + course,
         buildHtmlTemplate(
@@ -69,11 +70,12 @@ public class EnrollmentNotificationService {
           "¡Excelentes noticias! Tu pago ha sido confirmado.",
           "Tu inscripción al curso <strong>\"" + course + "\"</strong> está activa.",
           "Ya puedes acceder a todo el contenido del curso. ¡Éxitos en tu aprendizaje!",
+          "",
           enrollmentId,
           occurredAt
         )
       );
-      
+
       case CANCELLED -> new EmailContent(
         "Inscripción cancelada - " + course,
         buildHtmlTemplate(
@@ -83,11 +85,12 @@ public class EnrollmentNotificationService {
           "Te confirmamos que tu inscripción al curso <strong>\"" + course + "\"</strong> ha sido cancelada.",
           "",
           "Esperamos verte pronto en nuestros cursos.",
+          "",
           enrollmentId,
           occurredAt
         )
       );
-      
+
       case COMPLETED -> new EmailContent(
         "Curso completado - " + course,
         buildHtmlTemplate(
@@ -97,11 +100,28 @@ public class EnrollmentNotificationService {
           "Has completado exitosamente el curso <strong>\"" + course + "\"</strong>.",
           "Tu dedicación y esfuerzo han dado sus frutos.",
           "Gracias por aprender con nosotros. ¡Sigue creciendo!",
+          "",
           enrollmentId,
           occurredAt
         )
       );
     };
+  }
+
+  private String buildPaymentButton(String paymentUrl) {
+    if (paymentUrl == null || paymentUrl.isBlank()) {
+      return "";
+    }
+    return """
+      <tr>
+        <td align="center" style="padding: 0 40px 30px 40px;">
+          <a href="%s" target="_blank"
+             style="display: inline-block; background-color: #009EE3; color: #ffffff; font-size: 16px; font-weight: 700; text-decoration: none; padding: 14px 40px; border-radius: 8px;">
+            Pagar inscripción
+          </a>
+        </td>
+      </tr>
+      """.formatted(paymentUrl);
   }
   
   private String buildHtmlTemplate(
@@ -111,6 +131,7 @@ public class EnrollmentNotificationService {
     String mainMessage,
     String statusMessage,
     String additionalInfo,
+    String ctaHtml,
     String enrollmentId,
     String occurredAt
   ) {
@@ -181,7 +202,10 @@ public class EnrollmentNotificationService {
                   </p>
                 </td>
               </tr>
-              
+
+              <!-- Call to action (botón de pago) -->
+              %s
+
               <!-- Detalles en caja -->
               <tr>
                 <td style="padding: 0 40px 40px 40px;">
@@ -251,6 +275,7 @@ public class EnrollmentNotificationService {
       mainMessage,
       statusMessage,
       additionalInfo,
+      ctaHtml,
       enrollmentId,
       occurredAt
     );

@@ -30,6 +30,12 @@ public class RouterConfig {
             .filters(f -> f.rewritePath("/v3/api-docs/enrollment-service", "/v3/api-docs"))
             .uri("lb://enrollment-server"))
         
+        // Webhooks de pasarelas de pago (Mercado Pago): sin AuthFilter porque el emisor
+        // externo no tiene JWT; el enrollment-server valida la firma HMAC (x-signature).
+        .route("payment-webhooks",
+            r -> r.path("/webhooks/**")
+                .uri("lb://enrollment-server"))
+
         .route("enrollment-service",
             r -> r.path("/api/**").filters(f -> f.filter(authFilter.apply(new Config()))
                     .retry(retryConfig -> retryConfig.setRetries(3)))
