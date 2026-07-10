@@ -19,6 +19,7 @@ import TermsPage from "@/features/term/pages/TermsPage";
 import CourseOfferingPage from "@/features/course-offering/pages/CourseOfferingPage";
 import EnrollmentsPage from "@/features/enrollment/pages/EnrollmentsPage";
 import RolesPage from "@/features/rbac/pages/RolesPages";
+import StatisticsPage from "@/features/dashboard/pages/StatisticsPage";
 import UsersRbacPage from "@/features/rbac/pages/UsersRbacPage";
 import PermissionsPage from "@/features/rbac/pages/PermissionsPage";
 
@@ -54,6 +55,10 @@ export const router = createBrowserRouter([
       {
         path: ROUTE_PATHS.dashboard,
         element: <DashboardPage />,
+      },
+      {
+        path: ROUTE_PATHS.statistics,
+        element: <StatisticsPage />,
       },
       {
         path: ROUTE_PATHS.faculty,

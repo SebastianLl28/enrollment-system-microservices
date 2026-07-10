@@ -18,12 +18,22 @@ import {
   ListTodo,
   BookUp,
   Shield,
+  ChartColumn,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useMemo } from "react";
-import DashboardStats from "@/features/dashboard/components/DashboardStats";
 
 const allModules = [
+  {
+    title: "Estadísticas",
+    description: "Indicadores y gráficos del sistema",
+    path: ROUTE_PATHS.statistics,
+    icon: ChartColumn,
+    // Sin vista de UI propia: se muestra a cualquier rol con UI_VIEW:READ,
+    // el mismo permiso que exige el endpoint de estadísticas.
+    requiredViewCode: null,
+    requiredPermission: "UI_VIEW:READ",
+  },
   {
     title: "Facultad",
     description: "Lista y gestión de facultades",
@@ -128,9 +138,11 @@ const DashboardPage = () => {
 
   const visibleModules = useMemo(() => {
     return allModules.filter((module) => {
-      const hasView = uiViews?.some(
-        (view) => view.code === module.requiredViewCode && view.active
-      );
+      const hasView =
+        !module.requiredViewCode ||
+        uiViews?.some(
+          (view) => view.code === module.requiredViewCode && view.active
+        );
 
       if (!hasView) {
         return false;
@@ -149,8 +161,8 @@ const DashboardPage = () => {
   }, [uiViews, permissions]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto w-full max-w-6xl space-y-6 rounded-lg bg-white p-6 shadow">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
+      <div className="w-full max-w-4xl space-y-6 rounded-lg bg-white p-6 shadow md:max-w-5xl">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">Zona protegida</p>
@@ -162,8 +174,6 @@ const DashboardPage = () => {
             Cerrar sesión
           </Button>
         </div>
-
-        <DashboardStats />
 
         <p className="text-gray-600">
           Esta vista está protegida. Usa los accesos rápidos para navegar a los

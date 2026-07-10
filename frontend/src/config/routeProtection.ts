@@ -6,6 +6,13 @@ export const ROUTE_PROTECTION_CONFIG: Record<string, RouteProtection> = {
     requiresAuth: true,
   },
 
+  // Sin vista de UI propia: visible para cualquier rol con UI_VIEW:READ,
+  // el mismo permiso que protege GET /api/v1/dashboard/stats en el backend.
+  [ROUTE_PATHS.statistics]: {
+    requiresAuth: true,
+    requiredPermission: "UI_VIEW:READ",
+  },
+
   [ROUTE_PATHS.faculty]: {
     requiresAuth: true,
     requiredViewCode: "FACULTY_LIST",

@@ -6,6 +6,7 @@ export const ROUTE_PATHS = {
   paymentResult: "/payments/:status",
   notFound: "*",
   dashboard: "/app",
+  statistics: "/app/statistics",
   faculty: "/app/faculty",
   career: "/app/career",
   course: "/app/course",
