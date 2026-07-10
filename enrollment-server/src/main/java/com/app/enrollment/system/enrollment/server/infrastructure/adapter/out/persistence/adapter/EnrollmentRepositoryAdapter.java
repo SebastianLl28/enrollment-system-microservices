@@ -9,11 +9,13 @@ import com.app.enrollment.system.enrollment.server.domain.model.valueobject.Enro
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.StudentID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.TermID;
 import com.app.enrollment.system.enrollment.server.domain.repository.EnrollmentRepository;
+import com.app.enrollment.system.enrollment.server.domain.repository.PageResult;
 import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.jpa.entity.EnrollmentJpaEntity;
 import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.jpa.repository.EnrollmentJpaRepository;
 import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.mapper.EnrollmentJpaMapper;
-import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 /**
  * @author Alonso
@@ -47,13 +49,16 @@ public class EnrollmentRepositoryAdapter implements EnrollmentRepository {
   }
   
   @Override
-  public List<Enrollment> findAllByStudentIDAndTermIDAndCourseID(StudentID studentID, TermID termID,
-    CourseID courseID) {
+  public PageResult<Enrollment> findAllByStudentIDAndTermIDAndCourseID(StudentID studentID, TermID termID,
+    CourseID courseID, int page, int size) {
     Integer studentId = studentID != null ? studentID.getValue() : null;
     Integer termId = termID != null ? termID.getValue() : null;
     Integer courseId = courseID != null ? courseID.getValue() : null;
-    return enrollmentJpaRepository.findAllByStudentIDAndTermIDAndCourseID(studentId, termId, courseId).stream()
-      .map(enrollmentJpaMapper::toDomainEntity).toList();
+    Page<EnrollmentJpaEntity> result = enrollmentJpaRepository.findAllByStudentIDAndTermIDAndCourseID(
+      studentId, termId, courseId, PageRequest.of(page, size));
+    return new PageResult<>(
+      result.getContent().stream().map(enrollmentJpaMapper::toDomainEntity).toList(),
+      result.getNumber(), result.getSize(), result.getTotalElements(), result.getTotalPages());
   }
   
   @Override

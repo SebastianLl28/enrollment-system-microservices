@@ -37,8 +37,10 @@ export const COURSE_OFFERING_PUT_MUTATION = [
   "put",
 ] as const;
 
+export const ENROLLMENT_LIST_QUERY = ["enrollment", "list"] as const;
+
 export const generateEnrollmentQueryKey = (query: EnrollmentRequestQuery) =>
-  ["enrollment", "list", query] as const;
+  [...ENROLLMENT_LIST_QUERY, query] as const;
 
 export const ENROLLMENT_POST_MUTATION = ["enrollment", "post"] as const;
 

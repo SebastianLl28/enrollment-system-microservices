@@ -7,7 +7,6 @@ import com.app.enrollment.system.enrollment.server.domain.model.valueobject.Cour
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.EnrollmentID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.StudentID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.TermID;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,7 +18,7 @@ public interface EnrollmentRepository {
   
   Optional<Enrollment> findByStudentIDAndCourseOfferingIDAndStatus(StudentID studentID, CourseOfferingID courseOfferingID, EnrollmentStatus enrollmentStatus);
   
-  List<Enrollment> findAllByStudentIDAndTermIDAndCourseID(StudentID studentID, TermID termID, CourseID courseID);
+  PageResult<Enrollment> findAllByStudentIDAndTermIDAndCourseID(StudentID studentID, TermID termID, CourseID courseID, int page, int size);
   
   Optional<Enrollment> findByEnrollmentID(EnrollmentID enrollmentID);
   

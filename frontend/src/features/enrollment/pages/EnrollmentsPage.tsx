@@ -11,11 +11,14 @@ import type {
 } from "../types/request";
 import { Card } from "@/components/ui/card";
 import { DataTable } from "@/components/common/table/DataTable";
+import { TablePagination } from "@/components/common/table/TablePagination";
 import { useEnrollmentColumns } from "@/config/columns";
 import { usePostEnrollment } from "../hooks/useMutation";
 import EnrollmentSearchForm from "../components/EnrollmentSearchForm";
 import type { EnrollmentResponse } from "../types/response";
 import EnrollmentDetailDialog from "../components/EnrollmentDetailDialog";
+
+const PAGE_SIZE = 10;
 
 const EnrollmentsPage = () => {
   const canCreate = useHasPermission("ENROLLMENT", "CREATE");
@@ -24,11 +27,17 @@ const EnrollmentsPage = () => {
   const [selectedEnrollment, setSelectedEnrollment] =
     useState<EnrollmentResponse | null>(null);
 
+  const [page, setPage] = useState(0);
   const [query, setQuery] = useState<EnrollmentRequestQuery>({
     studentId: null,
     termId: null,
     courseId: null,
   });
+
+  const handleQueryChange = (newQuery: EnrollmentRequestQuery) => {
+    setQuery(newQuery);
+    setPage(0);
+  };
 
   const handleDetail = (enrollment: EnrollmentResponse) => {
     setSelectedEnrollment(enrollment);
@@ -37,10 +46,14 @@ const EnrollmentsPage = () => {
 
   const columns = useEnrollmentColumns(handleDetail);
 
-  const { data: enrollments, refetch, isLoading } = useGetEnrollment(query);
+  const {
+    data: enrollmentsPage,
+    refetch,
+    isLoading,
+  } = useGetEnrollment({ ...query, page, size: PAGE_SIZE });
 
   const { mutate: createEnrollment, isPending: isCreating } =
-    usePostEnrollment(query);
+    usePostEnrollment();
 
   const onSubmit = (courseOffering: EnrollmentRequest) => {
     createEnrollment(courseOffering, {
@@ -76,17 +89,25 @@ const EnrollmentsPage = () => {
         </div>
 
         <div>
-          <EnrollmentSearchForm query={query} setQuery={setQuery} />
+          <EnrollmentSearchForm query={query} setQuery={handleQueryChange} />
         </div>
 
         <Card>
           <DataTable
-            data={enrollments || []}
+            data={enrollmentsPage?.content || []}
             columns={columns}
             isLoading={isLoading}
             onRetry={() => refetch()}
-            emptyMessage="No hay cursos en vigencia registradas."
+            emptyMessage="No hay inscripciones registradas."
           />
+          {enrollmentsPage && (
+            <TablePagination
+              page={enrollmentsPage.page}
+              totalPages={enrollmentsPage.totalPages}
+              totalElements={enrollmentsPage.totalElements}
+              onPageChange={setPage}
+            />
+          )}
         </Card>
 
         <EnrollmentDialog

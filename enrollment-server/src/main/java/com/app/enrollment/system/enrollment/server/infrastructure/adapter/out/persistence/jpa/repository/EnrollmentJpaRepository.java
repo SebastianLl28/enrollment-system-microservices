@@ -2,8 +2,9 @@ package com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.p
 
 import com.app.enrollment.system.enrollment.server.domain.model.enums.EnrollmentStatus;
 import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.jpa.entity.EnrollmentJpaEntity;
-import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,8 +31,8 @@ public interface EnrollmentJpaRepository extends JpaRepository<EnrollmentJpaEnti
       WHERE (:studentId IS NULL OR e.studentId = :studentId)
         AND (:termId   IS NULL OR co.termId   = :termId)
         AND (:courseId IS NULL OR co.courseId = :courseId)
-      ORDER BY e.createdAt ASC
+      ORDER BY e.createdAt DESC
     """)
-  List<EnrollmentJpaEntity> findAllByStudentIDAndTermIDAndCourseID(@Param("studentId") Integer studentId,
-    @Param("termId") Integer termId, @Param("courseId") Integer courseId);
+  Page<EnrollmentJpaEntity> findAllByStudentIDAndTermIDAndCourseID(@Param("studentId") Integer studentId,
+    @Param("termId") Integer termId, @Param("courseId") Integer courseId, Pageable pageable);
 }

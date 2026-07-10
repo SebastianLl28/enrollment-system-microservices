@@ -6,13 +6,13 @@ import com.app.enrollment.system.enrollment.server.application.dto.command.Unenr
 import com.app.enrollment.system.enrollment.server.application.dto.command.UpdateEnrollmentCommand;
 import com.app.enrollment.system.enrollment.server.application.dto.query.EnrollmentQuery;
 import com.app.enrollment.system.enrollment.server.application.dto.response.EnrollmentResponse;
+import com.app.enrollment.system.enrollment.server.application.dto.response.PageResponse;
 import com.app.enrollment.system.enrollment.server.application.port.in.CreateEnrollmentUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.GetAllEnrollmentCourseUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.GetEnrollmentByIdUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.UnenrollStudentUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.UpdateEnrollmentUseCase;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.UserID;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,12 +67,14 @@ public class EnrollmentController {
   }
   
   @GetMapping("/enrollment")
-  public ResponseEntity<List<EnrollmentResponse>> getAllEnrollments(
+  public ResponseEntity<PageResponse<EnrollmentResponse>> getAllEnrollments(
     @RequestParam(required = false) Integer studentId,
     @RequestParam(required = false) Integer termId,
-    @RequestParam(required = false) Integer courseId) {
-    EnrollmentQuery query = new EnrollmentQuery(studentId, termId, courseId);
-    List<EnrollmentResponse> responses = getAllEnrollmentCourseUseCase.getAllEnrollmentCourses(
+    @RequestParam(required = false) Integer courseId,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size) {
+    EnrollmentQuery query = new EnrollmentQuery(studentId, termId, courseId, page, size);
+    PageResponse<EnrollmentResponse> responses = getAllEnrollmentCourseUseCase.getAllEnrollmentCourses(
       query);
     return ResponseEntity.ok(responses);
   }

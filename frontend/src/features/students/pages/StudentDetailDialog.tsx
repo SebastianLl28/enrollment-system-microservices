@@ -39,15 +39,22 @@ const StudentDetailDialog = ({
 }: StudentDetailDialogProps) => {
   const canReadEnrollments = useHasPermission("ENROLLMENT", "READ");
 
-  // Si el usuario no puede leer inscripciones, studentId=null desactiva la query
-  const { data: enrollments, isPending: isLoadingEnrollments } =
-    useGetEnrollment({
-      studentId: canReadEnrollments ? (student?.id ?? null) : null,
-      termId: null,
-      courseId: null,
-    });
+  // Solo consulta si el usuario puede leer inscripciones y hay un estudiante seleccionado
+  const { data: enrollmentsPage, isPending: isLoadingEnrollments } =
+    useGetEnrollment(
+      {
+        studentId: student?.id ?? null,
+        termId: null,
+        courseId: null,
+        page: 0,
+        size: 100,
+      },
+      { enabled: canReadEnrollments && student != null }
+    );
 
   if (!student) return null;
+
+  const enrollments = enrollmentsPage?.content;
 
   const activeEnrollments =
     enrollments?.filter(
@@ -100,7 +107,7 @@ const StudentDetailDialog = ({
           <div className="flex gap-4">
             <div className="flex-1 rounded-lg bg-blue-50 p-3 text-center">
               <p className="text-2xl font-bold text-blue-600">
-                {isLoadingEnrollments ? "…" : (enrollments?.length ?? 0)}
+                {isLoadingEnrollments ? "…" : (enrollmentsPage?.totalElements ?? 0)}
               </p>
               <p className="text-xs text-gray-500">Total inscripciones</p>
             </div>

@@ -11,6 +11,7 @@ import com.app.enrollment.system.enrollment.server.application.dto.command.Updat
 import com.app.enrollment.system.enrollment.server.application.dto.query.EnrollmentQuery;
 import com.app.enrollment.system.enrollment.server.application.dto.response.CourseSummaryResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.EnrollmentResponse;
+import com.app.enrollment.system.enrollment.server.application.dto.response.PageResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.PaymentPreferenceResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.TermResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.UserSummaryResponse;
@@ -45,6 +46,7 @@ import com.app.enrollment.system.enrollment.server.domain.model.valueobject.User
 import com.app.enrollment.system.enrollment.server.domain.repository.CourseOfferingRepository;
 import com.app.enrollment.system.enrollment.server.domain.repository.CourseRepository;
 import com.app.enrollment.system.enrollment.server.domain.repository.EnrollmentRepository;
+import com.app.enrollment.system.enrollment.server.domain.repository.PageResult;
 import com.app.enrollment.system.enrollment.server.domain.repository.StudentRepository;
 import com.app.enrollment.system.enrollment.server.domain.repository.TermRepository;
 import java.time.Clock;
@@ -259,15 +261,15 @@ public class EnrollmentApplicationService implements CreateEnrollmentUseCase,
   }
   
   @Override
-  public List<EnrollmentResponse> getAllEnrollmentCourses(EnrollmentQuery query) {
+  public PageResponse<EnrollmentResponse> getAllEnrollmentCourses(EnrollmentQuery query) {
     StudentID studentID = new StudentID(query.studentId());
     TermID termID = new TermID(query.termId());
     CourseID courseID = new CourseID(query.courseId());
-    
-    List<Enrollment> enrollmentList = enrollmentRepository.findAllByStudentIDAndTermIDAndCourseID(
-      studentID, termID, courseID);
-    
-    return enrollmentList.stream().map(enrollment -> {
+
+    PageResult<Enrollment> enrollmentPage = enrollmentRepository.findAllByStudentIDAndTermIDAndCourseID(
+      studentID, termID, courseID, query.page(), query.size());
+
+    List<EnrollmentResponse> content = enrollmentPage.content().stream().map(enrollment -> {
       
       Student student = studentRepository.findById(enrollment.getStudentID()).orElseThrow(
         () -> new StudentNotFoundException(
@@ -292,6 +294,9 @@ public class EnrollmentApplicationService implements CreateEnrollmentUseCase,
       
       return enrollmentMapper.toEnrollmentResponse(enrollment, student, courseOffering, courseSummaryResponse, termResponse);
     }).toList();
+
+    return new PageResponse<>(content, enrollmentPage.page(), enrollmentPage.size(),
+      enrollmentPage.totalElements(), enrollmentPage.totalPages());
   }
   
   @Override

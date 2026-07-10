@@ -1,21 +1,17 @@
-import {
-  ENROLLMENT_POST_MUTATION,
-  generateEnrollmentQueryKey,
-} from "@/config/keys";
+import { ENROLLMENT_LIST_QUERY, ENROLLMENT_POST_MUTATION } from "@/config/keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { EnrollmentRequestQuery } from "../types/request";
 import { postEnrollment, putEnrollment } from "../services/EnrollmentService";
 import { toast } from "sonner";
 import { getApiErrorMessage } from "@/lib/apiError";
 
-export const usePostEnrollment = (query: EnrollmentRequestQuery) => {
+export const usePostEnrollment = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ENROLLMENT_POST_MUTATION,
     mutationFn: postEnrollment,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: generateEnrollmentQueryKey(query),
+        queryKey: ENROLLMENT_LIST_QUERY,
       });
       toast.success("Inscripción creada con éxito");
     },
@@ -32,12 +28,14 @@ export const usePutEnrollment = () => {
     mutationFn: putEnrollment,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["enrollment", "list"],
+        queryKey: ENROLLMENT_LIST_QUERY,
       });
       toast.success("Inscripción actualizada con éxito");
     },
     onError: (error) => {
-      toast.error(getApiErrorMessage(error, "No se pudo actualizar la inscripción"));
+      toast.error(
+        getApiErrorMessage(error, "No se pudo actualizar la inscripción")
+      );
     },
   });
 };

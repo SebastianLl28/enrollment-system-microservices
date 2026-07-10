@@ -9,3 +9,11 @@ export interface EnrollmentResponse {
   unenrollmentDate?: Date;
   status: "PENDING" | "PAID" | "CANCELLED" | "COMPLETED";
 }
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
