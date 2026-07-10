@@ -2,6 +2,7 @@ package com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.p
 
 import com.app.enrollment.system.enrollment.server.domain.model.enums.EnrollmentStatus;
 import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.jpa.entity.EnrollmentJpaEntity;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,4 +36,35 @@ public interface EnrollmentJpaRepository extends JpaRepository<EnrollmentJpaEnti
     """)
   Page<EnrollmentJpaEntity> findAllByStudentIDAndTermIDAndCourseID(@Param("studentId") Integer studentId,
     @Param("termId") Integer termId, @Param("courseId") Integer courseId, Pageable pageable);
+
+  @Query("SELECT e.status, COUNT(e) FROM EnrollmentJpaEntity e GROUP BY e.status")
+  List<Object[]> countGroupByStatus();
+
+  @Query("""
+      SELECT t.code, COUNT(e)
+      FROM EnrollmentJpaEntity e
+      JOIN CourseOfferingJpaEntity co ON e.courseOfferingId = co.id
+      JOIN TermJpaEntity t ON co.termId = t.id
+      GROUP BY t.code, t.startDate
+      ORDER BY t.startDate ASC
+    """)
+  List<Object[]> countGroupByTerm();
+
+  @Query("""
+      SELECT c.name, COUNT(e)
+      FROM EnrollmentJpaEntity e
+      JOIN CourseOfferingJpaEntity co ON e.courseOfferingId = co.id
+      JOIN CourseJpaEntity c ON co.courseId = c.courseId
+      GROUP BY c.name
+      ORDER BY COUNT(e) DESC
+    """)
+  List<Object[]> countGroupByCourse(Pageable pageable);
+
+  @Query("""
+      SELECT COUNT(e)
+      FROM EnrollmentJpaEntity e
+      JOIN CourseOfferingJpaEntity co ON e.courseOfferingId = co.id
+      WHERE co.termId = :termId
+    """)
+  long countByTermId(@Param("termId") Integer termId);
 }

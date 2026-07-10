@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface CourseOfferingJpaRepository extends JpaRepository<CourseOfferingJpaEntity, Integer> {
 
+  long countByActiveTrue();
 }

@@ -38,6 +38,10 @@ export const ENROLLMENT_ENDPOINT = {
   base: "/api/v1/enrollment",
 };
 
+export const DASHBOARD_ENDPOINT = {
+  stats: "/api/v1/dashboard/stats",
+};
+
 export const RBAC_ENDPOINT = {
   roles: "/auth/rbac/roles",
   roleById: (id: number) => `/auth/rbac/roles/${id}`,

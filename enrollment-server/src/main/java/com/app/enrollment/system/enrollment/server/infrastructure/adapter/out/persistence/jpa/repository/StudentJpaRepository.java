@@ -20,4 +20,6 @@ public interface StudentJpaRepository extends JpaRepository<StudentJpaEntity, In
     )
   """)
   List<StudentJpaEntity> findAllByCourseId(Integer courseId);
+
+  long countByActiveTrue();
 }

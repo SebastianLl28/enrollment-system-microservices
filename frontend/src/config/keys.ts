@@ -44,6 +44,8 @@ export const generateEnrollmentQueryKey = (query: EnrollmentRequestQuery) =>
 
 export const ENROLLMENT_POST_MUTATION = ["enrollment", "post"] as const;
 
+export const DASHBOARD_STATS_QUERY = ["dashboard", "stats"] as const;
+
 export const RBAC_ROLES_QUERY = ["rbac", "roles"] as const;
 export const RBAC_ROLE_QUERY = (id: number) => ["rbac", "role", id] as const;
 export const RBAC_PERMISSIONS_QUERY = ["rbac", "permissions"] as const;

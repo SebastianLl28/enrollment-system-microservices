@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useMemo } from "react";
+import DashboardStats from "@/features/dashboard/components/DashboardStats";
 
 const allModules = [
   {
@@ -148,8 +149,8 @@ const DashboardPage = () => {
   }, [uiViews, permissions]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-      <div className="w-full max-w-4xl space-y-6 rounded-lg bg-white p-6 shadow md:max-w-5xl">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="mx-auto w-full max-w-6xl space-y-6 rounded-lg bg-white p-6 shadow">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">Zona protegida</p>
@@ -161,6 +162,8 @@ const DashboardPage = () => {
             Cerrar sesión
           </Button>
         </div>
+
+        <DashboardStats />
 
         <p className="text-gray-600">
           Esta vista está protegida. Usa los accesos rápidos para navegar a los
