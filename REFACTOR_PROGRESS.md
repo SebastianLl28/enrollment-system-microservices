@@ -49,6 +49,10 @@
 - [x] Frontend: features `classroom/` y `section/` completas (types/service/hooks/form/dialog/page), columnas `useClassroomColumns`/`useSectionColumns`, rutas `/app/classroom` y `/app/section`, routeProtection, endpoints, keys, módulos dashboard (iconos DoorOpen/Layers). Form de aula: checkbox "Aula virtual" deshabilita/limpia capacidad. Build OK.
 - [ ] Probar tras `make reset`: crear aula física y virtual → crear sección (curso+periodo+aula) → verificar unique (curso, periodo, código de sección).
 
+### Regla de negocio secciones (2026-07-11, análisis con el usuario)
+- Decisión: **Section se queda como curso+periodo+aula (sin careerId)** — las clases son compartidas: alumnos de distintas carreras asisten a la misma sección si el curso está en su malla (la carrera se deriva de `CareerCourse`).
+- [x] Hueco cerrado: ya no se puede crear una sección en un periodo sin carreras ofertadas. Backend: `SectionApplicationService.validateCourseOfferedInTerm` (curso debe tener ≥1 carrera de su malla con `CareerOffering` **activa** en el periodo, si no → `InvalidSectionException` 400); nuevo `CareerOfferingRepository.findAllByTermId`. Frontend: en `SectionForm` el select de periodo depende del curso elegido (deshabilitado hasta elegir curso; opciones = periodos de ofertas activas de carreras de la malla del curso; `termId` se resetea al cambiar de curso).
+
 ## Notas
 - Los "compile breaks" sospechados en CourseOfferingMapper/JpaEntity/EnrollmentJpaRepository/StudentRepositoryAdapter eran falsos positivos: ya están migrados.
 - No hay migraciones SQL; los renames de columnas requieren `make reset` en dev (destruye volúmenes).

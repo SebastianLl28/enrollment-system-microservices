@@ -24,6 +24,7 @@ import com.app.enrollment.system.enrollment.server.domain.exception.InvalidDegre
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidDocumentNumberException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidEmailException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidFacultyIDException;
+import com.app.enrollment.system.enrollment.server.domain.exception.InvalidSectionException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidSemesterLengthException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidSemesterLevelException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidStudentAttributeException;
@@ -114,7 +115,8 @@ public class GlobalExceptionHandler {
       InvalidStudentNameException.class,
       InvalidTermException.class,
       InvalidCareerOfferingException.class,
-      InvalidClassroomException.class
+      InvalidClassroomException.class,
+      InvalidSectionException.class
   })
   public ResponseEntity<ErrorResponse> handleDomainValidation(RuntimeException ex,
       HttpServletRequest request) {

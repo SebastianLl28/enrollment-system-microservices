@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Select from "react-select";
 import { useGetCourses } from "@/features/course/hooks/useQuery";
-import { useGetTerms } from "@/features/term/hooks/useQuery";
+import { useGetAllCareerOfferings } from "@/features/career-offering/hooks/useQuery";
 import { useGetAllClassrooms } from "@/features/classroom/hooks/useQuery";
 
 export type SectionFormValues = SectionRequest & {
@@ -26,15 +26,20 @@ const SectionForm = ({
     register,
     handleSubmit,
     control,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<SectionFormValues>({
     defaultValues: defaultFormValues ?? { active: true },
   });
 
   const { data: courses, isPending: isLoadingCourses } = useGetCourses();
-  const { data: terms, isLoading: isLoadingTerms } = useGetTerms();
+  const { data: careerOfferings, isPending: isLoadingCareerOfferings } =
+    useGetAllCareerOfferings();
   const { data: classrooms, isPending: isLoadingClassrooms } =
     useGetAllClassrooms();
+
+  const selectedCourseId = watch("courseId");
 
   const courseOptions =
     courses?.map((course) => ({
@@ -42,11 +47,24 @@ const SectionForm = ({
       label: `${course.code} - ${course.name}`,
     })) ?? [];
 
-  const termOptions =
-    terms?.map((term) => ({
-      value: term.id,
-      label: term.code,
-    })) ?? [];
+  // Solo periodos donde alguna carrera con el curso en su malla está ofertada
+  // (misma regla que valida el backend).
+  const selectedCourseCareerIds =
+    courses
+      ?.find((course) => course.id === selectedCourseId)
+      ?.careers.map((assignment) => assignment.careerId) ?? [];
+
+  const termOptions = (careerOfferings ?? [])
+    .filter(
+      (offering) =>
+        offering.active && selectedCourseCareerIds.includes(offering.career.id)
+    )
+    .reduce<{ value: number; label: string }[]>((options, offering) => {
+      if (!options.some((option) => option.value === offering.term.id)) {
+        options.push({ value: offering.term.id, label: offering.term.code });
+      }
+      return options;
+    }, []);
 
   const classroomOptions =
     classrooms?.map((classroom) => ({
@@ -79,7 +97,11 @@ const SectionForm = ({
                 courseOptions.find((option) => option.value === field.value) ??
                 null
               }
-              onChange={(option) => field.onChange(option?.value ?? null)}
+              onChange={(option) => {
+                field.onChange(option?.value ?? null);
+                // Los periodos disponibles dependen del curso elegido.
+                setValue("termId", null as unknown as number);
+              }}
               isClearable
               classNamePrefix="react-select"
             />
@@ -101,8 +123,15 @@ const SectionForm = ({
               inputId="termId"
               className="w-full"
               options={termOptions}
-              isLoading={isLoadingTerms}
-              placeholder="Selecciona un periodo"
+              isLoading={isLoadingCareerOfferings}
+              isDisabled={!selectedCourseId}
+              placeholder={
+                selectedCourseId
+                  ? termOptions.length > 0
+                    ? "Selecciona un periodo"
+                    : "El curso no tiene carreras ofertadas en ningún periodo"
+                  : "Selecciona primero un curso"
+              }
               value={
                 termOptions.find((option) => option.value === field.value) ??
                 null
