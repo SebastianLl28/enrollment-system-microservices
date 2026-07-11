@@ -16,6 +16,9 @@ make down    # stop (keeps data)
 make reset   # destroy volumes (DBs included) and rebuild from scratch
 make logs    # tail all container logs
 make prod    # docker-compose.yml only — no host-exposed debug ports
+make sonar-up   # SonarQube server (docker-compose.sonarqube.yml, http://localhost:9000)
+make sonar      # mvn clean verify sonar:sonar (needs SONAR_TOKEN in .env and Docker for the ITs)
+make sonar-down # stop SonarQube (data persists in volumes)
 ```
 
 Requires a `.env` at repo root (`cp .env.example .env`; a full example is in the README). The override compose file exposes ports to the host (Eureka 8761, gateway `${API_GATEWAY_PORT}`=8080, Postgres 5432/5433/5434, Kafka on 29092 for host access, enrollment-server debug on 5005).
@@ -37,6 +40,8 @@ mvn -pl enrollment-server -am verify       # + integration tests (*IT, needs Doc
 ### Testing (enrollment-server only, so far)
 
 Convention: `*Test` = unit (Surefire, plain JUnit 5 + AssertJ + Mockito, no Spring context except `@WebMvcTest`); `*IT` = integration (Failsafe, Testcontainers PostgreSQL via `@ServiceConnection`). Tests mirror the main package layout; shared fixtures live in `testsupport/` (`Mothers` object mothers, `PostgresContainerSupport` base class, fixed `Clock`). Controller tests use `@MockBean PermissionInterceptor` stubbed to allow (the interceptor has its own unit test). `src/test/resources/application-test.yml` disables Eureka/Kafka/MP for the context-load IT. JaCoCo writes `target/site/jacoco/jacoco.xml` on `verify` (SonarQube-ready). `testcontainers.version` is overridden to 1.21.4 in the module pom because the Boot-3.2-managed 1.19.x cannot talk to Docker 29's minimum API. Note: module poms inherit from `spring-boot-starter-parent`, NOT from the root aggregator pom — put version overrides and plugin config in each module.
+
+**SonarQube**: `make sonar-up` starts the server (own compose file + its own Postgres, port 9000); `make sonar` runs `mvn clean verify sonar:sonar` from the root (project key `enrollment-system-microservices`, `sonar-maven-plugin` version pinned in the root pom's pluginManagement — the aggregator goal does run from the root). The analysis token lives in `.env` as `SONAR_TOKEN` (gitignored). The old always-failing `contextLoads` tests of the other 5 services were deleted so the root `verify` passes; write real tests when each service gets its turn.
 
 ### Frontend (`frontend/`)
 

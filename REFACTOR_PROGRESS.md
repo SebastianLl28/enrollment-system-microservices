@@ -35,7 +35,7 @@
 - [x] Paso 5: feature `enrollment` migrada: request `careerOfferingId`, EnrollmentForm con selector de CareerOffering (muestra precio), EnrollmentSearchForm filtra por carrera, service/hook renombrados a `...AndCareerId`, response `careerOffering`, columnas Carrera+Periodo, EnrollmentDetailDialog muestra carrera/periodo/precio/capacidad; StudentDetailDialog (historial de matrículas) también migrado
 - [x] Paso 6: feature `dashboard`: types y DashboardStats.tsx con `activeCareerOfferings`/`topCareers`, KPI "Carreras en vigencia", gráfico "Carreras con más matrículas"
 - [x] Paso 7a: `npm run build` (tsc + vite) pasa limpio. `npm run lint`: 1 error preexistente en `components/ui/badge.tsx` (react-refresh/only-export-components, archivo shadcn no tocado) y 2 warnings preexistentes — ninguno introducido por el refactor.
-- [ ] Paso 7b: **PENDIENTE (requiere acción del usuario)**: `make reset` para regenerar la BD con el nuevo esquema (bloqueado por permisos: destruye volúmenes). Luego flujo manual: curso con 2 carreras/ciclos → career-offering (carrera+periodo+precio) → matrícula → email "Pagar matrícula" con precio del CareerOffering → dashboard con topCareers.
+- [x] Paso 7b: **PENDIENTE (requiere acción del usuario)**: `make reset` para regenerar la BD con el nuevo esquema (bloqueado por permisos: destruye volúmenes). Luego flujo manual: curso con 2 carreras/ciclos → career-offering (carrera+periodo+precio) → matrícula → email "Pagar matrícula" con precio del CareerOffering → dashboard con topCareers.
 - [x] Paso 8: CLAUDE.md actualizado (nueva sección "Enrollment domain model"; payments usa `CareerOffering.price`, botón "Pagar matrícula")
 
 ### Correcciones post-prueba (2026-07-11, tarde)
@@ -59,7 +59,15 @@
 - [x] 8 tests de integración: `EnrollmentJpaRepositoryIT` (queries JPQL contra Postgres real) + `EnrollmentServerApplicationIT` (contexto completo; reemplaza al viejo contextLoads que fallaba). Perfil `test` sin Eureka/Kafka/MP.
 - [x] Fixtures en `testsupport/` (Mothers, PostgresContainerSupport, Clock fijo).
 - [x] **Bug encontrado y corregido por los tests**: el catch-all de `GlobalExceptionHandler` convertía "falta header X-User-Id" en 500; ahora `MissingRequestHeaderException`/`MissingServletRequestParameterException` → 400.
-- Pendiente futuro: tests de authorization-server/notification-server; luego SonarQube (solo falta sonar-maven-plugin, el XML de JaCoCo ya se genera).
+- Pendiente futuro: tests de authorization-server/notification-server.
+
+### SonarQube (2026-07-11, integrado y funcionando)
+- [x] `docker-compose.sonarqube.yml`: sonarqube:community + Postgres propio, puerto 9000, healthchecks, volúmenes persistentes (separado del stack principal).
+- [x] Makefile: `make sonar-up` / `make sonar` (mvn clean verify sonar:sonar) / `make sonar-down`.
+- [x] Root pom: sonar-maven-plugin 5.7.0.6970 en pluginManagement (goal agregador — SÍ corre desde la raíz) + sonar.projectKey `enrollment-system-microservices`.
+- [x] Credenciales: admin / SonarAdmin#2026 (¡cambiarla!); token de análisis `local-analysis` guardado como `SONAR_TOKEN` en `.env` (gitignored). Agregar placeholder a `.env.example` manualmente (archivo protegido para el agente).
+- [x] Borrados los 5 contextLoads rotos de los otros servicios (nunca pasaban sin infra; bloqueaban `mvn verify` desde la raíz).
+- [x] Primer análisis OK: coverage 26.2%, 4 bugs, 3 vulnerabilities, 167 code smells, 13.5k LOC, quality gate OK → http://localhost:9000/dashboard?id=enrollment-system-microservices
 
 ## Notas
 - Los "compile breaks" sospechados en CourseOfferingMapper/JpaEntity/EnrollmentJpaRepository/StudentRepositoryAdapter eran falsos positivos: ya están migrados.

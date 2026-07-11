@@ -20,6 +20,9 @@ help:
 	@echo "  make ps      -> Ver qué está corriendo"
 	@echo "  make reset   -> Borrar TODO incluido bases de datos y levantar de cero"
 	@echo "  make prod    -> Levantar en el servidor (sin puertos de debug)"
+	@echo "  make sonar-up   -> Levantar SonarQube (http://localhost:9000)"
+	@echo "  make sonar      -> Correr tests + analisis SonarQube (SONAR_TOKEN en .env)"
+	@echo "  make sonar-down -> Apagar SonarQube (los datos persisten)"
 	@echo ""
 
 up:
@@ -44,4 +47,17 @@ prod:
 	docker compose -f docker-compose.yml up -d --build --wait --wait-timeout 180
 	docker compose -f docker-compose.yml ps
 
-.PHONY: help up down logs ps reset prod
+sonar-up:
+	docker compose -f docker-compose.sonarqube.yml up -d --wait --wait-timeout 300
+
+sonar-down:
+	docker compose -f docker-compose.sonarqube.yml down
+
+# Tests con cobertura (solo enrollment-server tiene tests hoy) + análisis.
+# Requiere: make sonar-up y SONAR_TOKEN en .env (User > My Account > Security).
+sonar:
+	mvn clean verify sonar:sonar \
+		-Dsonar.host.url=$(if $(SONAR_HOST_URL),$(SONAR_HOST_URL),http://localhost:9000) \
+		-Dsonar.token=$(SONAR_TOKEN)
+
+.PHONY: help up down logs ps reset prod sonar-up sonar-down sonar

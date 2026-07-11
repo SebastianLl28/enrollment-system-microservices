@@ -29,6 +29,11 @@
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.2</spring-cloud.version>
+
+		<!-- SonarQube: `make sonar` (o mvn clean verify sonar:sonar con SONAR_TOKEN) -->
+		<sonar.projectKey>enrollment-system-microservices</sonar.projectKey>
+		<sonar.projectName>Enrollment System Microservices</sonar.projectName>
+		<sonar.qualitygate.wait>false</sonar.qualitygate.wait>
 	</properties>
 
 	<dependencyManagement>
@@ -63,6 +68,13 @@
 							</goals>
 						</execution>
 					</executions>
+				</plugin>
+
+				<!-- Se invoca desde la raíz como goal agregador: mvn sonar:sonar -->
+				<plugin>
+					<groupId>org.sonarsource.scanner.maven</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>5.7.0.6970</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
