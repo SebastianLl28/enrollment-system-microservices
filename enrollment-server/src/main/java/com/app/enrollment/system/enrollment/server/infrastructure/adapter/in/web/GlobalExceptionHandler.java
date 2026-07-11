@@ -47,6 +47,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -125,6 +127,18 @@ public class GlobalExceptionHandler {
   }
 
   // ── 400 Bean Validation (@Valid) ─────────────────────────────────────────────
+
+  // ── 400 Request malformado (headers/params requeridos ausentes) ─────────────
+
+  @ExceptionHandler({
+      MissingRequestHeaderException.class,
+      MissingServletRequestParameterException.class
+  })
+  public ResponseEntity<ErrorResponse> handleMissingRequestParts(Exception ex,
+      HttpServletRequest request) {
+    logger.warn("Request malformado: {}", ex.getMessage());
+    return build(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+  }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
