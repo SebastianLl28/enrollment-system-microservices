@@ -91,6 +91,14 @@ const allModules = [
     requiredPermission: null,
   },
   {
+    title: "Carreras en Vigencia",
+    description: "Gestiona las carreras ofertadas por periodo y su precio",
+    path: ROUTE_PATHS.careerOffering,
+    icon: BookUp,
+    requiredViewCode: "CAREER_OFFERING_LIST",
+    requiredPermission: null,
+  },
+  {
     title: "Inscripciones",
     description: "Gestiona las inscripciones de los estudiantes",
     path: ROUTE_PATHS.enrollment,

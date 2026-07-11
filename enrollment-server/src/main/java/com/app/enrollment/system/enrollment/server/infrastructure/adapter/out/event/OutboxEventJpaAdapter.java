@@ -36,7 +36,7 @@ public class OutboxEventJpaAdapter implements OutboxEventPort {
       entity.setPayload(json);
       entity.setUserId(event.userID().getValue());
       entity.setEnrollmentStatus(event.enrollmentStatus());
-      entity.setCourseId(event.course().getId().getValue());
+      entity.setCareerId(event.career().getId().getValue());
       entity.setStudentId(event.student().getId().getValue());
       
       entity.setRetryCount(entity.getRetryCount() + 1);

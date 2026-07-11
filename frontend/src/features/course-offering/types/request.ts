@@ -3,7 +3,6 @@ export interface CourseOfferingRequest {
   termId: number;
   sectionCode: string;
   capacity: number;
-  price: number;
 }
 
 export interface UpdateCourseOfferingRequest {
@@ -12,5 +11,4 @@ export interface UpdateCourseOfferingRequest {
   sectionCode: string;
   capacity: number;
   active: boolean;
-  price: number;
 }

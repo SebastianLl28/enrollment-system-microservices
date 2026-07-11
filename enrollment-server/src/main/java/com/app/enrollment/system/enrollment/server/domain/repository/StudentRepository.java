@@ -10,7 +10,6 @@ import java.util.Optional;
  */
 public interface StudentRepository {
   
-  List<Student> findAllByCourseId(Integer courseId);
   
   Student save(Student student);
   

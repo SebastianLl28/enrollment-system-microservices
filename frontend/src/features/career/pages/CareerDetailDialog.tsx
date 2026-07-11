@@ -73,12 +73,17 @@ const CareerDetailDialog = ({
                       </span>
                       {course.name}
                     </span>
-                    <Badge
-                      variant={course.active ? "success" : "destructive"}
-                      className="text-xs"
-                    >
-                      {course.active ? "Activo" : "Inactivo"}
-                    </Badge>
+                    <span className="flex items-center gap-1">
+                      <Badge variant="default" className="text-xs">
+                        Ciclo {course.semesterLevel}
+                      </Badge>
+                      <Badge
+                        variant={course.active ? "success" : "destructive"}
+                        className="text-xs"
+                      >
+                        {course.active ? "Activo" : "Inactivo"}
+                      </Badge>
+                    </span>
                   </li>
                 ))}
               </ul>

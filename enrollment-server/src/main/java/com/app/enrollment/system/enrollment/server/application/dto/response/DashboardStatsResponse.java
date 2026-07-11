@@ -11,12 +11,12 @@ public record DashboardStatsResponse(
   long totalStudents,
   long activeStudents,
   long totalCourses,
-  long activeCourseOfferings,
+  long activeCareerOfferings,
   long totalEnrollments,
   List<LabelCountResponse> enrollmentsByStatus,
   TermResponse currentTerm,
   long currentTermEnrollments,
   List<LabelCountResponse> enrollmentsByTerm,
-  List<LabelCountResponse> topCourses) {
+  List<LabelCountResponse> topCareers) {
 
 }

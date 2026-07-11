@@ -39,14 +39,14 @@ public class MercadoPagoPaymentAdapter implements PaymentGatewayPort {
   @Override
   public PaymentPreferenceResponse createPreference(CreatePaymentPreferenceCommand command) {
 
-    // Precio del CourseOffering (curso-periodo); offerings antiguos sin precio usan la tarifa por defecto
+    // Precio del CareerOffering (carrera-periodo); ofertas sin precio usan la tarifa por defecto
     BigDecimal unitPrice = command.amount() != null ? command.amount() : properties.enrollmentFee();
 
     PreferenceItemRequest item = PreferenceItemRequest.builder()
       .id(command.enrollmentId().toString())
-      .title("Inscripción - " + command.courseName())
-      .description("Inscripción de " + command.studentFullName()
-        + " al curso " + command.courseName())
+      .title("Matrícula - " + command.careerName() + " (" + command.termCode() + ")")
+      .description("Matrícula de " + command.studentFullName()
+        + " en la carrera " + command.careerName() + ", periodo " + command.termCode())
       .quantity(1)
       .currencyId(properties.currencyId())
       .unitPrice(unitPrice)

@@ -14,7 +14,6 @@ import com.app.enrollment.system.enrollment.server.application.port.in.GetAllCou
 import com.app.enrollment.system.enrollment.server.application.port.in.UpdateCourseOfferingUseCase;
 import com.app.enrollment.system.enrollment.server.domain.exception.CourseNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.CourseOfferingNotFoundException;
-import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCourseOfferingException;
 import com.app.enrollment.system.enrollment.server.domain.exception.TermNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.model.Course;
 import com.app.enrollment.system.enrollment.server.domain.model.CourseOffering;
@@ -34,7 +33,7 @@ import java.util.List;
 @UseCase
 public class CourseOfferingApplicationService implements CreateCourseOfferingUseCase,
   GetAllCourseOfferingUseCase, UpdateCourseOfferingUseCase {
-  
+
   private final CourseRepository courseRepository;
   private final TermRepository termRepository;
   private final CourseOfferingRepository courseOfferingRepository;
@@ -42,7 +41,7 @@ public class CourseOfferingApplicationService implements CreateCourseOfferingUse
   private final CourseMapper courseMapper;
   private final TermMapper termMapper;
   private final Clock clock;
-  
+
   public CourseOfferingApplicationService(CourseRepository courseRepository,
     TermRepository termRepository, CourseOfferingRepository courseOfferingRepository,
     CourseOfferingMapper courseOfferingMapper, CourseMapper courseMapper, TermMapper termMapper, Clock clock) {
@@ -54,38 +53,37 @@ public class CourseOfferingApplicationService implements CreateCourseOfferingUse
     this.termMapper = termMapper;
     this.clock = clock;
   }
-  
+
   @Override
   public CourseOfferingResponse createCourseOffering(CreateCourseOfferingCommand command) {
     CourseID courseID = new CourseID(command.courseId());
     TermID termID = new TermID(command.termId());
-    
+
     Course course = courseRepository.findById(courseID).orElseThrow(
       () -> new CourseNotFoundException("Course with ID " + command.courseId() + " not found.")
     );
-    
+
     Term term = termRepository.findById(termID).orElseThrow(
       () -> new TermNotFoundException("Term with ID " + command.termId() + " not found.")
     );
-    
+
     CourseOffering courseOffering = CourseOffering.create(
       courseID,
       termID,
       command.sectionCode(),
       command.capacity(),
-      command.price(),
       clock.instant()
     );
-    
+
     CourseOffering savedCourseOffering = courseOfferingRepository.save(courseOffering);
-    
+
     CourseSummaryResponse courseSummaryResponse = courseMapper.toSummaryResponse(course);
-    
+
     TermResponse termResponse = termMapper.toTermResponse(term);
-    
+
     return courseOfferingMapper.toCourseOfferingResponse(savedCourseOffering, courseSummaryResponse, termResponse);
   }
-  
+
   @Override
   public CourseOfferingResponse updateCourseOffering(UpdateCourseOfferingCommand command,
     Integer courseOfferingId) {
@@ -106,17 +104,8 @@ public class CourseOfferingApplicationService implements CreateCourseOfferingUse
       () -> new TermNotFoundException("Term with ID " + command.termId() + " not found.")
     );
 
-    // La capacidad no puede quedar por debajo de los estudiantes ya inscritos.
-    Integer enrolledCount = existing.getEnrolledCount() != null ? existing.getEnrolledCount() : 0;
-    if (command.capacity() < enrolledCount) {
-      throw new InvalidCourseOfferingException(
-        "La capacidad (" + command.capacity() + ") no puede ser menor a los inscritos actuales ("
-          + enrolledCount + ").");
-    }
-
     CourseOffering updated = CourseOffering.rehydrate(courseOfferingID, courseID, termID,
-      command.sectionCode(), command.capacity(), enrolledCount, command.active(),
-      existing.getCreatedAt(), command.price());
+      command.sectionCode(), command.capacity(), command.active(), existing.getCreatedAt());
 
     CourseOffering saved = courseOfferingRepository.save(updated);
 

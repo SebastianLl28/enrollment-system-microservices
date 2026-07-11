@@ -53,7 +53,7 @@ public class OutboxEventJpaEntity {
   
   private Integer studentId;
   
-  private Integer courseId;
+  private Integer careerId;
   
   @Enumerated(EnumType.STRING)
   private EnrollmentStatus enrollmentStatus;
@@ -158,11 +158,11 @@ public class OutboxEventJpaEntity {
     this.studentId = studentId;
   }
   
-  public Integer getCourseId() {
-    return courseId;
+  public Integer getCareerId() {
+    return careerId;
   }
   
-  public void setCourseId(Integer courseId) {
-    this.courseId = courseId;
+  public void setCareerId(Integer careerId) {
+    this.careerId = careerId;
   }
 }

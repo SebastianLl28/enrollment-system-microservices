@@ -8,6 +8,7 @@ import type { CellContext, ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import type { TermResponse } from "@/features/term/types/response";
 import type { CourseOfferingResponse } from "@/features/course-offering/types/response";
+import type { CareerOfferingResponse } from "@/features/career-offering/types/response";
 import type { EnrollmentResponse } from "@/features/enrollment/types/response";
 import {
   DropdownMenu,
@@ -264,12 +265,20 @@ export const useCourseColumns = (
         accessorKey: "credits",
       },
       {
-        header: "Semestre",
-        accessorKey: "semesterLevel",
-      },
-      {
-        header: "Inscritos",
-        cell: ({ row }) => row.original.enrolledStudentList?.length ?? 0,
+        header: "Carreras",
+        cell: ({ row }) => {
+          const careers = row.original.careers ?? [];
+          if (careers.length === 0) return "—";
+          return (
+            <div className="flex flex-wrap gap-1">
+              {careers.map((assignment) => (
+                <Badge key={assignment.careerId} variant="default">
+                  {assignment.careerName} · C{assignment.semesterLevel}
+                </Badge>
+              ))}
+            </div>
+          );
+        },
       },
       {
         header: "Estado",
@@ -405,20 +414,6 @@ export const useCourseOfferingColumns = (
           accessorKey: "capacity",
         },
         {
-          header: "Inscritos",
-          accessorKey: "enrolledCount",
-        },
-        {
-          header: "Precio",
-          accessorKey: "price",
-          cell: ({
-            getValue,
-          }: CellContext<CourseOfferingResponse, unknown>) => {
-            const price = getValue() as number | null;
-            return price != null ? `S/ ${price.toFixed(2)}` : "—";
-          },
-        },
-        {
           header: "Creación",
           accessorKey: "createdAt",
           cell: ({
@@ -463,6 +458,91 @@ export const useCourseOfferingColumns = (
       [handleEdit, canEdit]
     );
 
+export const useCareerOfferingColumns = (
+  handleEdit?: (offering: CareerOfferingResponse) => void,
+  canEdit = false
+): ColumnDef<CareerOfferingResponse>[] =>
+    useMemo(
+      () => [
+        {
+          header: "Carrera",
+          accessor: "career",
+          cell: ({ row }: CellContext<CareerOfferingResponse, unknown>) => {
+            const career = row.original.career;
+            return career.name;
+          },
+        },
+        {
+          header: "Periodo",
+          accessor: "term",
+          cell: ({ row }: CellContext<CareerOfferingResponse, unknown>) => {
+            const term = row.original.term;
+            return `${term.code}`;
+          },
+        },
+        {
+          header: "Capacidad",
+          accessorKey: "capacity",
+        },
+        {
+          header: "Matriculados",
+          accessorKey: "enrolledCount",
+        },
+        {
+          header: "Precio",
+          accessorKey: "price",
+          cell: ({
+            getValue,
+          }: CellContext<CareerOfferingResponse, unknown>) => {
+            const price = getValue() as number | null;
+            return price != null ? `S/ ${price.toFixed(2)}` : "—";
+          },
+        },
+        {
+          header: "Creación",
+          accessorKey: "createdAt",
+          cell: ({
+            getValue,
+          }: CellContext<CareerOfferingResponse, unknown>) => {
+            const date = new Date(getValue() as string);
+            return date.toLocaleDateString();
+          },
+        },
+        {
+          header: "Activo",
+          accessorKey: "active",
+          cell: ({
+            getValue,
+          }: CellContext<CareerOfferingResponse, unknown>) => {
+            const active = getValue() as boolean;
+            return (
+              <Badge variant={active ? "success" : "destructive"}>
+                {active ? "Activo" : "Inactivo"}
+              </Badge>
+            );
+          },
+        },
+        ...(canEdit && handleEdit
+          ? [
+              {
+                header: "Acciones",
+                id: "actions",
+                cell: ({ row }: CellContext<CareerOfferingResponse, unknown>) => (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleEdit(row.original)}
+                  >
+                    Editar
+                  </Button>
+                ),
+              } satisfies ColumnDef<CareerOfferingResponse>,
+            ]
+          : []),
+      ],
+      [handleEdit, canEdit]
+    );
+
 export const useEnrollmentColumns = (
   handleDetail: (enrollment: EnrollmentResponse) => void
 ): ColumnDef<EnrollmentResponse>[] =>
@@ -477,11 +557,17 @@ export const useEnrollmentColumns = (
         },
       },
       {
-        header: "Curso",
-        accessor: "courseOffering",
+        header: "Carrera",
+        accessor: "careerOffering",
         cell: ({ row }: CellContext<EnrollmentResponse, unknown>) => {
-          const courseOffering = row.original.courseOffering;
-          return `${courseOffering.course.code} - ${courseOffering.course.name}`;
+          const careerOffering = row.original.careerOffering;
+          return careerOffering.career.name;
+        },
+      },
+      {
+        header: "Periodo",
+        cell: ({ row }: CellContext<EnrollmentResponse, unknown>) => {
+          return row.original.careerOffering.term.code;
         },
       },
       {

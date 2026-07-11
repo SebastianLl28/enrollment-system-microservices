@@ -8,6 +8,7 @@ export interface CareerCourse {
   name: string;
   code: string;
   active: boolean;
+  semesterLevel: number;
 }
 
 export interface Career {

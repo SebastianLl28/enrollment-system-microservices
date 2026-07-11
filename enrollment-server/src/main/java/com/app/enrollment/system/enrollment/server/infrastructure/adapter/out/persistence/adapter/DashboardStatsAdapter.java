@@ -4,8 +4,8 @@ import com.app.common.annotation.Adapter;
 import com.app.enrollment.system.enrollment.server.application.dto.response.LabelCountResponse;
 import com.app.enrollment.system.enrollment.server.application.port.out.DashboardStatsPort;
 import com.app.enrollment.system.enrollment.server.domain.model.Term;
+import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.jpa.repository.CareerOfferingJpaRepository;
 import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.jpa.repository.CourseJpaRepository;
-import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.jpa.repository.CourseOfferingJpaRepository;
 import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.jpa.repository.EnrollmentJpaRepository;
 import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.jpa.repository.StudentJpaRepository;
 import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.persistence.jpa.repository.TermJpaRepository;
@@ -23,19 +23,19 @@ public class DashboardStatsAdapter implements DashboardStatsPort {
 
   private final StudentJpaRepository studentJpaRepository;
   private final CourseJpaRepository courseJpaRepository;
-  private final CourseOfferingJpaRepository courseOfferingJpaRepository;
+  private final CareerOfferingJpaRepository careerOfferingJpaRepository;
   private final EnrollmentJpaRepository enrollmentJpaRepository;
   private final TermJpaRepository termJpaRepository;
   private final TermJpaMapper termJpaMapper;
 
   public DashboardStatsAdapter(StudentJpaRepository studentJpaRepository,
     CourseJpaRepository courseJpaRepository,
-    CourseOfferingJpaRepository courseOfferingJpaRepository,
+    CareerOfferingJpaRepository careerOfferingJpaRepository,
     EnrollmentJpaRepository enrollmentJpaRepository, TermJpaRepository termJpaRepository,
     TermJpaMapper termJpaMapper) {
     this.studentJpaRepository = studentJpaRepository;
     this.courseJpaRepository = courseJpaRepository;
-    this.courseOfferingJpaRepository = courseOfferingJpaRepository;
+    this.careerOfferingJpaRepository = careerOfferingJpaRepository;
     this.enrollmentJpaRepository = enrollmentJpaRepository;
     this.termJpaRepository = termJpaRepository;
     this.termJpaMapper = termJpaMapper;
@@ -57,8 +57,8 @@ public class DashboardStatsAdapter implements DashboardStatsPort {
   }
 
   @Override
-  public long countActiveCourseOfferings() {
-    return courseOfferingJpaRepository.countByActiveTrue();
+  public long countActiveCareerOfferings() {
+    return careerOfferingJpaRepository.countByActiveTrue();
   }
 
   @Override
@@ -77,8 +77,8 @@ public class DashboardStatsAdapter implements DashboardStatsPort {
   }
 
   @Override
-  public List<LabelCountResponse> findTopCoursesByEnrollments(int limit) {
-    return toLabelCounts(enrollmentJpaRepository.countGroupByCourse(PageRequest.of(0, limit)));
+  public List<LabelCountResponse> findTopCareersByEnrollments(int limit) {
+    return toLabelCounts(enrollmentJpaRepository.countGroupByCareer(PageRequest.of(0, limit)));
   }
 
   @Override

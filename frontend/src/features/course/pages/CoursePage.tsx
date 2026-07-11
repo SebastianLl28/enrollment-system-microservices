@@ -53,19 +53,22 @@ const CoursePage = () => {
   }, []);
 
   const onSubmit = (values: CourseFormValues) => {
-    if (!values.careerId) {
-      toast.error("Selecciona una carrera");
+    if (values.careers.some((assignment) => assignment.careerId == null)) {
+      toast.error("Selecciona una carrera en cada asignación");
       return;
     }
+    const careers = values.careers.map((assignment) => ({
+      careerId: assignment.careerId as number,
+      semesterLevel: assignment.semesterLevel,
+    }));
 
     if (editingCourse) {
       const payload: UpdateCoursePayload = {
-        careerId: values.careerId,
         code: values.code,
         name: values.name,
         description: values.description,
         credits: values.credits,
-        semesterLevel: values.semesterLevel,
+        careers,
         active: values.active ?? editingCourse.active,
       };
       updateCourse(
@@ -74,12 +77,11 @@ const CoursePage = () => {
       );
     } else {
       const payload: CreateCoursePayload = {
-        careerId: values.careerId,
         code: values.code,
         name: values.name,
         description: values.description,
         credits: values.credits,
-        semesterLevel: values.semesterLevel,
+        careers,
       };
       createCourse(payload, { onSuccess: closeDialog });
     }
@@ -104,7 +106,7 @@ const CoursePage = () => {
               Lista de cursos
             </h1>
             <p className="text-sm text-gray-600">
-              Gestiona los cursos, asigna carrera, créditos y semestre.
+              Gestiona los cursos y su malla curricular (carreras y ciclos).
             </p>
           </div>
           {canCreate && (

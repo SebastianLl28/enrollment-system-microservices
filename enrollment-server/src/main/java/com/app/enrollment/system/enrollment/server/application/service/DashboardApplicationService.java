@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @UseCase
 public class DashboardApplicationService implements GetDashboardStatsUseCase {
 
-  private static final int TOP_COURSES_LIMIT = 5;
+  private static final int TOP_CAREERS_LIMIT = 5;
 
   private final DashboardStatsPort dashboardStatsPort;
   private final TermMapper termMapper;
@@ -46,13 +46,13 @@ public class DashboardApplicationService implements GetDashboardStatsUseCase {
       dashboardStatsPort.countStudents(),
       dashboardStatsPort.countActiveStudents(),
       dashboardStatsPort.countCourses(),
-      dashboardStatsPort.countActiveCourseOfferings(),
+      dashboardStatsPort.countActiveCareerOfferings(),
       dashboardStatsPort.countEnrollments(),
       dashboardStatsPort.countEnrollmentsByStatus(),
       currentTermResponse,
       currentTermEnrollments,
       dashboardStatsPort.countEnrollmentsByTerm(),
-      dashboardStatsPort.findTopCoursesByEnrollments(TOP_COURSES_LIMIT)
+      dashboardStatsPort.findTopCareersByEnrollments(TOP_CAREERS_LIMIT)
     );
   }
 }

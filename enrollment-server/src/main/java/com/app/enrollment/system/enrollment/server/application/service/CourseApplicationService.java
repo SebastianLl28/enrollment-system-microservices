@@ -2,24 +2,29 @@ package com.app.enrollment.system.enrollment.server.application.service;
 
 import com.app.enrollment.system.enrollment.server.application.dto.command.CreateCourseCommand;
 import com.app.enrollment.system.enrollment.server.application.dto.command.UpdateCourseCommand;
+import com.app.enrollment.system.enrollment.server.application.dto.response.CareerAssignmentResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.CourseResponse;
 import com.app.enrollment.system.enrollment.server.application.mapper.CourseMapper;
 import com.app.enrollment.system.enrollment.server.application.port.in.CreateCourseUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.GetAllCourseUseCase;
 import com.app.enrollment.system.enrollment.server.application.port.in.UpdateCourseUseCase;
+import com.app.enrollment.system.enrollment.server.domain.exception.CareerNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.CourseNotFoundException;
+import com.app.enrollment.system.enrollment.server.domain.model.Career;
+import com.app.enrollment.system.enrollment.server.domain.model.CareerCourse;
 import com.app.enrollment.system.enrollment.server.domain.model.Course;
-import com.app.enrollment.system.enrollment.server.domain.model.Student;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CareerID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CourseCode;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CourseID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.Credits;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.SemesterLevel;
+import com.app.enrollment.system.enrollment.server.domain.repository.CareerCourseRepository;
+import com.app.enrollment.system.enrollment.server.domain.repository.CareerRepository;
 import com.app.enrollment.system.enrollment.server.domain.repository.CourseRepository;
-import com.app.enrollment.system.enrollment.server.domain.repository.StudentRepository;
 import java.time.Clock;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Alonso
@@ -30,13 +35,16 @@ public class CourseApplicationService implements GetAllCourseUseCase, CreateCour
   private final CourseRepository courseRepository;
   private final CourseMapper courseMapper;
   private final Clock clock;
-  private final StudentRepository studentRepository;
-  
-  public CourseApplicationService(CourseRepository courseRepository, CourseMapper courseMapper, Clock clock, StudentRepository studentRepository) {
+  private final CareerCourseRepository careerCourseRepository;
+  private final CareerRepository careerRepository;
+
+  public CourseApplicationService(CourseRepository courseRepository, CourseMapper courseMapper,
+    Clock clock, CareerCourseRepository careerCourseRepository, CareerRepository careerRepository) {
     this.courseRepository = courseRepository;
     this.courseMapper = courseMapper;
     this.clock = clock;
-    this.studentRepository = studentRepository;
+    this.careerCourseRepository = careerCourseRepository;
+    this.careerRepository = careerRepository;
   }
 
   @Override
@@ -44,43 +52,75 @@ public class CourseApplicationService implements GetAllCourseUseCase, CreateCour
     List<Course> courseList = courseRepository.findAll();
 
     return courseList.stream()
-        .map(course -> {
-          List<Student> enrolledStudents = studentRepository.findAllByCourseId
-          (course.getId().getValue());
-          return courseMapper.toResponse(course, enrolledStudents);
-        })
+        .map(course -> courseMapper.toResponse(course, findCareerAssignments(course.getId())))
         .toList();
   }
 
   @Override
+  @Transactional
   public CourseResponse updateCourse(UpdateCourseCommand command, Integer courseId) {
     CourseID courseID = new CourseID(courseId);
     Course existing = courseRepository.findById(courseID).orElseThrow(() ->
         new CourseNotFoundException("Course with ID " + courseId + " not found"));
 
-    CareerID careerID = new CareerID(command.careerId());
     CourseCode courseCode = new CourseCode(command.code());
     Credits credits = new Credits(command.credits());
-    SemesterLevel semesterLevel = new SemesterLevel(command.semesterLevel());
 
-    Course updated = Course.rehydrate(courseID, careerID, courseCode, command.name(),
-        command.description(), credits, semesterLevel, existing.getRegistrationDate(), command.active());
+    Course updated = Course.rehydrate(courseID, courseCode, command.name(),
+        command.description(), credits, existing.getRegistrationDate(), command.active());
 
     Course savedCourse = courseRepository.save(updated);
-    List<Student> enrolledStudents = studentRepository.findAllByCourseId(savedCourse.getId().getValue());
-    return courseMapper.toResponse(savedCourse, enrolledStudents);
+
+    replaceCareerAssignments(savedCourse.getId(), command.careers().stream()
+        .map(assignment -> toCareerCourse(savedCourse.getId(), assignment.careerId(),
+            assignment.semesterLevel()))
+        .toList());
+
+    return courseMapper.toResponse(savedCourse, findCareerAssignments(savedCourse.getId()));
   }
 
   @Override
+  @Transactional
   public CourseResponse createCourse(CreateCourseCommand createCourseCommand) {
-    CareerID careerID = new CareerID(createCourseCommand.careerId());
     CourseCode courseCode = new CourseCode(createCourseCommand.code());
     Credits credits = new Credits(createCourseCommand.credits());
-    SemesterLevel semesterLevel = new SemesterLevel(createCourseCommand.semesterLevel());
 
-    Course course = Course.create(careerID, courseCode, createCourseCommand.name(), createCourseCommand.description(), credits, semesterLevel, clock.instant());
+    Course course = Course.create(courseCode, createCourseCommand.name(),
+        createCourseCommand.description(), credits, clock.instant());
 
     Course savedCourse = courseRepository.save(course);
-    return courseMapper.toResponse(savedCourse, List.of());
+
+    replaceCareerAssignments(savedCourse.getId(), createCourseCommand.careers().stream()
+        .map(assignment -> toCareerCourse(savedCourse.getId(), assignment.careerId(),
+            assignment.semesterLevel()))
+        .toList());
+
+    return courseMapper.toResponse(savedCourse, findCareerAssignments(savedCourse.getId()));
+  }
+
+  private CareerCourse toCareerCourse(CourseID courseID, Integer careerId, Integer semesterLevel) {
+    CareerID careerID = new CareerID(careerId);
+    // Valida que la carrera exista antes de asignarla a la malla.
+    careerRepository.findById(careerID).orElseThrow(() ->
+        new CareerNotFoundException("Career with ID " + careerId + " not found"));
+    return CareerCourse.create(careerID, courseID, new SemesterLevel(semesterLevel));
+  }
+
+  private void replaceCareerAssignments(CourseID courseID, List<CareerCourse> careerCourses) {
+    careerCourseRepository.replaceForCourse(courseID, careerCourses);
+  }
+
+  private List<CareerAssignmentResponse> findCareerAssignments(CourseID courseID) {
+    return careerCourseRepository.findByCourseId(courseID).stream()
+        .map(careerCourse -> {
+          Career career = careerRepository.findById(careerCourse.getCareerId()).orElseThrow(() ->
+              new CareerNotFoundException(
+                  "Career with ID " + careerCourse.getCareerId().getValue() + " not found"));
+          return new CareerAssignmentResponse(
+              career.getId().getValue(),
+              career.getName(),
+              careerCourse.getSemesterLevel().getValue());
+        })
+        .toList();
   }
 }

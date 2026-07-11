@@ -34,6 +34,10 @@ export const COURSE_OFFERING_ENDPOINT = {
   base: "/api/v1/course-offering",
 };
 
+export const CAREER_OFFERING_ENDPOINT = {
+  base: "/api/v1/career-offering",
+};
+
 export const ENROLLMENT_ENDPOINT = {
   base: "/api/v1/enrollment",
 };

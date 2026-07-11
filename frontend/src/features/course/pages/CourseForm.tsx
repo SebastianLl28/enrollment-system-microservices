@@ -1,7 +1,9 @@
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import Select from "react-select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Plus, Trash2 } from "lucide-react";
 import type { Course, CourseFormValues } from "../types/Course";
 import { useGetCareers } from "@/features/career/hooks/useQuery";
 
@@ -21,22 +23,28 @@ const CourseForm = ({ onSubmit, defaultValues }: CourseFormProps) => {
   } = useForm<CourseFormValues>({
     defaultValues: defaultValues
       ? {
-          careerId: defaultValues.careerId,
           code: defaultValues.code,
           name: defaultValues.name,
           description: defaultValues.description ?? "",
           credits: defaultValues.credits,
-          semesterLevel: defaultValues.semesterLevel,
+          careers: defaultValues.careers.map((assignment) => ({
+            careerId: assignment.careerId,
+            semesterLevel: assignment.semesterLevel,
+          })),
           active: defaultValues.active,
         }
       : {
-          careerId: null,
           code: "",
           name: "",
           description: "",
           credits: 3,
-          semesterLevel: 1,
+          careers: [{ careerId: null, semesterLevel: 1 }],
         },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "careers",
   });
 
   const { data: careers, isPending: isLoadingCareers } = useGetCareers({ includeInactive: false });
@@ -53,34 +61,6 @@ const CourseForm = ({ onSubmit, defaultValues }: CourseFormProps) => {
       onSubmit={handleSubmit(onSubmit)}
       id="course-form"
     >
-      <div className="space-y-2">
-        <Label htmlFor="careerId">Carrera</Label>
-        <Controller
-          control={control}
-          name="careerId"
-          rules={{ required: "Selecciona una carrera" }}
-          render={({ field }) => (
-            <Select
-              inputId="careerId"
-              className="w-full"
-              options={careerOptions}
-              isLoading={isLoadingCareers}
-              placeholder="Selecciona una carrera"
-              value={
-                careerOptions.find((option) => option.value === field.value) ??
-                null
-              }
-              onChange={(option) => field.onChange(option?.value ?? null)}
-              isClearable
-              classNamePrefix="react-select"
-            />
-          )}
-        />
-        {errors.careerId && (
-          <p className="text-sm text-red-600">{errors.careerId.message}</p>
-        )}
-      </div>
-
       <div className="space-y-2">
         <Label htmlFor="code">Código</Label>
         <Input
@@ -116,42 +96,104 @@ const CourseForm = ({ onSubmit, defaultValues }: CourseFormProps) => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="credits">Créditos</Label>
-          <Input
-            id="credits"
-            type="number"
-            min={1}
-            {...register("credits", {
-              required: "Requerido",
-              valueAsNumber: true,
-              min: { value: 1, message: "Debe ser mayor a 0" },
-            })}
-          />
-          {errors.credits && (
-            <p className="text-sm text-red-600">{errors.credits.message}</p>
-          )}
+      <div className="space-y-2">
+        <Label htmlFor="credits">Créditos</Label>
+        <Input
+          id="credits"
+          type="number"
+          min={1}
+          {...register("credits", {
+            required: "Requerido",
+            valueAsNumber: true,
+            min: { value: 1, message: "Debe ser mayor a 0" },
+          })}
+        />
+        {errors.credits && (
+          <p className="text-sm text-red-600">{errors.credits.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label>Carreras (malla curricular)</Label>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => append({ careerId: null, semesterLevel: 1 })}
+          >
+            <Plus className="h-4 w-4" />
+            Agregar carrera
+          </Button>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="semesterLevel">Semestre</Label>
-          <Input
-            id="semesterLevel"
-            type="number"
-            min={1}
-            {...register("semesterLevel", {
-              required: "Requerido",
-              valueAsNumber: true,
-              min: { value: 1, message: "Debe ser mayor a 0" },
-            })}
-          />
-          {errors.semesterLevel && (
-            <p className="text-sm text-red-600">
-              {errors.semesterLevel.message}
-            </p>
-          )}
-        </div>
+        {fields.map((field, index) => (
+          <div key={field.id} className="flex items-start gap-2">
+            <div className="flex-1 space-y-1">
+              <Controller
+                control={control}
+                name={`careers.${index}.careerId`}
+                rules={{ required: "Selecciona una carrera" }}
+                render={({ field: selectField }) => (
+                  <Select
+                    inputId={`careers-${index}-careerId`}
+                    className="w-full"
+                    options={careerOptions}
+                    isLoading={isLoadingCareers}
+                    placeholder="Selecciona una carrera"
+                    value={
+                      careerOptions.find(
+                        (option) => option.value === selectField.value
+                      ) ?? null
+                    }
+                    onChange={(option) =>
+                      selectField.onChange(option?.value ?? null)
+                    }
+                    isClearable
+                    classNamePrefix="react-select"
+                  />
+                )}
+              />
+              {errors.careers?.[index]?.careerId && (
+                <p className="text-sm text-red-600">
+                  {errors.careers[index]?.careerId?.message}
+                </p>
+              )}
+            </div>
+
+            <div className="w-28 space-y-1">
+              <Input
+                type="number"
+                min={1}
+                placeholder="Ciclo"
+                {...register(`careers.${index}.semesterLevel`, {
+                  required: "Requerido",
+                  valueAsNumber: true,
+                  min: { value: 1, message: "Debe ser mayor a 0" },
+                })}
+              />
+              {errors.careers?.[index]?.semesterLevel && (
+                <p className="text-sm text-red-600">
+                  {errors.careers[index]?.semesterLevel?.message}
+                </p>
+              )}
+            </div>
+
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              disabled={fields.length === 1}
+              onClick={() => remove(index)}
+            >
+              <Trash2 className="h-4 w-4 text-red-500" />
+            </Button>
+          </div>
+        ))}
+        <p className="text-xs text-gray-500">
+          El ciclo puede variar según la carrera. Debe haber al menos una
+          carrera asignada.
+        </p>
       </div>
 
       {isEditing && (

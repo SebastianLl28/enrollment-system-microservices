@@ -5,14 +5,12 @@ import java.util.List;
 public class CourseResponse {
 
   private Integer id;
-  private Integer careerId;
   private String code;
   private String name;
   private String description;
   private boolean active;
   private int credits;
-  private int semesterLevel;
-  private List<StudentSummaryResponse> enrolledStudentList;
+  private List<CareerAssignmentResponse> careers;
 
   public CourseResponse() {
   }
@@ -23,14 +21,6 @@ public class CourseResponse {
 
   public void setId(Integer id) {
     this.id = id;
-  }
-
-  public Integer getCareerId() {
-    return careerId;
-  }
-
-  public void setCareerId(Integer careerId) {
-    this.careerId = careerId;
   }
 
   public String getCode() {
@@ -65,27 +55,19 @@ public class CourseResponse {
     this.active = active;
   }
 
-  public List<StudentSummaryResponse> getEnrolledStudentList() {
-    return enrolledStudentList;
-  }
-
-  public void setEnrolledStudentList(List<StudentSummaryResponse> enrolledStudentList) {
-    this.enrolledStudentList = enrolledStudentList;
-  }
-  
   public int getCredits() {
     return credits;
   }
-  
+
   public void setCredits(int credits) {
     this.credits = credits;
   }
-  
-  public int getSemesterLevel() {
-    return semesterLevel;
+
+  public List<CareerAssignmentResponse> getCareers() {
+    return careers;
   }
-  
-  public void setSemesterLevel(int semesterLevel) {
-    this.semesterLevel = semesterLevel;
+
+  public void setCareers(List<CareerAssignmentResponse> careers) {
+    this.careers = careers;
   }
 }

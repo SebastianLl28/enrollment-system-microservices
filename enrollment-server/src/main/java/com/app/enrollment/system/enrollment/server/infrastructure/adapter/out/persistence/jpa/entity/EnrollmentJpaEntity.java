@@ -13,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
@@ -25,7 +24,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "enrollment", indexes = {
   @Index(name = "idx_enroll_student", columnList = "student_id"),
-  @Index(name = "idx_enroll_offering", columnList = "course_offering_id"),
+  @Index(name = "idx_enroll_offering", columnList = "career_offering_id"),
   @Index(name = "idx_enroll_status", columnList = "status")
 })
 public class EnrollmentJpaEntity {
@@ -44,7 +43,7 @@ public class EnrollmentJpaEntity {
 
   @Column(name = "enrollment_date", nullable = false)
   private LocalDateTime enrollmentDate;
-  
+
   @Column(name = "unenrollment_date")
   private LocalDateTime unenrollmentDate;
 
@@ -64,31 +63,31 @@ public class EnrollmentJpaEntity {
   @UpdateTimestamp
   @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
-  
+
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
-  
+
   @Column(name = "user_id", nullable = false)
   private Integer userId;
-  
-  @Column(name = "course_offering_id", nullable = false)
-  private Integer courseOfferingId;
-  
+
+  @Column(name = "career_offering_id", nullable = false)
+  private Integer careerOfferingId;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(
-    name = "course_offering_id",
+    name = "career_offering_id",
     nullable = false,
     insertable = false,
     updatable = false,
-    foreignKey = @ForeignKey(name = "fk_enrollment_offering")
+    foreignKey = @ForeignKey(name = "fk_enrollment_career_offering")
   )
-  private CourseOfferingJpaEntity courseOffering;
-  
+  private CareerOfferingJpaEntity careerOffering;
+
   public EnrollmentJpaEntity() {
   }
-  
-  public EnrollmentJpaEntity(Integer enrollmentId, Integer studentId, Integer courseOfferingId,
+
+  public EnrollmentJpaEntity(Integer enrollmentId, Integer studentId, Integer careerOfferingId,
     LocalDateTime enrollmentDate, LocalDateTime unenrollmentDate, EnrollmentStatus status, Integer userId) {
     this.enrollmentId = enrollmentId;
     this.studentId = studentId;
@@ -96,89 +95,97 @@ public class EnrollmentJpaEntity {
     this.unenrollmentDate = unenrollmentDate;
     this.status = status;
     this.userId = userId;
-    this.courseOfferingId = courseOfferingId;
+    this.careerOfferingId = careerOfferingId;
   }
-  
+
   public Integer getEnrollmentId() {
     return enrollmentId;
   }
-  
+
   public void setEnrollmentId(Integer enrollmentId) {
     this.enrollmentId = enrollmentId;
   }
-  
+
   public Integer getStudentId() {
     return studentId;
   }
-  
+
   public void setStudentId(Integer studentId) {
     this.studentId = studentId;
   }
-  
+
   public StudentJpaEntity getStudent() {
     return student;
   }
-  
+
   public void setStudent(
     StudentJpaEntity student) {
     this.student = student;
   }
-  
+
   public LocalDateTime getEnrollmentDate() {
     return enrollmentDate;
   }
-  
+
   public void setEnrollmentDate(LocalDateTime enrollmentDate) {
     this.enrollmentDate = enrollmentDate;
   }
-  
+
   public LocalDateTime getUnenrollmentDate() {
     return unenrollmentDate;
   }
-  
+
   public void setUnenrollmentDate(LocalDateTime unenrollmentDate) {
     this.unenrollmentDate = unenrollmentDate;
   }
-  
+
   public EnrollmentStatus getStatus() {
     return status;
   }
-  
+
   public void setStatus(
     EnrollmentStatus status) {
     this.status = status;
   }
-  
+
   public LocalDateTime getUpdatedAt() {
     return updatedAt;
   }
-  
+
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
   }
-  
+
   public LocalDateTime getCreatedAt() {
     return createdAt;
   }
-  
+
   public void setCreatedAt(LocalDateTime createdAt) {
     this.createdAt = createdAt;
   }
-  
+
   public Integer getUserId() {
     return userId;
   }
-  
+
   public void setUserId(Integer userId) {
     this.userId = userId;
   }
-  
-  public Integer getCourseOfferingId() {
-    return courseOfferingId;
+
+  public Integer getCareerOfferingId() {
+    return careerOfferingId;
   }
 
-  public void setCourseOfferingId(Integer courseOfferingId) {
-    this.courseOfferingId = courseOfferingId;
+  public void setCareerOfferingId(Integer careerOfferingId) {
+    this.careerOfferingId = careerOfferingId;
+  }
+
+  public CareerOfferingJpaEntity getCareerOffering() {
+    return careerOffering;
+  }
+
+  public void setCareerOffering(CareerOfferingJpaEntity careerOffering) {
+    this.careerOffering = careerOffering;
   }
 
   public String getPaymentId() {

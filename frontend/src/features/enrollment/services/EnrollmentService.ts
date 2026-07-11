@@ -7,17 +7,17 @@ import type {
   EnrollmentUpdateRequest,
 } from "../types/request";
 
-export const getEnrollmentsByStudentIdAndTermIdAndCourseId = async ({
+export const getEnrollmentsByStudentIdAndTermIdAndCareerId = async ({
   studentId,
   termId,
-  courseId,
+  careerId,
   page,
   size,
 }: EnrollmentRequestQuery) => {
   const params = new URLSearchParams();
   if (studentId != null) params.append("studentId", String(studentId));
   if (termId != null) params.append("termId", String(termId));
-  if (courseId != null) params.append("courseId", String(courseId));
+  if (careerId != null) params.append("careerId", String(careerId));
   if (page != null) params.append("page", String(page));
   if (size != null) params.append("size", String(size));
 

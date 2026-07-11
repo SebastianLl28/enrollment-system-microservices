@@ -1,12 +1,12 @@
 export interface EnrollmentRequest {
   studentId: number;
-  courseOfferingId: number;
+  careerOfferingId: number;
 }
 
 export interface EnrollmentRequestQuery {
   studentId: number | null;
   termId: number | null;
-  courseId: number | null;
+  careerId: number | null;
   page?: number;
   size?: number;
 }

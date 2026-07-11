@@ -56,7 +56,6 @@ const CourseOfferingPage = () => {
           termId: editingOffering.term.id,
           sectionCode: editingOffering.section,
           capacity: editingOffering.capacity,
-          price: editingOffering.price ?? undefined,
           active: editingOffering.active,
         }
       : null;
@@ -71,7 +70,6 @@ const CourseOfferingPage = () => {
             termId: values.termId,
             sectionCode: values.sectionCode,
             capacity: values.capacity,
-            price: values.price,
             active: values.active ?? editingOffering.active,
           },
         },
@@ -84,7 +82,6 @@ const CourseOfferingPage = () => {
           termId: values.termId,
           sectionCode: values.sectionCode,
           capacity: values.capacity,
-          price: values.price,
         },
         { onSuccess: closeDialog }
       );

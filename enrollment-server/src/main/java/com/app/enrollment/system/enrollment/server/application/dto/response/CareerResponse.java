@@ -13,7 +13,7 @@ public class CareerResponse {
   private String degreeAwarded;
   private Instant registrationDate;
   private boolean active;
-  private List<CourseSummaryResponse> courseList;
+  private List<CourseWithLevelResponse> courseList;
 
   public CareerResponse() {
   }
@@ -82,11 +82,11 @@ public class CareerResponse {
     this.active = active;
   }
 
-  public List<CourseSummaryResponse> getCourseList() {
+  public List<CourseWithLevelResponse> getCourseList() {
     return courseList;
   }
 
-  public void setCourseList(List<CourseSummaryResponse> courseList) {
+  public void setCourseList(List<CourseWithLevelResponse> courseList) {
     this.courseList = courseList;
   }
 }

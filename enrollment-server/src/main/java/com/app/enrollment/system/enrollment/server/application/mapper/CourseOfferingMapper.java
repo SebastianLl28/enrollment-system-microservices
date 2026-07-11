@@ -1,7 +1,6 @@
 package com.app.enrollment.system.enrollment.server.application.mapper;
 
 import com.app.enrollment.system.enrollment.server.application.dto.response.CourseOfferingResponse;
-import com.app.enrollment.system.enrollment.server.application.dto.response.CourseResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.CourseSummaryResponse;
 import com.app.enrollment.system.enrollment.server.application.dto.response.TermResponse;
 import com.app.enrollment.system.enrollment.server.domain.model.CourseOffering;
@@ -20,11 +19,9 @@ public class CourseOfferingMapper {
       termResponse,
       courseOffering.getSectionCode(),
       courseOffering.getCapacity(),
-      courseOffering.getEnrolledCount(),
       courseOffering.isActive(),
-      courseOffering.getCreatedAt(),
-      courseOffering.getPrice()
+      courseOffering.getCreatedAt()
     );
   }
-  
+
 }

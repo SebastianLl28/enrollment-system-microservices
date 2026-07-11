@@ -9,19 +9,22 @@ import com.app.enrollment.system.enrollment.server.application.port.in.ProcessPa
 import com.app.enrollment.system.enrollment.server.application.port.out.OutboxEventPort;
 import com.app.enrollment.system.enrollment.server.application.port.out.PaymentGatewayPort;
 import com.app.enrollment.system.enrollment.server.domain.event.EventType;
-import com.app.enrollment.system.enrollment.server.domain.exception.CourseNotFoundException;
-import com.app.enrollment.system.enrollment.server.domain.exception.CourseOfferingNotFoundException;
+import com.app.enrollment.system.enrollment.server.domain.exception.CareerNotFoundException;
+import com.app.enrollment.system.enrollment.server.domain.exception.CareerOfferingNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.EnrollmentNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.StudentNotFoundException;
-import com.app.enrollment.system.enrollment.server.domain.model.Course;
-import com.app.enrollment.system.enrollment.server.domain.model.CourseOffering;
+import com.app.enrollment.system.enrollment.server.domain.exception.TermNotFoundException;
+import com.app.enrollment.system.enrollment.server.domain.model.Career;
+import com.app.enrollment.system.enrollment.server.domain.model.CareerOffering;
 import com.app.enrollment.system.enrollment.server.domain.model.Enrollment;
 import com.app.enrollment.system.enrollment.server.domain.model.Student;
+import com.app.enrollment.system.enrollment.server.domain.model.Term;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.EnrollmentID;
-import com.app.enrollment.system.enrollment.server.domain.repository.CourseOfferingRepository;
-import com.app.enrollment.system.enrollment.server.domain.repository.CourseRepository;
+import com.app.enrollment.system.enrollment.server.domain.repository.CareerOfferingRepository;
+import com.app.enrollment.system.enrollment.server.domain.repository.CareerRepository;
 import com.app.enrollment.system.enrollment.server.domain.repository.EnrollmentRepository;
 import com.app.enrollment.system.enrollment.server.domain.repository.StudentRepository;
+import com.app.enrollment.system.enrollment.server.domain.repository.TermRepository;
 import java.time.Clock;
 import java.time.Instant;
 import org.slf4j.Logger;
@@ -30,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Procesa las notificaciones de pago de Mercado Pago: consulta el pago en la API
- * oficial, y si está aprobado marca la inscripción como PAID (idempotente) y
+ * oficial, y si está aprobado marca la matrícula como PAID (idempotente) y
  * registra el evento de dominio en el outbox para notificar al estudiante.
  *
  * @author Alonso
@@ -45,20 +48,22 @@ public class PaymentApplicationService implements ProcessPaymentNotificationUseC
   private final PaymentGatewayPort paymentGatewayPort;
   private final EnrollmentRepository enrollmentRepository;
   private final StudentRepository studentRepository;
-  private final CourseOfferingRepository courseOfferingRepository;
-  private final CourseRepository courseRepository;
+  private final CareerOfferingRepository careerOfferingRepository;
+  private final CareerRepository careerRepository;
+  private final TermRepository termRepository;
   private final OutboxEventPort outboxEventPort;
   private final Clock clock;
 
   public PaymentApplicationService(PaymentGatewayPort paymentGatewayPort,
     EnrollmentRepository enrollmentRepository, StudentRepository studentRepository,
-    CourseOfferingRepository courseOfferingRepository, CourseRepository courseRepository,
-    OutboxEventPort outboxEventPort, Clock clock) {
+    CareerOfferingRepository careerOfferingRepository, CareerRepository careerRepository,
+    TermRepository termRepository, OutboxEventPort outboxEventPort, Clock clock) {
     this.paymentGatewayPort = paymentGatewayPort;
     this.enrollmentRepository = enrollmentRepository;
     this.studentRepository = studentRepository;
-    this.courseOfferingRepository = courseOfferingRepository;
-    this.courseRepository = courseRepository;
+    this.careerOfferingRepository = careerOfferingRepository;
+    this.careerRepository = careerRepository;
+    this.termRepository = termRepository;
     this.outboxEventPort = outboxEventPort;
     this.clock = clock;
   }
@@ -117,23 +122,27 @@ public class PaymentApplicationService implements ProcessPaymentNotificationUseC
       () -> new StudentNotFoundException(
         "Student not found with id: " + enrollment.getStudentID().getValue()));
 
-    CourseOffering courseOffering = courseOfferingRepository.findById(
-      enrollment.getCourseOfferingID()).orElseThrow(
-      () -> new CourseOfferingNotFoundException(
-        "Course offering not found with id: " + enrollment.getCourseOfferingID().getValue()));
+    CareerOffering careerOffering = careerOfferingRepository.findById(
+      enrollment.getCareerOfferingID()).orElseThrow(
+      () -> new CareerOfferingNotFoundException(
+        "Career offering not found with id: " + enrollment.getCareerOfferingID().getValue()));
 
-    Course course = courseRepository.findById(courseOffering.getCourseId()).orElseThrow(
-      () -> new CourseNotFoundException(
-        "Course not found with id: " + courseOffering.getCourseId().getValue()));
+    Career career = careerRepository.findById(careerOffering.getCareerId()).orElseThrow(
+      () -> new CareerNotFoundException(
+        "Career not found with id: " + careerOffering.getCareerId().getValue()));
+
+    Term term = termRepository.findById(careerOffering.getTermId()).orElseThrow(
+      () -> new TermNotFoundException(
+        "Term not found with id: " + careerOffering.getTermId().getValue()));
 
     EnrollmentAssignedEvent event = new EnrollmentAssignedEvent(
       enrollment.getID().getValue().toString(),
-      enrollment.getStudentID().getValue().toString(),
-      courseOffering.getCourseId().toString(), paidAt,
+      paidAt,
       student.getFullName(), student.getEmail().getValue(),
       enrollment.getStatus().toString(),
       enrollment.getUserID().getValue(),
-      course.getName()
+      career.getName(),
+      term.getCode()
     );
 
     SendEnrollmentEvent sendEnrollmentEvent = new SendEnrollmentEvent(
@@ -144,7 +153,7 @@ public class PaymentApplicationService implements ProcessPaymentNotificationUseC
       enrollment.getUserID(),
       enrollment.getStatus(),
       student,
-      course
+      career
     );
 
     outboxEventPort.saveEvent(sendEnrollmentEvent);

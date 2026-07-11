@@ -90,7 +90,7 @@ const DashboardStats = () => {
     Inscripciones: item.count,
   }));
 
-  const topCoursesData = stats.topCourses.map((item) => ({
+  const topCareersData = stats.topCareers.map((item) => ({
     name: item.label,
     Inscripciones: item.count,
   }));
@@ -122,8 +122,8 @@ const DashboardStats = () => {
           icon={CalendarDays}
         />
         <KpiCard
-          title="Cursos en vigencia"
-          value={String(stats.activeCourseOfferings)}
+          title="Carreras en vigencia"
+          value={String(stats.activeCareerOfferings)}
           detail={`${stats.totalCourses} cursos en el catálogo`}
           icon={ListTodo}
         />
@@ -191,19 +191,19 @@ const DashboardStats = () => {
         </Card>
       </div>
 
-      {topCoursesData.length > 0 && (
+      {topCareersData.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              Cursos con más inscripciones
+              Carreras con más matrículas
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer
               width="100%"
-              height={40 * topCoursesData.length + 40}
+              height={40 * topCareersData.length + 40}
             >
-              <BarChart data={topCoursesData} layout="vertical">
+              <BarChart data={topCareersData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                 <XAxis
                   type="number"

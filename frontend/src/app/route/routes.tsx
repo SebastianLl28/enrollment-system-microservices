@@ -17,6 +17,7 @@ import StudentsPage from "@/features/students/pages/StudentsPage";
 import ProfilePage from "@/features/profile/pages/ProfilePage";
 import TermsPage from "@/features/term/pages/TermsPage";
 import CourseOfferingPage from "@/features/course-offering/pages/CourseOfferingPage";
+import CareerOfferingPage from "@/features/career-offering/pages/CareerOfferingPage";
 import EnrollmentsPage from "@/features/enrollment/pages/EnrollmentsPage";
 import RolesPage from "@/features/rbac/pages/RolesPages";
 import StatisticsPage from "@/features/dashboard/pages/StatisticsPage";
@@ -87,6 +88,10 @@ export const router = createBrowserRouter([
       {
         path: ROUTE_PATHS.courseOffering,
         element: <CourseOfferingPage />,
+      },
+      {
+        path: ROUTE_PATHS.careerOffering,
+        element: <CareerOfferingPage />,
       },
       {
         path: ROUTE_PATHS.enrollment,

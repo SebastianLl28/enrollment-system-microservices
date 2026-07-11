@@ -46,7 +46,7 @@ const CourseOfferingForm = ({
       className="space-y-4"
     >
       <div className="space-y-2">
-        <Label htmlFor="careerId">Carrera</Label>
+        <Label htmlFor="courseId">Curso</Label>
         <Controller
           control={control}
           name="courseId"
@@ -114,22 +114,6 @@ const CourseOfferingForm = ({
             valueAsNumber: true,
           })}
           placeholder="30"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="price">Precio de inscripción (S/)</Label>
-        <input
-          type="number"
-          id="price"
-          step="0.01"
-          min="0"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          {...register("price", {
-            required: "Requerido",
-            valueAsNumber: true,
-            min: { value: 0, message: "El precio no puede ser negativo" },
-          })}
-          placeholder="150.00"
         />
       </div>
       {isEditing && (

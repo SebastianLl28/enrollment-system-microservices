@@ -9,12 +9,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 
 /**
@@ -57,9 +54,6 @@ public class CareerJpaEntity {
 
   @Column(nullable = false)
   private Boolean active;
-
-  @OneToMany(mappedBy = "career")
-  private List<CourseJpaEntity> courses = new ArrayList<>();
 
   public CareerJpaEntity() {
   }
@@ -135,14 +129,5 @@ public class CareerJpaEntity {
   
   public void setActive(Boolean active) {
     this.active = active;
-  }
-  
-  public List<CourseJpaEntity> getCourses() {
-    return courses;
-  }
-  
-  public void setCourses(
-    List<CourseJpaEntity> courses) {
-    this.courses = courses;
   }
 }

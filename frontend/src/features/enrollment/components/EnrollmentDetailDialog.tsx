@@ -178,38 +178,40 @@ const EnrollmentDetailDialog = ({
             </div>
           </div>
 
-          {/* Información del Curso */}
+          {/* Información de la Carrera */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-2 mb-3">
               <BookOpen className="text-green-600" size={20} />
               <h3 className="font-semibold text-gray-800">
-                Información del Curso
+                Información de la Matrícula
               </h3>
             </div>
             <div className="space-y-2 ml-7">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Curso:</span>
+                <span className="text-sm text-gray-600">Carrera:</span>
                 <span className="text-sm font-medium text-gray-900">
-                  {enrollment.courseOffering.course.name}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Sección:</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {enrollment.courseOffering.section}
+                  {enrollment.careerOffering.career.name}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">Periodo:</span>
                 <span className="text-sm font-medium text-gray-900">
-                  {enrollment.courseOffering.term.code}
+                  {enrollment.careerOffering.term.code}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Precio:</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {enrollment.careerOffering.price != null
+                    ? `S/ ${enrollment.careerOffering.price.toFixed(2)}`
+                    : "—"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">Capacidad:</span>
                 <span className="text-sm font-medium text-gray-900">
-                  {enrollment.courseOffering.enrolledCount} /{" "}
-                  {enrollment.courseOffering.capacity}
+                  {enrollment.careerOffering.enrolledCount} /{" "}
+                  {enrollment.careerOffering.capacity}
                 </span>
               </div>
             </div>
@@ -242,11 +244,11 @@ const EnrollmentDetailDialog = ({
                 <span className="text-sm text-gray-600">Periodo:</span>
                 <span className="text-sm font-medium text-gray-900">
                   {new Date(
-                    enrollment.courseOffering.term.startDate
+                    enrollment.careerOffering.term.startDate
                   ).toLocaleDateString("es-ES")}{" "}
                   -{" "}
                   {new Date(
-                    enrollment.courseOffering.term.endDate
+                    enrollment.careerOffering.term.endDate
                   ).toLocaleDateString("es-ES")}
                 </span>
               </div>

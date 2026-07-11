@@ -37,38 +37,8 @@ public class CourseRepositoryAdapter implements CourseRepository {
     return courseJpaMapper.toDomainCourse(courseJpaEntity);
   }
 
-//  @Override
-//  public boolean existsByCodeAndCareerId(CourseCode code, Integer careerId) {
-//    return false;
-//  }
-
-//  @Override
-//  public void mustExist(CourseID id) {
-//
-//  }
-
-//  @Override
-//  public List<Course> findByCareerId(Integer careerId) {
-//    return List.of();
-//  }
-
-//  @Override
-//  public List<Course> findByCareerIdAndActive(Integer careerId, boolean active) {
-//    return List.of();
-//  }
-
-//  @Override
-//  public List<Course> findByCareerIdAndSemesterLevel(Integer careerId, int level) {
-//    return List.of();
-//  }
-
   @Override
   public List<Course> findAll() {
     return courseJpaRepository.findAll().stream().map(courseJpaMapper::toDomainCourse).toList();
-  }
-
-  @Override
-  public List<Course> findByCareerIdWithActiveCourses(Integer careerId) {
-    return courseJpaRepository.findAllByCareerIdAndActiveIsFalse(careerId).stream().map(courseJpaMapper::toDomainCourse).toList();
   }
 }

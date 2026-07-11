@@ -20,7 +20,7 @@ public interface DashboardStatsPort {
 
   long countCourses();
 
-  long countActiveCourseOfferings();
+  long countActiveCareerOfferings();
 
   long countEnrollments();
 
@@ -28,7 +28,7 @@ public interface DashboardStatsPort {
 
   List<LabelCountResponse> countEnrollmentsByTerm();
 
-  List<LabelCountResponse> findTopCoursesByEnrollments(int limit);
+  List<LabelCountResponse> findTopCareersByEnrollments(int limit);
 
   Optional<Term> findCurrentTerm(LocalDate today);
 

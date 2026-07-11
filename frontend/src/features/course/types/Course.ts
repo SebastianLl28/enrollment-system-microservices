@@ -1,36 +1,43 @@
-export interface CourseStudent {
-  id: number;
-  firstName: string;
-  lastName: string;
+export interface CourseCareerAssignment {
+  careerId: number;
+  careerName: string;
+  semesterLevel: number;
 }
 
 export interface Course {
   id: number;
-  careerId: number;
   code: string;
   name: string;
   description?: string;
   credits: number;
-  semesterLevel: number;
   active: boolean;
-  enrolledStudentList: CourseStudent[];
+  careers: CourseCareerAssignment[];
+}
+
+export interface CareerAssignmentFormValues {
+  careerId: number | null;
+  semesterLevel: number;
 }
 
 export interface CourseFormValues {
-  careerId: number | null;
   code: string;
   name: string;
   description?: string;
   credits: number;
-  semesterLevel: number;
+  careers: CareerAssignmentFormValues[];
   active?: boolean;
 }
 
-export type CreateCoursePayload = Omit<CourseFormValues, "careerId" | "active"> & {
+export interface CareerAssignmentPayload {
   careerId: number;
+  semesterLevel: number;
+}
+
+export type CreateCoursePayload = Omit<CourseFormValues, "careers" | "active"> & {
+  careers: CareerAssignmentPayload[];
 };
 
-export type UpdateCoursePayload = Omit<CourseFormValues, "careerId" | "active"> & {
-  careerId: number;
+export type UpdateCoursePayload = Omit<CourseFormValues, "careers" | "active"> & {
+  careers: CareerAssignmentPayload[];
   active: boolean;
 };

@@ -45,9 +45,4 @@ public class StudentRepositoryAdapter implements StudentRepository {
   public List<Student> findAll() {
     return studentJpaRepository.findAll().stream().map(studentJpaMapper::toDomainStudent).toList();
   }
-
-  @Override
-  public List<Student> findAllByCourseId(Integer courseId) {
-    return studentJpaRepository.findAllByCourseId(courseId).stream().map(studentJpaMapper::toDomainStudent).toList();
-  }
 }

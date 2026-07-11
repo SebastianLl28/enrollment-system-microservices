@@ -38,21 +38,23 @@ public class EnrollmentNotificationService {
     EnrollmentStatus status = event.getEnrollmentStatus();
     
     String name = safe(event.getStudentFullName());
-    String course = safe(event.getCourseName());
+    String career = safe(event.getCareerName());
+    String term = safe(event.getTermCode());
     String enrollmentId = safe(event.getEnrollmentId());
-    
+
     String occurredAt = (event.getOccurredAt() != null)
       ? DateTimeFormatter.format(event.getOccurredAt())
       : "N/A";
-    
+
     return switch (status) {
       case PENDING -> new EmailContent(
-        "Inscripción registrada (pago pendiente) - " + course,
+        "Matrícula registrada (pago pendiente) - " + career + " (" + term + ")",
         buildHtmlTemplate(
-          "⏳ Inscripción Registrada",
+          "⏳ Matrícula Registrada",
           "#FFA500",
           name,
-          "Tu inscripción al curso <strong>\"" + course + "\"</strong> ya fue registrada correctamente.",
+          "Tu matrícula en la carrera <strong>\"" + career + "\"</strong> para el periodo <strong>"
+            + term + "</strong> ya fue registrada correctamente.",
           "Estado: <span style='color: #FFA500; font-weight: bold;'>PENDIENTE DE PAGO</span>",
           "Debes completar el pago para confirmar tu matrícula. Cuando se confirme el pago, te avisaremos inmediatamente por este medio.",
           buildPaymentButton(event.getPaymentUrl()),
@@ -62,14 +64,15 @@ public class EnrollmentNotificationService {
       );
 
       case PAID -> new EmailContent(
-        "Pago confirmado - " + course,
+        "Pago confirmado - " + career + " (" + term + ")",
         buildHtmlTemplate(
           "✅ Pago Confirmado",
           "#10B981",
           name,
           "¡Excelentes noticias! Tu pago ha sido confirmado.",
-          "Tu inscripción al curso <strong>\"" + course + "\"</strong> está activa.",
-          "Ya puedes acceder a todo el contenido del curso. ¡Éxitos en tu aprendizaje!",
+          "Tu matrícula en la carrera <strong>\"" + career + "\"</strong> para el periodo <strong>"
+            + term + "</strong> está activa.",
+          "Ya estás matriculado en el periodo académico. ¡Éxitos en tus estudios!",
           "",
           enrollmentId,
           occurredAt
@@ -77,14 +80,15 @@ public class EnrollmentNotificationService {
       );
 
       case CANCELLED -> new EmailContent(
-        "Inscripción cancelada - " + course,
+        "Matrícula cancelada - " + career + " (" + term + ")",
         buildHtmlTemplate(
-          "❌ Inscripción Cancelada",
+          "❌ Matrícula Cancelada",
           "#EF4444",
           name,
-          "Te confirmamos que tu inscripción al curso <strong>\"" + course + "\"</strong> ha sido cancelada.",
+          "Te confirmamos que tu matrícula en la carrera <strong>\"" + career
+            + "\"</strong> del periodo <strong>" + term + "</strong> ha sido cancelada.",
           "",
-          "Esperamos verte pronto en nuestros cursos.",
+          "Esperamos verte pronto nuevamente.",
           "",
           enrollmentId,
           occurredAt
@@ -92,14 +96,15 @@ public class EnrollmentNotificationService {
       );
 
       case COMPLETED -> new EmailContent(
-        "Curso completado - " + course,
+        "Periodo completado - " + career + " (" + term + ")",
         buildHtmlTemplate(
           "🎉 ¡Felicitaciones!",
           "#8B5CF6",
           name,
-          "Has completado exitosamente el curso <strong>\"" + course + "\"</strong>.",
+          "Has completado exitosamente el periodo <strong>" + term
+            + "</strong> de la carrera <strong>\"" + career + "\"</strong>.",
           "Tu dedicación y esfuerzo han dado sus frutos.",
-          "Gracias por aprender con nosotros. ¡Sigue creciendo!",
+          "Gracias por estudiar con nosotros. ¡Sigue creciendo!",
           "",
           enrollmentId,
           occurredAt
@@ -117,7 +122,7 @@ public class EnrollmentNotificationService {
         <td align="center" style="padding: 0 40px 30px 40px;">
           <a href="%s" target="_blank"
              style="display: inline-block; background-color: #009EE3; color: #ffffff; font-size: 16px; font-weight: 700; text-decoration: none; padding: 14px 40px; border-radius: 8px;">
-            Pagar inscripción
+            Pagar matrícula
           </a>
         </td>
       </tr>
@@ -215,7 +220,7 @@ public class EnrollmentNotificationService {
                         <table role="presentation" style="width: 100%%; border-collapse: collapse;">
                           <tr>
                             <td style="padding: 8px 0;">
-                              <span style="font-size: 14px; color: #6B7280; font-weight: 600;">ID de inscripción:</span>
+                              <span style="font-size: 14px; color: #6B7280; font-weight: 600;">ID de matrícula:</span>
                             </td>
                             <td style="padding: 8px 0; text-align: right;">
                               <span style="font-size: 14px; color: #111827; font-family: 'Courier New', monospace;">%s</span>

@@ -9,11 +9,11 @@ export interface DashboardStatsResponse {
   totalStudents: number;
   activeStudents: number;
   totalCourses: number;
-  activeCourseOfferings: number;
+  activeCareerOfferings: number;
   totalEnrollments: number;
   enrollmentsByStatus: LabelCountResponse[];
   currentTerm: TermResponse | null;
   currentTermEnrollments: number;
   enrollmentsByTerm: LabelCountResponse[];
-  topCourses: LabelCountResponse[];
+  topCareers: LabelCountResponse[];
 }

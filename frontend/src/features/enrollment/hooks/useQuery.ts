@@ -1,7 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { EnrollmentRequestQuery } from "../types/request";
 import { generateEnrollmentQueryKey } from "@/config/keys";
-import { getEnrollmentsByStudentIdAndTermIdAndCourseId } from "../services/EnrollmentService";
+import { getEnrollmentsByStudentIdAndTermIdAndCareerId } from "../services/EnrollmentService";
 
 export const useGetEnrollment = (
   query: EnrollmentRequestQuery,
@@ -9,7 +9,7 @@ export const useGetEnrollment = (
 ) => {
   return useQuery({
     queryKey: generateEnrollmentQueryKey(query),
-    queryFn: () => getEnrollmentsByStudentIdAndTermIdAndCourseId(query),
+    queryFn: () => getEnrollmentsByStudentIdAndTermIdAndCareerId(query),
     placeholderData: keepPreviousData,
     enabled: options?.enabled ?? true,
   });

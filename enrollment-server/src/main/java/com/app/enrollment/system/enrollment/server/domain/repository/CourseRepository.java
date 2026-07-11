@@ -13,6 +13,5 @@ public interface CourseRepository {
   Optional<Course> findById(CourseID courseID);
   Course save(Course course);
   List<Course> findAll();
-  List<Course> findByCareerIdWithActiveCourses(Integer careerId);
   
 }

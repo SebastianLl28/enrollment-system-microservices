@@ -1,10 +1,10 @@
-import type { CourseOfferingResponse } from "@/features/course-offering/types/response";
+import type { CareerOfferingResponse } from "@/features/career-offering/types/response";
 import type { StudentResponse } from "@/features/students/types/Student";
 
 export interface EnrollmentResponse {
   id: number;
   student: StudentResponse;
-  courseOffering: CourseOfferingResponse;
+  careerOffering: CareerOfferingResponse;
   enrollmentDate: Date;
   unenrollmentDate?: Date;
   status: "PENDING" | "PAID" | "CANCELLED" | "COMPLETED";

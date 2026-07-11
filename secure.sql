@@ -31,6 +31,7 @@ VALUES ('MY_PROFILE', '/app/profile', 'Mi perfil', 'ACCOUNT', 1, true),
        ('COURSE_LIST', '/app/course', 'Cursos', 'ADMIN', 5, true),
        ('TERM_LIST', '/app/term', 'Vigencias', 'ADMIN', 6, true),
        ('COURSE_OFFERING_LIST', '/app/course-offering', 'Cursos en Vigencia', 'ADMIN', 7, true),
+       ('CAREER_OFFERING_LIST', '/app/career-offering', 'Carreras en Vigencia', 'ADMIN', 8, true),
 
        ('RBAC_ROLES', '/app/rbac/roles', 'Gestión de Roles', 'RBAC', 1, true),
        ('RBAC_USERS', '/app/rbac/users', 'Asignar Roles a Usuarios', 'RBAC', 2, true),
@@ -88,6 +89,7 @@ WHERE code IN (
                'ENROLLMENT_ADMIN',
                'COURSE_LIST',
                'COURSE_OFFERING_LIST',
+               'CAREER_OFFERING_LIST',
                'TERM_LIST',
                'FACULTY_LIST'
     );
@@ -241,7 +243,8 @@ WHERE code IN (
                'CAREER_LIST',
                'COURSE_LIST',
                'TERM_LIST',
-               'COURSE_OFFERING_LIST'
+               'COURSE_OFFERING_LIST',
+               'CAREER_OFFERING_LIST'
     );
 
 INSERT INTO "user" (email, full_name, password, two_factor_enabled, username)

@@ -31,7 +31,7 @@ const EnrollmentsPage = () => {
   const [query, setQuery] = useState<EnrollmentRequestQuery>({
     studentId: null,
     termId: null,
-    courseId: null,
+    careerId: null,
   });
 
   const handleQueryChange = (newQuery: EnrollmentRequestQuery) => {
@@ -55,8 +55,8 @@ const EnrollmentsPage = () => {
   const { mutate: createEnrollment, isPending: isCreating } =
     usePostEnrollment();
 
-  const onSubmit = (courseOffering: EnrollmentRequest) => {
-    createEnrollment(courseOffering, {
+  const onSubmit = (enrollment: EnrollmentRequest) => {
+    createEnrollment(enrollment, {
       onSuccess: () => setDialogOpen(false),
     });
   };

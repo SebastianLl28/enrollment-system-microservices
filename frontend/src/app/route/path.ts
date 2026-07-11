@@ -14,6 +14,7 @@ export const ROUTE_PATHS = {
   profile: "/app/profile",
   term: "/app/term",
   courseOffering: "/app/course-offering",
+  careerOffering: "/app/career-offering",
   enrollment: "/app/enrollment",
   rbacRoles: "/app/rbac/roles",
   rbacUsers: "/app/rbac/users",

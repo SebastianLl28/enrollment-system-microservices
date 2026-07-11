@@ -1,4 +1,4 @@
-import { useGetCourses } from "@/features/course/hooks/useQuery";
+import { useGetCareers } from "@/features/career/hooks/useQuery";
 import type { EnrollmentRequestQuery } from "../types/request";
 import Select from "react-select";
 import { useGetTerms } from "@/features/term/hooks/useQuery";
@@ -13,14 +13,14 @@ const EnrollmentSearchForm = ({
   query,
   setQuery,
 }: EnrollmentSearchFormProps) => {
-  const { data: courses } = useGetCourses();
+  const { data: careers } = useGetCareers({ includeInactive: true });
   const { data: terms } = useGetTerms();
   const { data: students } = useGetStudents();
 
-  const courseOptions =
-    courses?.map((course) => ({
-      value: course.id,
-      label: course.name,
+  const careerOptions =
+    careers?.map((career) => ({
+      value: career.id,
+      label: career.name,
     })) ?? [];
 
   const termOptions =
@@ -80,16 +80,16 @@ const EnrollmentSearchForm = ({
         <div>
           <Select
             className="w-full"
-            options={courseOptions}
-            placeholder="Selecciona un curso"
+            options={careerOptions}
+            placeholder="Selecciona una carrera"
             value={
-              courseOptions.find((option) => option.value === query.courseId) ??
+              careerOptions.find((option) => option.value === query.careerId) ??
               null
             }
             onChange={(option) =>
               setQuery({
                 ...query,
-                courseId: option?.value ?? null,
+                careerId: option?.value ?? null,
               })
             }
             isClearable

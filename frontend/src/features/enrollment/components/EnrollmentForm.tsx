@@ -3,7 +3,7 @@ import type { EnrollmentRequest } from "../types/request";
 import { Label } from "@radix-ui/react-label";
 import Select from "react-select";
 import { useGetStudents } from "@/features/students/hooks/useQuery";
-import { useGetAllCourseOfferings } from "@/features/course-offering/hooks/useQuery";
+import { useGetAllCareerOfferings } from "@/features/career-offering/hooks/useQuery";
 
 interface EnrollmentFormProps {
   onSubmit: (data: EnrollmentRequest) => void;
@@ -12,8 +12,8 @@ interface EnrollmentFormProps {
 const EnrollmentForm = ({ onSubmit }: EnrollmentFormProps) => {
   const { handleSubmit, control } = useForm<EnrollmentRequest>();
   const { data: students, isPending: isLoadingStudents } = useGetStudents();
-  const { data: courseOfferings, isPending: isLoadingCourseOfferings } =
-    useGetAllCourseOfferings();
+  const { data: careerOfferings, isPending: isLoadingCareerOfferings } =
+    useGetAllCareerOfferings();
 
   const studentOptions =
     students?.map((student) => ({
@@ -21,10 +21,12 @@ const EnrollmentForm = ({ onSubmit }: EnrollmentFormProps) => {
       label: `${student.name} ${student.lastName}`,
     })) ?? [];
 
-  const courseOfferingOptions =
-    courseOfferings?.map((offering) => ({
+  const careerOfferingOptions =
+    careerOfferings?.map((offering) => ({
       value: offering.id,
-      label: `${offering.term.code} - ${offering.course.name}`,
+      label: `${offering.term.code} - ${offering.career.name}${
+        offering.price != null ? ` (S/ ${offering.price.toFixed(2)})` : ""
+      }`,
     })) ?? [];
 
   return (
@@ -58,20 +60,20 @@ const EnrollmentForm = ({ onSubmit }: EnrollmentFormProps) => {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="termId">Periodo</Label>
+        <Label htmlFor="careerOfferingId">Carrera en Vigencia</Label>
         <Controller
           control={control}
-          name="courseOfferingId"
-          rules={{ required: "Selecciona un periodo" }}
+          name="careerOfferingId"
+          rules={{ required: "Selecciona una carrera en vigencia" }}
           render={({ field }) => (
             <Select
-              inputId="termId"
+              inputId="careerOfferingId"
               className="w-full"
-              options={courseOfferingOptions}
-              isLoading={isLoadingCourseOfferings}
-              placeholder="Selecciona un Curso en Vigencia"
+              options={careerOfferingOptions}
+              isLoading={isLoadingCareerOfferings}
+              placeholder="Selecciona una Carrera en Vigencia"
               value={
-                courseOfferingOptions.find(
+                careerOfferingOptions.find(
                   (option) => option.value === field.value
                 ) ?? null
               }

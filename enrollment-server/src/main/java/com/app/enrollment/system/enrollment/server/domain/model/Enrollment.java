@@ -2,7 +2,7 @@ package com.app.enrollment.system.enrollment.server.domain.model;
 
 import com.app.enrollment.system.enrollment.server.domain.exception.CannotChangeStatusOfCancelledEnrollmentException;
 import com.app.enrollment.system.enrollment.server.domain.model.enums.EnrollmentStatus;
-import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CourseOfferingID;
+import com.app.enrollment.system.enrollment.server.domain.model.valueobject.CareerOfferingID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.EnrollmentID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.StudentID;
 import com.app.enrollment.system.enrollment.server.domain.model.valueobject.UserID;
@@ -19,31 +19,31 @@ public class Enrollment {
   private Instant unenrollmentDate;
   private EnrollmentStatus status;
   private final UserID userID;
-  private final CourseOfferingID courseOfferingID;
+  private final CareerOfferingID careerOfferingID;
   private String paymentId;
   private String paymentStatus;
   private Instant paidAt;
 
-  private Enrollment(EnrollmentID id, StudentID studentID, CourseOfferingID courseOfferingID, Instant enrollmentDate, Instant unenrollmentDate, EnrollmentStatus enrollmentStatus, UserID userID) {
+  private Enrollment(EnrollmentID id, StudentID studentID, CareerOfferingID careerOfferingID, Instant enrollmentDate, Instant unenrollmentDate, EnrollmentStatus enrollmentStatus, UserID userID) {
     this.id = id;
     this.studentID = studentID;
     this.enrollmentDate = enrollmentDate;
     this.unenrollmentDate = unenrollmentDate;
     this.status = enrollmentStatus;
     this.userID = userID;
-    this.courseOfferingID = courseOfferingID;
+    this.careerOfferingID = careerOfferingID;
   }
 
-  public static Enrollment create(StudentID studentID, CourseOfferingID courseOfferingID,
+  public static Enrollment create(StudentID studentID, CareerOfferingID careerOfferingID,
     Instant now, UserID userID) {
     return new
-      Enrollment(null, studentID, courseOfferingID, now, null, EnrollmentStatus.PENDING, userID);
+      Enrollment(null, studentID, careerOfferingID, now, null, EnrollmentStatus.PENDING, userID);
   }
 
-  public static Enrollment rehydrate(EnrollmentID id, StudentID studentID, CourseOfferingID courseOfferingID,
+  public static Enrollment rehydrate(EnrollmentID id, StudentID studentID, CareerOfferingID careerOfferingID,
     Instant enrollmentDate, Instant unenrollmentDate, EnrollmentStatus enrollmentStatus, UserID userID,
     String paymentId, String paymentStatus, Instant paidAt) {
-    Enrollment enrollment = new Enrollment(id, studentID, courseOfferingID, enrollmentDate, unenrollmentDate, enrollmentStatus, userID);
+    Enrollment enrollment = new Enrollment(id, studentID, careerOfferingID, enrollmentDate, unenrollmentDate, enrollmentStatus, userID);
     enrollment.paymentId = paymentId;
     enrollment.paymentStatus = paymentStatus;
     enrollment.paidAt = paidAt;
@@ -90,8 +90,8 @@ public class Enrollment {
     return studentID;
   }
 
-  public CourseOfferingID getCourseOfferingID() {
-    return courseOfferingID;
+  public CareerOfferingID getCareerOfferingID() {
+    return careerOfferingID;
   }
   
   public Instant getEnrollmentDate() {

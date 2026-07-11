@@ -6,7 +6,6 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import type { Course } from "../types/Course";
-import { useGetCareers } from "@/features/career/hooks/useQuery";
 
 interface CourseDetailDialogProps {
   course: Course | null;
@@ -19,9 +18,6 @@ const CourseDetailDialog = ({
   open,
   onOpenChange,
 }: CourseDetailDialogProps) => {
-  const { data: careers } = useGetCareers({ includeInactive: true });
-  const careerName = careers?.find((c) => c.id === course?.careerId)?.name ?? "—";
-
   if (!course) return null;
 
   return (
@@ -42,17 +38,11 @@ const CourseDetailDialog = ({
             <span className="font-medium text-gray-500">Nombre</span>
             <span>{course.name}</span>
 
-            <span className="font-medium text-gray-500">Carrera</span>
-            <span>{careerName}</span>
-
             <span className="font-medium text-gray-500">Descripción</span>
             <span>{course.description ?? "—"}</span>
 
             <span className="font-medium text-gray-500">Créditos</span>
             <span>{course.credits}</span>
-
-            <span className="font-medium text-gray-500">Semestre</span>
-            <span>{course.semesterLevel}</span>
 
             <span className="font-medium text-gray-500">Estado</span>
             <Badge variant={course.active ? "success" : "destructive"}>
@@ -60,23 +50,24 @@ const CourseDetailDialog = ({
             </Badge>
           </div>
 
-          {course.enrolledStudentList && course.enrolledStudentList.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-500">
-                Estudiantes inscritos ({course.enrolledStudentList.length})
-              </p>
-              <ul className="space-y-1">
-                {course.enrolledStudentList.map((student) => (
-                  <li
-                    key={student.id}
-                    className="rounded-md bg-gray-50 px-3 py-1.5 text-sm"
-                  >
-                    {student.firstName} {student.lastName}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-500">
+              Carreras en las que se dicta ({course.careers.length})
+            </p>
+            <ul className="space-y-1">
+              {course.careers.map((assignment) => (
+                <li
+                  key={assignment.careerId}
+                  className="flex items-center justify-between rounded-md bg-gray-50 px-3 py-1.5 text-sm"
+                >
+                  <span>{assignment.careerName}</span>
+                  <Badge variant="default">
+                    Ciclo {assignment.semesterLevel}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

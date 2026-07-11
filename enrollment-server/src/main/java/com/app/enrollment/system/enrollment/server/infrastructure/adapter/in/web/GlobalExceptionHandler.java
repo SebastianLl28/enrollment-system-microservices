@@ -4,6 +4,7 @@ import com.app.enrollment.system.enrollment.server.application.dto.response.Erro
 import com.app.enrollment.system.enrollment.server.domain.exception.CannotChangeStatusOfCancelledEnrollmentException;
 import com.app.enrollment.system.enrollment.server.domain.exception.CareerNameRequiredException;
 import com.app.enrollment.system.enrollment.server.domain.exception.CareerNotFoundException;
+import com.app.enrollment.system.enrollment.server.domain.exception.CareerOfferingNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.CourseNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.CourseOfferingNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.EnrollmentNotFoundException;
@@ -13,6 +14,7 @@ import com.app.enrollment.system.enrollment.server.domain.exception.FacultyNameR
 import com.app.enrollment.system.enrollment.server.domain.exception.FacultyNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.FacultyRequiredException;
 import com.app.enrollment.system.enrollment.server.domain.exception.IllegalCourseIDException;
+import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCareerOfferingException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCarreerException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCourseCodeException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCourseNameException;
@@ -60,6 +62,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({
       FacultyNotFoundException.class,
       CareerNotFoundException.class,
+      CareerOfferingNotFoundException.class,
       CourseNotFoundException.class,
       CourseOfferingNotFoundException.class,
       EnrollmentNotFoundException.class,
@@ -108,7 +111,8 @@ public class GlobalExceptionHandler {
       InvalidStudentIDException.class,
       InvalidStudentNameException.class,
       InvalidTermException.class,
-      InvalidCourseOfferingException.class
+      InvalidCourseOfferingException.class,
+      InvalidCareerOfferingException.class
   })
   public ResponseEntity<ErrorResponse> handleDomainValidation(RuntimeException ex,
       HttpServletRequest request) {

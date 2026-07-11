@@ -45,7 +45,7 @@ const StudentDetailDialog = ({
       {
         studentId: student?.id ?? null,
         termId: null,
-        courseId: null,
+        careerId: null,
         page: 0,
         size: 100,
       },
@@ -115,7 +115,7 @@ const StudentDetailDialog = ({
               <p className="text-2xl font-bold text-green-600">
                 {isLoadingEnrollments ? "…" : activeEnrollments.length}
               </p>
-              <p className="text-xs text-gray-500">Cursos activos</p>
+              <p className="text-xs text-gray-500">Matrículas activas</p>
             </div>
           </div>
           )}
@@ -124,7 +124,7 @@ const StudentDetailDialog = ({
           {canReadEnrollments && (
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
-              Historial de cursos
+              Historial de matrículas
             </p>
 
             {isLoadingEnrollments ? (
@@ -142,12 +142,12 @@ const StudentDetailDialog = ({
                   >
                     <div>
                       <p className="font-medium">
-                        {enrollment.courseOffering.course.name}
+                        {enrollment.careerOffering.career.name}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {enrollment.courseOffering.course.code} ·{" "}
-                        {enrollment.courseOffering.term.code} · Sección{" "}
-                        {enrollment.courseOffering.section}
+                        {enrollment.careerOffering.term.code}
+                        {enrollment.careerOffering.price != null &&
+                          ` · S/ ${enrollment.careerOffering.price.toFixed(2)}`}
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-1">

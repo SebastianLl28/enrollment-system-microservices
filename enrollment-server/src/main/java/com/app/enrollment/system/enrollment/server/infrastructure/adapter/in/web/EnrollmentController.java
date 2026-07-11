@@ -70,10 +70,10 @@ public class EnrollmentController {
   public ResponseEntity<PageResponse<EnrollmentResponse>> getAllEnrollments(
     @RequestParam(required = false) Integer studentId,
     @RequestParam(required = false) Integer termId,
-    @RequestParam(required = false) Integer courseId,
+    @RequestParam(required = false) Integer careerId,
     @RequestParam(defaultValue = "0") int page,
     @RequestParam(defaultValue = "10") int size) {
-    EnrollmentQuery query = new EnrollmentQuery(studentId, termId, courseId, page, size);
+    EnrollmentQuery query = new EnrollmentQuery(studentId, termId, careerId, page, size);
     PageResponse<EnrollmentResponse> responses = getAllEnrollmentCourseUseCase.getAllEnrollmentCourses(
       query);
     return ResponseEntity.ok(responses);
