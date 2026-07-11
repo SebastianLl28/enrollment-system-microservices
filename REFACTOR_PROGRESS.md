@@ -38,6 +38,11 @@
 - [ ] Paso 7b: **PENDIENTE (requiere acción del usuario)**: `make reset` para regenerar la BD con el nuevo esquema (bloqueado por permisos: destruye volúmenes). Luego flujo manual: curso con 2 carreras/ciclos → career-offering (carrera+periodo+precio) → matrícula → email "Pagar matrícula" con precio del CareerOffering → dashboard con topCareers.
 - [x] Paso 8: CLAUDE.md actualizado (nueva sección "Enrollment domain model"; payments usa `CareerOffering.price`, botón "Pagar matrícula")
 
+### Correcciones post-prueba (2026-07-11, tarde)
+- [x] Bug: `EnrollmentApplicationService.getAllEnrollmentCourses` lanzaba `IllegalArgumentException` al listar sin filtro de carrera (`new CareerID(null)`; CareerID valida no-nulo a diferencia de StudentID/TermID). Ahora los tres filtros opcionales se envuelven solo si vienen informados. Requiere rebuild del contenedor (`make up`).
+- [x] UX: CourseForm ahora tiene cabeceras "Carrera"/"Ciclo" sobre la lista de asignaciones y texto explicando que el ciclo es el semestre de la malla en esa carrera.
+- [x] Decisión del usuario: **CourseOffering eliminado por completo**. Backend: borrados 19 archivos (dominio, DTOs, mapper, use cases, servicio, controller, JPA entity/repo/mapper/adapter, excepciones, `CourseSummaryResponse` y `CourseMapper.toSummaryResponse` que solo él usaba) + limpiado `GlobalExceptionHandler`. Frontend: borrada `features/course-offering/`, limpiados `columns.tsx`, `routes.tsx`, `path.ts`, `routeProtection.ts`, `endpoints.ts`, `keys.ts`, `DashboardPage.tsx`. `secure.sql`: quitado `COURSE_OFFERING_LIST` (CAREER_OFFERING_LIST pasa a orden 7). CLAUDE.md actualizado. Backend y frontend compilan. La tabla `course_offering` desaparecerá con el próximo `make reset`.
+
 ## Notas
 - Los "compile breaks" sospechados en CourseOfferingMapper/JpaEntity/EnrollmentJpaRepository/StudentRepositoryAdapter eran falsos positivos: ya están migrados.
 - No hay migraciones SQL; los renames de columnas requieren `make reset` en dev (destruye volúmenes).

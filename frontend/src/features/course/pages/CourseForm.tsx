@@ -127,6 +127,16 @@ const CourseForm = ({ onSubmit, defaultValues }: CourseFormProps) => {
           </Button>
         </div>
 
+        <div className="flex items-center gap-2">
+          <span className="flex-1 text-xs font-medium text-gray-500">
+            Carrera
+          </span>
+          <span className="w-28 text-xs font-medium text-gray-500">
+            Ciclo
+          </span>
+          <span className="w-9" />
+        </div>
+
         {fields.map((field, index) => (
           <div key={field.id} className="flex items-start gap-2">
             <div className="flex-1 space-y-1">
@@ -191,7 +201,8 @@ const CourseForm = ({ onSubmit, defaultValues }: CourseFormProps) => {
           </div>
         ))}
         <p className="text-xs text-gray-500">
-          El ciclo puede variar según la carrera. Debe haber al menos una
+          El ciclo es el semestre de la malla en que se dicta el curso en esa
+          carrera (puede variar entre carreras). Debe haber al menos una
           carrera asignada.
         </p>
       </div>

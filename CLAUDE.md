@@ -64,7 +64,7 @@ Authentication is OAuth2 (GitHub/Google) + JWT + TOTP-based MFA, all owned by `a
 
 ### Enrollment domain model
 
-Students enroll in a **`CareerOffering`** (career + term), which owns the enrollment `price`, `capacity` and `enrolledCount`. The curriculum is the **`CareerCourse`** join (careerId + courseId + `semesterLevel` — a course can belong to several careers, and its cycle varies per career; assignments travel as the `careers` list in Create/UpdateCourseCommand). `CourseOffering` is catalog/scheduling only (course + term + section + capacity, no price or enrollment tracking). `Enrollment` references `careerOfferingId`; the list endpoint filters by `careerId`.
+Students enroll in a **`CareerOffering`** (career + term), which owns the enrollment `price`, `capacity` and `enrolledCount`. The curriculum is the **`CareerCourse`** join (careerId + courseId + `semesterLevel` — a course can belong to several careers, and its cycle varies per career; assignments travel as the `careers` list in Create/UpdateCourseCommand). `Enrollment` references `careerOfferingId`; the list endpoint filters by `careerId`. There is no CourseOffering concept — it was removed when enrollment moved to career+term.
 
 ### Payments (Mercado Pago Checkout Pro)
 
@@ -88,7 +88,7 @@ Keep new code within this layering: controllers depend on `port/in`, application
 
 ### Frontend structure
 
-Feature-based: `frontend/src/features/<feature>/{components,hooks,pages,services,types}` (features: auth, faculty, career, course, course-offering, term, enrollment, students, profile, rbac). Cross-cutting config lives in `frontend/src/config/` (axios `apiClient`, `endpoints.ts`, React Query `keys.ts`, `routeProtection.ts`). State: Zustand (`src/store`) + TanStack Query for server state; forms use react-hook-form + Zod; UI is Tailwind 4 + shadcn/Radix.
+Feature-based: `frontend/src/features/<feature>/{components,hooks,pages,services,types}` (features: auth, faculty, career, course, career-offering, term, enrollment, students, profile, rbac). Cross-cutting config lives in `frontend/src/config/` (axios `apiClient`, `endpoints.ts`, React Query `keys.ts`, `routeProtection.ts`). State: Zustand (`src/store`) + TanStack Query for server state; forms use react-hook-form + Zod; UI is Tailwind 4 + shadcn/Radix.
 
 ### Observability
 

@@ -30,10 +30,6 @@ export const TERM_ENDPOINT = {
   base: "/api/v1/term",
 };
 
-export const COURSE_OFFERING_ENDPOINT = {
-  base: "/api/v1/course-offering",
-};
-
 export const CAREER_OFFERING_ENDPOINT = {
   base: "/api/v1/career-offering",
 };

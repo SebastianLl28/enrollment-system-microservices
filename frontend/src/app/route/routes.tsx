@@ -16,7 +16,6 @@ import CoursePage from "@/features/course/pages/CoursePage";
 import StudentsPage from "@/features/students/pages/StudentsPage";
 import ProfilePage from "@/features/profile/pages/ProfilePage";
 import TermsPage from "@/features/term/pages/TermsPage";
-import CourseOfferingPage from "@/features/course-offering/pages/CourseOfferingPage";
 import CareerOfferingPage from "@/features/career-offering/pages/CareerOfferingPage";
 import EnrollmentsPage from "@/features/enrollment/pages/EnrollmentsPage";
 import RolesPage from "@/features/rbac/pages/RolesPages";
@@ -84,10 +83,6 @@ export const router = createBrowserRouter([
       {
         path: ROUTE_PATHS.term,
         element: <TermsPage />,
-      },
-      {
-        path: ROUTE_PATHS.courseOffering,
-        element: <CourseOfferingPage />,
       },
       {
         path: ROUTE_PATHS.careerOffering,

@@ -1,7 +1,7 @@
 import { useAuthStore } from "@/store/authStore";
 
 // Espeja el modelo del backend: RESOURCE:OPERATION:SCOPE.
-// El catálogo académico (faculty, career, course, term, course-offering)
+// El catálogo académico (faculty, career, course, term, career-offering)
 // se protege con el recurso UI_VIEW, igual que el PermissionInterceptor
 // del enrollment-server.
 export type PermissionResource = "STUDENT" | "ENROLLMENT" | "UI_VIEW";

@@ -7,7 +7,6 @@ import type { Student } from "@/features/students/types/Student";
 import type { CellContext, ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import type { TermResponse } from "@/features/term/types/response";
-import type { CourseOfferingResponse } from "@/features/course-offering/types/response";
 import type { CareerOfferingResponse } from "@/features/career-offering/types/response";
 import type { EnrollmentResponse } from "@/features/enrollment/types/response";
 import {
@@ -382,81 +381,6 @@ export const useTermColumns = (
     ],
     [handleView, handleEdit, canWrite]
   );
-
-export const useCourseOfferingColumns = (
-  handleEdit?: (offering: CourseOfferingResponse) => void,
-  canEdit = false
-): ColumnDef<CourseOfferingResponse>[] =>
-    useMemo(
-      () => [
-        {
-          header: "Curso",
-          accessor: "course",
-          cell: ({ row }: CellContext<CourseOfferingResponse, unknown>) => {
-            const course = row.original.course;
-            return `${course.code} - ${course.name}`;
-          },
-        },
-        {
-          header: "Periodo",
-          accessor: "term",
-          cell: ({ row }: CellContext<CourseOfferingResponse, unknown>) => {
-            const term = row.original.term;
-            return `${term.code}`;
-          },
-        },
-        {
-          header: "Sección",
-          accessorKey: "section",
-        },
-        {
-          header: "Capacidad",
-          accessorKey: "capacity",
-        },
-        {
-          header: "Creación",
-          accessorKey: "createdAt",
-          cell: ({
-            getValue,
-          }: CellContext<CourseOfferingResponse, unknown>) => {
-            const date = new Date(getValue() as string);
-            return date.toLocaleDateString();
-          },
-        },
-        {
-          header: "Activo",
-          accessorKey: "active",
-          cell: ({
-            getValue,
-          }: CellContext<CourseOfferingResponse, unknown>) => {
-            const active = getValue() as boolean;
-            return (
-              <Badge variant={active ? "success" : "destructive"}>
-                {active ? "Activo" : "Inactivo"}
-              </Badge>
-            );
-          },
-        },
-        ...(canEdit && handleEdit
-          ? [
-              {
-                header: "Acciones",
-                id: "actions",
-                cell: ({ row }: CellContext<CourseOfferingResponse, unknown>) => (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleEdit(row.original)}
-                  >
-                    Editar
-                  </Button>
-                ),
-              } satisfies ColumnDef<CourseOfferingResponse>,
-            ]
-          : []),
-      ],
-      [handleEdit, canEdit]
-    );
 
 export const useCareerOfferingColumns = (
   handleEdit?: (offering: CareerOfferingResponse) => void,

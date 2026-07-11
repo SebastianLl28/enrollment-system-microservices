@@ -79,7 +79,7 @@ public class PermissionInterceptor implements HandlerInterceptor {
     if (uri.startsWith("/api/v1/enrollment")) {
       return "ENROLLMENT";
     }
-    // Catálogo académico (faculty, career, course, term, course-offering):
+    // Catálogo académico (faculty, career, course, term, career-offering):
     // protegido con el recurso UI_VIEW, igual que en routeProtection del frontend.
     return "UI_VIEW";
   }

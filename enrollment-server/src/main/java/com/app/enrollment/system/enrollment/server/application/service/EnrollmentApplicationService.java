@@ -273,9 +273,10 @@ public class EnrollmentApplicationService implements CreateEnrollmentUseCase,
 
   @Override
   public PageResponse<EnrollmentResponse> getAllEnrollmentCourses(EnrollmentQuery query) {
-    StudentID studentID = new StudentID(query.studentId());
-    TermID termID = new TermID(query.termId());
-    CareerID careerID = new CareerID(query.careerId());
+    // Los filtros son opcionales: solo se envuelven en value objects si vienen informados.
+    StudentID studentID = query.studentId() != null ? new StudentID(query.studentId()) : null;
+    TermID termID = query.termId() != null ? new TermID(query.termId()) : null;
+    CareerID careerID = query.careerId() != null ? new CareerID(query.careerId()) : null;
 
     PageResult<Enrollment> enrollmentPage = enrollmentRepository.findAllByStudentIDAndTermIDAndCareerID(
       studentID, termID, careerID, query.page(), query.size());
