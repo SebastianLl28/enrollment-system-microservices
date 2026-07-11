@@ -17,6 +17,9 @@
   <properties>
     <java.version>17</java.version>
     <spring-cloud.version>2023.0.2</spring-cloud.version>
+    <jacoco.version>0.8.11</jacoco.version>
+    <!-- La versión que gestiona Boot 3.2.5 (1.19.x) no habla la API mínima de Docker 29 -->
+    <testcontainers.version>1.21.4</testcontainers.version>
   </properties>
   <dependencies>
     <dependency>
@@ -62,6 +65,21 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>com.app.enrollment.system</groupId>
@@ -104,6 +122,40 @@
           <execution>
             <goals>
               <goal>build-info</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Unit tests (*Test) en `mvn test`; integración (*IT) en `mvn verify` -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Cobertura para SonarQube: XML en target/site/jacoco/jacoco.xml -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
             </goals>
           </execution>
         </executions>
