@@ -8,6 +8,8 @@ import type { CellContext, ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import type { TermResponse } from "@/features/term/types/response";
 import type { CareerOfferingResponse } from "@/features/career-offering/types/response";
+import type { ClassroomResponse } from "@/features/classroom/types/response";
+import type { SectionResponse } from "@/features/section/types/response";
 import type { EnrollmentResponse } from "@/features/enrollment/types/response";
 import {
   DropdownMenu,
@@ -381,6 +383,146 @@ export const useTermColumns = (
     ],
     [handleView, handleEdit, canWrite]
   );
+
+export const useClassroomColumns = (
+  handleEdit?: (classroom: ClassroomResponse) => void,
+  canEdit = false
+): ColumnDef<ClassroomResponse>[] =>
+    useMemo(
+      () => [
+        {
+          header: "Código",
+          accessorKey: "code",
+        },
+        {
+          header: "Nombre",
+          cell: ({ row }: CellContext<ClassroomResponse, unknown>) =>
+            row.original.name || "—",
+        },
+        {
+          header: "Tipo",
+          accessorKey: "virtual",
+          cell: ({ getValue }: CellContext<ClassroomResponse, unknown>) => {
+            const virtual = getValue() as boolean;
+            return (
+              <Badge variant={virtual ? "default" : "secondary"}>
+                {virtual ? "Virtual" : "Física"}
+              </Badge>
+            );
+          },
+        },
+        {
+          header: "Capacidad",
+          accessorKey: "capacity",
+          cell: ({ row }: CellContext<ClassroomResponse, unknown>) =>
+            row.original.virtual ? "Sin límite" : row.original.capacity,
+        },
+        {
+          header: "Activo",
+          accessorKey: "active",
+          cell: ({ getValue }: CellContext<ClassroomResponse, unknown>) => {
+            const active = getValue() as boolean;
+            return (
+              <Badge variant={active ? "success" : "destructive"}>
+                {active ? "Activo" : "Inactivo"}
+              </Badge>
+            );
+          },
+        },
+        ...(canEdit && handleEdit
+          ? [
+              {
+                header: "Acciones",
+                id: "actions",
+                cell: ({ row }: CellContext<ClassroomResponse, unknown>) => (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleEdit(row.original)}
+                  >
+                    Editar
+                  </Button>
+                ),
+              } satisfies ColumnDef<ClassroomResponse>,
+            ]
+          : []),
+      ],
+      [handleEdit, canEdit]
+    );
+
+export const useSectionColumns = (
+  handleEdit?: (section: SectionResponse) => void,
+  canEdit = false
+): ColumnDef<SectionResponse>[] =>
+    useMemo(
+      () => [
+        {
+          header: "Curso",
+          cell: ({ row }: CellContext<SectionResponse, unknown>) => {
+            const course = row.original.course;
+            return `${course.code} - ${course.name}`;
+          },
+        },
+        {
+          header: "Periodo",
+          cell: ({ row }: CellContext<SectionResponse, unknown>) =>
+            row.original.term.code,
+        },
+        {
+          header: "Sección",
+          accessorKey: "sectionCode",
+        },
+        {
+          header: "Aula",
+          cell: ({ row }: CellContext<SectionResponse, unknown>) => {
+            const classroom = row.original.classroom;
+            return (
+              <span className="flex items-center gap-1">
+                {classroom.code}
+                {classroom.virtual && <Badge variant="default">Virtual</Badge>}
+              </span>
+            );
+          },
+        },
+        {
+          header: "Capacidad",
+          cell: ({ row }: CellContext<SectionResponse, unknown>) =>
+            row.original.classroom.virtual
+              ? "Sin límite"
+              : row.original.classroom.capacity,
+        },
+        {
+          header: "Activo",
+          accessorKey: "active",
+          cell: ({ getValue }: CellContext<SectionResponse, unknown>) => {
+            const active = getValue() as boolean;
+            return (
+              <Badge variant={active ? "success" : "destructive"}>
+                {active ? "Activo" : "Inactivo"}
+              </Badge>
+            );
+          },
+        },
+        ...(canEdit && handleEdit
+          ? [
+              {
+                header: "Acciones",
+                id: "actions",
+                cell: ({ row }: CellContext<SectionResponse, unknown>) => (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleEdit(row.original)}
+                  >
+                    Editar
+                  </Button>
+                ),
+              } satisfies ColumnDef<SectionResponse>,
+            ]
+          : []),
+      ],
+      [handleEdit, canEdit]
+    );
 
 export const useCareerOfferingColumns = (
   handleEdit?: (offering: CareerOfferingResponse) => void,

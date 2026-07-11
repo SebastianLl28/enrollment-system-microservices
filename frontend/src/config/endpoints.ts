@@ -30,6 +30,14 @@ export const TERM_ENDPOINT = {
   base: "/api/v1/term",
 };
 
+export const CLASSROOM_ENDPOINT = {
+  base: "/api/v1/classroom",
+};
+
+export const SECTION_ENDPOINT = {
+  base: "/api/v1/section",
+};
+
 export const CAREER_OFFERING_ENDPOINT = {
   base: "/api/v1/career-offering",
 };

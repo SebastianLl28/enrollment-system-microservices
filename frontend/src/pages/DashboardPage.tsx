@@ -19,6 +19,8 @@ import {
   BookUp,
   Shield,
   ChartColumn,
+  DoorOpen,
+  Layers,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useMemo } from "react";
@@ -88,6 +90,22 @@ const allModules = [
     path: ROUTE_PATHS.careerOffering,
     icon: ListTodo,
     requiredViewCode: "CAREER_OFFERING_LIST",
+    requiredPermission: null,
+  },
+  {
+    title: "Aulas",
+    description: "Gestiona las aulas físicas y virtuales",
+    path: ROUTE_PATHS.classroom,
+    icon: DoorOpen,
+    requiredViewCode: "CLASSROOM_LIST",
+    requiredPermission: null,
+  },
+  {
+    title: "Secciones",
+    description: "Asigna cursos a aulas por periodo",
+    path: ROUTE_PATHS.section,
+    icon: Layers,
+    requiredViewCode: "SECTION_LIST",
     requiredPermission: null,
   },
   {

@@ -27,6 +27,14 @@ export const TERM_LIST_QUERY = ["term", "list"] as const;
 export const TERM_POST_MUTATION = ["term", "post"] as const;
 export const TERM_PUT_MUTATION = ["term", "put"] as const;
 
+export const CLASSROOM_QUERY = ["classroom", "list"] as const;
+export const CLASSROOM_POST_MUTATION = ["classroom", "post"] as const;
+export const CLASSROOM_PUT_MUTATION = ["classroom", "put"] as const;
+
+export const SECTION_QUERY = ["section", "list"] as const;
+export const SECTION_POST_MUTATION = ["section", "post"] as const;
+export const SECTION_PUT_MUTATION = ["section", "put"] as const;
+
 export const CAREER_OFFERING_QUERY = ["career-offering", "list"] as const;
 export const CAREER_OFFERING_POST_MUTATION = [
   "career-offering",

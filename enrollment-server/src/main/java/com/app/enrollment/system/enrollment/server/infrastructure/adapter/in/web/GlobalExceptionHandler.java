@@ -5,6 +5,7 @@ import com.app.enrollment.system.enrollment.server.domain.exception.CannotChange
 import com.app.enrollment.system.enrollment.server.domain.exception.CareerNameRequiredException;
 import com.app.enrollment.system.enrollment.server.domain.exception.CareerNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.CareerOfferingNotFoundException;
+import com.app.enrollment.system.enrollment.server.domain.exception.ClassroomNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.CourseNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.EnrollmentNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.FacultyAlreadyExistsException;
@@ -15,6 +16,7 @@ import com.app.enrollment.system.enrollment.server.domain.exception.FacultyRequi
 import com.app.enrollment.system.enrollment.server.domain.exception.IllegalCourseIDException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCareerOfferingException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCarreerException;
+import com.app.enrollment.system.enrollment.server.domain.exception.InvalidClassroomException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCourseCodeException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCourseNameException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidCreditsException;
@@ -29,6 +31,7 @@ import com.app.enrollment.system.enrollment.server.domain.exception.InvalidStude
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidStudentNameException;
 import com.app.enrollment.system.enrollment.server.domain.exception.InvalidTermException;
 import com.app.enrollment.system.enrollment.server.domain.exception.OverlappingTermException;
+import com.app.enrollment.system.enrollment.server.domain.exception.SectionNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.StudentAlreadyEnrolledException;
 import com.app.enrollment.system.enrollment.server.domain.exception.StudentNotFoundException;
 import com.app.enrollment.system.enrollment.server.domain.exception.TermNotFoundException;
@@ -61,8 +64,10 @@ public class GlobalExceptionHandler {
       FacultyNotFoundException.class,
       CareerNotFoundException.class,
       CareerOfferingNotFoundException.class,
+      ClassroomNotFoundException.class,
       CourseNotFoundException.class,
       EnrollmentNotFoundException.class,
+      SectionNotFoundException.class,
       StudentNotFoundException.class,
       TermNotFoundException.class
   })
@@ -108,7 +113,8 @@ public class GlobalExceptionHandler {
       InvalidStudentIDException.class,
       InvalidStudentNameException.class,
       InvalidTermException.class,
-      InvalidCareerOfferingException.class
+      InvalidCareerOfferingException.class,
+      InvalidClassroomException.class
   })
   public ResponseEntity<ErrorResponse> handleDomainValidation(RuntimeException ex,
       HttpServletRequest request) {

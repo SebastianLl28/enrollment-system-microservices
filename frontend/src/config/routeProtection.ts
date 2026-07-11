@@ -48,6 +48,18 @@ export const ROUTE_PROTECTION_CONFIG: Record<string, RouteProtection> = {
     requiredPermission: "UI_VIEW:READ",
   },
 
+  [ROUTE_PATHS.classroom]: {
+    requiresAuth: true,
+    requiredViewCode: "CLASSROOM_LIST",
+    requiredPermission: "UI_VIEW:READ",
+  },
+
+  [ROUTE_PATHS.section]: {
+    requiresAuth: true,
+    requiredViewCode: "SECTION_LIST",
+    requiredPermission: "UI_VIEW:READ",
+  },
+
   [ROUTE_PATHS.careerOffering]: {
     requiresAuth: true,
     requiredViewCode: "CAREER_OFFERING_LIST",
