@@ -53,6 +53,14 @@
 - Decisión: **Section se queda como curso+periodo+aula (sin careerId)** — las clases son compartidas: alumnos de distintas carreras asisten a la misma sección si el curso está en su malla (la carrera se deriva de `CareerCourse`).
 - [x] Hueco cerrado: ya no se puede crear una sección en un periodo sin carreras ofertadas. Backend: `SectionApplicationService.validateCourseOfferedInTerm` (curso debe tener ≥1 carrera de su malla con `CareerOffering` **activa** en el periodo, si no → `InvalidSectionException` 400); nuevo `CareerOfferingRepository.findAllByTermId`. Frontend: en `SectionForm` el select de periodo depende del curso elegido (deshabilitado hasta elegir curso; opciones = periodos de ofertas activas de carreras de la malla del curso; `termId` se resetea al cambiar de curso).
 
+### Sistema de tests — enrollment-server (2026-07-11, preparación SonarQube)
+- [x] Maven: failsafe (`*IT` en `mvn verify`) + JaCoCo (XML en `target/site/jacoco/jacoco.xml`) + Testcontainers **1.21.4** (override: el 1.19.x de Boot 3.2 no habla la API mínima de Docker 29). Todo en el pom de enrollment-server (los módulos NO heredan del pom raíz agregador).
+- [x] 67 tests unitarios: dominio (Enrollment, CareerOffering, CareerCourse, Classroom, Section, CareerID), servicios con Mockito (Enrollment con fail-soft MP, Payment idempotente, Section regla de periodo, Classroom capacidad, CareerOffering, Course malla), web (`@WebMvcTest` de EnrollmentController y webhook MP, PermissionInterceptor, firma HMAC).
+- [x] 8 tests de integración: `EnrollmentJpaRepositoryIT` (queries JPQL contra Postgres real) + `EnrollmentServerApplicationIT` (contexto completo; reemplaza al viejo contextLoads que fallaba). Perfil `test` sin Eureka/Kafka/MP.
+- [x] Fixtures en `testsupport/` (Mothers, PostgresContainerSupport, Clock fijo).
+- [x] **Bug encontrado y corregido por los tests**: el catch-all de `GlobalExceptionHandler` convertía "falta header X-User-Id" en 500; ahora `MissingRequestHeaderException`/`MissingServletRequestParameterException` → 400.
+- Pendiente futuro: tests de authorization-server/notification-server; luego SonarQube (solo falta sonar-maven-plugin, el XML de JaCoCo ya se genera).
+
 ## Notas
 - Los "compile breaks" sospechados en CourseOfferingMapper/JpaEntity/EnrollmentJpaRepository/StudentRepositoryAdapter eran falsos positivos: ya están migrados.
 - No hay migraciones SQL; los renames de columnas requieren `make reset` en dev (destruye volúmenes).

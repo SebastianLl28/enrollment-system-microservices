@@ -1,0 +1,26 @@
+# Perfil de test: sin Eureka, Kafka apuntando a un broker inexistente (los
+# productores son lazy) y Mercado Pago deshabilitado (sin access token).
+# La base de datos la inyecta Testcontainers vía @ServiceConnection.
+eureka:
+  client:
+    enabled: false
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:19092
+
+# KafkaProducerConfig/OutboxProcessor leen estas claves planas (en Docker las
+# resuelve la variable de entorno KAFKA_BOOTSTRAP_SERVERS por relaxed binding).
+kafka:
+  bootstrap-servers: localhost:19092
+
+topic:
+  enrollment-events: enrollment-events
+
+mercadopago:
+  access-token: ""
+  webhook-secret: "test-webhook-secret"
+  notification-url: ""
+  back-urls-base: "http://localhost:5173"
+  enrollment-fee: 100.00
+  currency-id: PEN

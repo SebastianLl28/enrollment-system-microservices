@@ -27,11 +27,16 @@ Root `pom.xml` is a multi-module aggregator (modules: `discovery-server`, `api-g
 ```bash
 mvn clean package                          # build all modules from root
 mvn -pl enrollment-server -am package      # build one service + its deps (common)
-cd enrollment-server && ./mvnw test        # run one service's tests
+mvn -pl enrollment-server -am test         # unit tests only (*Test, no Docker needed)
+mvn -pl enrollment-server -am verify       # + integration tests (*IT, needs Docker) + JaCoCo
 ./mvnw test -Dtest=SomeTest                # single test class
 ```
 
-`common` is a shared library (annotations `@UseCase`/`@Adapter`, constants, enums, `AuditEvent`) consumed by the services — build it (`-am` handles this) before building a service standalone.
+`common` is a shared library (annotations `@UseCase`/`@Adapter`, constants, enums, `AuditEvent`) consumed by the services — build it (`-am` handles this) before building a service standalone. Always use `-am` when testing: without it the stale `common` jar from `~/.m2` is used.
+
+### Testing (enrollment-server only, so far)
+
+Convention: `*Test` = unit (Surefire, plain JUnit 5 + AssertJ + Mockito, no Spring context except `@WebMvcTest`); `*IT` = integration (Failsafe, Testcontainers PostgreSQL via `@ServiceConnection`). Tests mirror the main package layout; shared fixtures live in `testsupport/` (`Mothers` object mothers, `PostgresContainerSupport` base class, fixed `Clock`). Controller tests use `@MockBean PermissionInterceptor` stubbed to allow (the interceptor has its own unit test). `src/test/resources/application-test.yml` disables Eureka/Kafka/MP for the context-load IT. JaCoCo writes `target/site/jacoco/jacoco.xml` on `verify` (SonarQube-ready). `testcontainers.version` is overridden to 1.21.4 in the module pom because the Boot-3.2-managed 1.19.x cannot talk to Docker 29's minimum API. Note: module poms inherit from `spring-boot-starter-parent`, NOT from the root aggregator pom — put version overrides and plugin config in each module.
 
 ### Frontend (`frontend/`)
 
@@ -41,7 +46,7 @@ npm run build    # tsc -b && vite build
 npm run lint     # eslint
 ```
 
-There is no test suite beyond the default Spring Boot context-load tests and no frontend tests.
+There are no frontend tests (deliberate). Backend tests exist for enrollment-server (see Testing above); the other services still have no real tests.
 
 ## Architecture
 
