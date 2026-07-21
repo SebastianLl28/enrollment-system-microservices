@@ -16,7 +16,6 @@ logs/
 src/test/
 README.md
 
-.git/
 .gitignore
 
 .env
