@@ -11,7 +11,7 @@
 - **`CourseOffering`**: solo catálogo/secciones (curso+term+sección+capacity). Sin `price` ni `enrolledCount`.
 - **`Enrollment`**: referencia `careerOfferingId` (antes `courseOfferingId`). Filtro de listado por `careerId` (antes `courseId`).
 - **`EnrollmentAssignedEvent`** (common): `careerName` + `termCode` (antes `courseName`). Emails dicen "matrícula"/"Pagar matrícula".
-- API nueva: `POST/GET/PUT /api/v1/career-offering` (permiso vista `CAREER_OFFERING_LIST`, ya en `secure.sql`).
+- API nueva: `POST/GET/PUT /api/v1/career-offering` (permiso vista `CAREER_OFFERING_LIST`, ya en `../secure.sql`).
 
 ## Checklist
 
@@ -28,7 +28,7 @@
 ### Pendiente (esta sesión)
 - [x] Paso 0: este archivo + memoria persistente
 - [x] Paso 1: `mvn -pl common,enrollment-server,notification-server -am package -DskipTests` → **compila limpio, sin errores residuales**
-- [x] Paso 2a: `useCareerOfferingColumns()` agregado en `frontend/src/config/columns.tsx`
+- [x] Paso 2a: `useCareerOfferingColumns()` agregado en `../frontend/src/config/columns.tsx`
 - [x] Paso 2b: módulo "Carreras en Vigencia" agregado en `allModules` de `DashboardPage.tsx` (icono BookUp)
 - [x] Paso 3: feature `course` migrada: types con `careers[]`, CourseForm con useFieldArray, CoursePage payloads, CourseDetailDialog muestra malla, columna "Carreras" con badges; además `CareerCourse` del frontend ganó `semesterLevel` y CareerDetailDialog muestra "Ciclo N" (CareerResponse.courseList ahora es CourseWithLevelResponse)
 - [x] Paso 4: feature `course-offering`: `price`/`enrolledCount` eliminados de types/form/page/columnas; `CourseOfferingResponse.course` ahora tipado como summary (`CourseOfferingCourse`); etiqueta "Carrera"→"Curso" corregida en el form
@@ -41,7 +41,7 @@
 ### Correcciones post-prueba (2026-07-11, tarde)
 - [x] Bug: `EnrollmentApplicationService.getAllEnrollmentCourses` lanzaba `IllegalArgumentException` al listar sin filtro de carrera (`new CareerID(null)`; CareerID valida no-nulo a diferencia de StudentID/TermID). Ahora los tres filtros opcionales se envuelven solo si vienen informados. Requiere rebuild del contenedor (`make up`).
 - [x] UX: CourseForm ahora tiene cabeceras "Carrera"/"Ciclo" sobre la lista de asignaciones y texto explicando que el ciclo es el semestre de la malla en esa carrera.
-- [x] Decisión del usuario: **CourseOffering eliminado por completo**. Backend: borrados 19 archivos (dominio, DTOs, mapper, use cases, servicio, controller, JPA entity/repo/mapper/adapter, excepciones, `CourseSummaryResponse` y `CourseMapper.toSummaryResponse` que solo él usaba) + limpiado `GlobalExceptionHandler`. Frontend: borrada `features/course-offering/`, limpiados `columns.tsx`, `routes.tsx`, `path.ts`, `routeProtection.ts`, `endpoints.ts`, `keys.ts`, `DashboardPage.tsx`. `secure.sql`: quitado `COURSE_OFFERING_LIST` (CAREER_OFFERING_LIST pasa a orden 7). CLAUDE.md actualizado. Backend y frontend compilan. La tabla `course_offering` desaparecerá con el próximo `make reset`.
+- [x] Decisión del usuario: **CourseOffering eliminado por completo**. Backend: borrados 19 archivos (dominio, DTOs, mapper, use cases, servicio, controller, JPA entity/repo/mapper/adapter, excepciones, `CourseSummaryResponse` y `CourseMapper.toSummaryResponse` que solo él usaba) + limpiado `GlobalExceptionHandler`. Frontend: borrada `features/course-offering/`, limpiados `columns.tsx`, `routes.tsx`, `path.ts`, `routeProtection.ts`, `endpoints.ts`, `keys.ts`, `DashboardPage.tsx`. `../secure.sql`: quitado `COURSE_OFFERING_LIST` (CAREER_OFFERING_LIST pasa a orden 7). CLAUDE.md actualizado. Backend y frontend compilan. La tabla `course_offering` desaparecerá con el próximo `make reset`.
 
 ### Módulo Aulas + Secciones (2026-07-11, decisiones del usuario: sección = curso+periodo+aula, capacidad en el aula, sin horario v1)
 - [x] Backend: `Classroom` (code, name?, capacity nullable, virtual, active — aula física exige capacity > 0, validado en `ClassroomApplicationService` con `InvalidClassroomException`) y `Section` (courseId+termId+classroomId+sectionCode, unique (course,term,code)). Hexagonal completo: dominio, repos, DTOs, mappers, use cases, servicios, controllers `/api/v1/classroom` y `/api/v1/section`, JPA (tablas `classroom`, `section`), GlobalExceptionHandler. Se re-agregó `CourseSummaryResponse` + `CourseMapper.toSummaryResponse` (los usa SectionResponse). Compila.
@@ -59,7 +59,9 @@
 - [x] 8 tests de integración: `EnrollmentJpaRepositoryIT` (queries JPQL contra Postgres real) + `EnrollmentServerApplicationIT` (contexto completo; reemplaza al viejo contextLoads que fallaba). Perfil `test` sin Eureka/Kafka/MP.
 - [x] Fixtures en `testsupport/` (Mothers, PostgresContainerSupport, Clock fijo).
 - [x] **Bug encontrado y corregido por los tests**: el catch-all de `GlobalExceptionHandler` convertía "falta header X-User-Id" en 500; ahora `MissingRequestHeaderException`/`MissingServletRequestParameterException` → 400.
-- Pendiente futuro: tests de authorization-server/notification-server.
+- [x] **authorization-server** (2026-07-18): JaCoCo + failsafe en pom; 19 unit tests — `EmailTest`, `PasswordTest`, `AuthApplicationServiceTest` (login sin/con 2FA, bad credentials; validateToken: inválido, token temporal 2FA rechazado, válido).
+- [x] **notification-server** (2026-07-18): JaCoCo + failsafe en pom; 8 unit tests — `EnrollmentNotificationServiceTest` (los 4 estados, botón pago con/sin URL, email nulo/blank).
+- [x] **enrollment-server controllers** (2026-07-20): 9 `@WebMvcTest` tests — Faculty, Career, Course, Term, Classroom, Section, CareerOffering, Student, Dashboard.
 
 ### SonarQube (2026-07-11, integrado y funcionando)
 - [x] `docker-compose.sonarqube.yml`: sonarqube:community + Postgres propio, puerto 9000, healthchecks, volúmenes persistentes (separado del stack principal).

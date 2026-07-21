@@ -37,9 +37,17 @@ mvn -pl enrollment-server -am verify       # + integration tests (*IT, needs Doc
 
 `common` is a shared library (annotations `@UseCase`/`@Adapter`, constants, enums, `AuditEvent`) consumed by the services — build it (`-am` handles this) before building a service standalone. Always use `-am` when testing: without it the stale `common` jar from `~/.m2` is used.
 
-### Testing (enrollment-server only, so far)
+### Testing
 
-Convention: `*Test` = unit (Surefire, plain JUnit 5 + AssertJ + Mockito, no Spring context except `@WebMvcTest`); `*IT` = integration (Failsafe, Testcontainers PostgreSQL via `@ServiceConnection`). Tests mirror the main package layout; shared fixtures live in `testsupport/` (`Mothers` object mothers, `PostgresContainerSupport` base class, fixed `Clock`). Controller tests use `@MockBean PermissionInterceptor` stubbed to allow (the interceptor has its own unit test). `src/test/resources/application-test.yml` disables Eureka/Kafka/MP for the context-load IT. JaCoCo writes `target/site/jacoco/jacoco.xml` on `verify` (SonarQube-ready). `testcontainers.version` is overridden to 1.21.4 in the module pom because the Boot-3.2-managed 1.19.x cannot talk to Docker 29's minimum API. Note: module poms inherit from `spring-boot-starter-parent`, NOT from the root aggregator pom — put version overrides and plugin config in each module.
+Convention: `*Test` = unit (Surefire, plain JUnit 5 + AssertJ + Mockito, no Spring context except `@WebMvcTest`); `*IT` = integration (Failsafe, Testcontainers PostgreSQL via `@ServiceConnection`). Tests mirror the main package layout. JaCoCo writes `target/site/jacoco/jacoco.xml` on `verify` (SonarQube-ready). Note: module poms inherit from `spring-boot-starter-parent`, NOT from the root aggregator pom — put version overrides and plugin config in each module.
+
+**enrollment-server** (full): 67 unit + 8 IT. Shared fixtures in `testsupport/` (`Mothers` object mothers, `PostgresContainerSupport` base class, fixed `Clock`). Controller tests use `@MockBean PermissionInterceptor` stubbed to allow. `src/test/resources/application-test.yml` disables Eureka/Kafka/MP for the context-load IT. `testcontainers.version` overridden to 1.21.4 (Boot-3.2-managed 1.19.x cannot talk to Docker 29's minimum API).
+
+**authorization-server** (sample): 19 unit tests — value objects (`Email`, `Password`), service (`AuthApplicationService`: login paths with/without 2FA, bad credentials; validateToken: invalid/2FA-temp/valid). No ITs yet.
+
+**notification-server** (sample): 8 unit tests — `EnrollmentNotificationService`: all four enrollment statuses, payment button presence/absence, missing email guard. No ITs yet.
+
+**SonarQube**: `make sonar-up` starts the server (own compose file + its own Postgres, port 9000); `make sonar` runs `mvn clean verify sonar:sonar` from the root (project key `enrollment-system-microservices`, `sonar-maven-plugin` version pinned in the root pom's pluginManagement — the aggregator goal does run from the root). The analysis token lives in `.env` as `SONAR_TOKEN` (gitignored). The old always-failing `contextLoads` tests of the other 5 services were deleted so the root `verify` passes; write real tests when each service gets its turn.
 
 **SonarQube**: `make sonar-up` starts the server (own compose file + its own Postgres, port 9000); `make sonar` runs `mvn clean verify sonar:sonar` from the root (project key `enrollment-system-microservices`, `sonar-maven-plugin` version pinned in the root pom's pluginManagement — the aggregator goal does run from the root). The analysis token lives in `.env` as `SONAR_TOKEN` (gitignored). The old always-failing `contextLoads` tests of the other 5 services were deleted so the root `verify` passes; write real tests when each service gets its turn.
 

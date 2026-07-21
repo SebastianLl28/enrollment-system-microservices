@@ -6,8 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * Verifica que el contexto completo del servicio arranca contra un Postgres
- * real (Testcontainers), sin Eureka ni Kafka ni Mercado Pago.
+ * Verify context loads against a real Postgres (Testcontainers),
+ * without Eureka, Kafka, or Mercado Pago.
  */
 @SpringBootTest
 @ActiveProfiles("test")
