@@ -44,17 +44,16 @@ class VersionControllerTest {
     @SuppressWarnings("unchecked")
     Map<String, Object> result = (Map<String, Object>) controller.version().block();
 
-    assertThat(result).containsKey("build");
-    assertThat(result).containsKey("commit");
-    assertThat(result).containsKey("branch");
-    assertThat(result).containsKey("startedAt");
+    assertThat(result)
+        .containsKeys("build", "commit", "branch", "startedAt")
+        .containsEntry("branch", "main");
 
     @SuppressWarnings("unchecked")
     Map<String, Object> commit = (Map<String, Object>) result.get("commit");
-    assertThat(commit.get("id")).isEqualTo("abc1234");
-    assertThat(commit.get("idFull")).isEqualTo("abc1234567890abcdef");
-    assertThat(commit.get("message")).isEqualTo("test commit");
-    assertThat(result.get("branch")).isEqualTo("main");
+    assertThat(commit)
+        .containsEntry("id", "abc1234")
+        .containsEntry("idFull", "abc1234567890abcdef")
+        .containsEntry("message", "test commit");
   }
 
   @Test
@@ -64,9 +63,8 @@ class VersionControllerTest {
     @SuppressWarnings("unchecked")
     Map<String, Object> result = (Map<String, Object>) controller.version().block();
 
-    assertThat(result).containsKey("build");
-    assertThat(result).containsKey("startedAt");
-    assertThat(result).doesNotContainKey("commit");
-    assertThat(result).doesNotContainKey("branch");
+    assertThat(result)
+        .containsKeys("build", "startedAt")
+        .doesNotContainKeys("commit", "branch");
   }
 }
