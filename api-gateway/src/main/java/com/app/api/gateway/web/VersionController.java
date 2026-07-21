@@ -3,7 +3,7 @@ package com.app.api.gateway.web;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,13 +14,12 @@ import reactor.core.publisher.Mono;
 public class VersionController {
 
   private final BuildProperties buildProperties;
+  private final GitProperties gitProperties;
   private final Instant startedAt = Instant.now();
 
-  @Autowired(required = false)
-  private GitProperties gitProperties;
-
-  public VersionController(BuildProperties buildProperties) {
+  public VersionController(BuildProperties buildProperties, ObjectProvider<GitProperties> gitPropertiesProvider) {
     this.buildProperties = buildProperties;
+    this.gitProperties = gitPropertiesProvider.getIfAvailable();
   }
 
   @GetMapping("/version")
