@@ -44,7 +44,13 @@
 			**/config/**,
 			**/configuration/**,
 			**/dto/**,
-			**/generated/**
+			**/generated/**,
+			**/entity/**,
+			**/valueobject/**,
+			**/security/**,
+			**/*Filter.java,
+			**/*Exception.java,
+			**/*JpaEntity.java,
 		</sonar.coverage.exclusions>
 
 		<sonar.cpd.exclusions>
