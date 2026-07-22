@@ -37,14 +37,15 @@ class SemesterLevelTest {
 
   @Test
   void equalityByValue() {
-    assertThat(new SemesterLevel(3)).isEqualTo(new SemesterLevel(3));
-    assertThat(new SemesterLevel(3)).hasSameHashCodeAs(new SemesterLevel(3));
-    assertThat(new SemesterLevel(3)).isNotEqualTo(new SemesterLevel(4));
+    assertThat(new SemesterLevel(3))
+        .isEqualTo(new SemesterLevel(3))
+        .hasSameHashCodeAs(new SemesterLevel(3))
+        .isNotEqualTo(new SemesterLevel(4));
   }
 
   @Test
   void toStringReturnsValue() {
-    assertThat(new SemesterLevel(5).toString()).isEqualTo("5");
+    assertThat(new SemesterLevel(5)).hasToString("5");
   }
 
   @Test

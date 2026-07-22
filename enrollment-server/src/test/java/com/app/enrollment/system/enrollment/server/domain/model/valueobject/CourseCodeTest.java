@@ -65,14 +65,15 @@ class CourseCodeTest {
 
   @Test
   void equalityByValue() {
-    assertThat(new CourseCode("CS101")).isEqualTo(new CourseCode("cs101"));
-    assertThat(new CourseCode("CS101")).hasSameHashCodeAs(new CourseCode("cs101"));
-    assertThat(new CourseCode("CS101")).isNotEqualTo(new CourseCode("MAT205"));
+    assertThat(new CourseCode("CS101"))
+        .isEqualTo(new CourseCode("cs101"))
+        .hasSameHashCodeAs(new CourseCode("cs101"))
+        .isNotEqualTo(new CourseCode("MAT205"));
   }
 
   @Test
   void toStringReturnsValue() {
-    assertThat(new CourseCode("INF300").toString()).isEqualTo("INF300");
+    assertThat(new CourseCode("INF300")).hasToString("INF300");
   }
 
   @Test

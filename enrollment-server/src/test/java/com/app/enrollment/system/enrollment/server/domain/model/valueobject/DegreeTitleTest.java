@@ -48,9 +48,10 @@ class DegreeTitleTest {
 
   @Test
   void equalityByValue() {
-    assertThat(new DegreeTitle("Técnico")).isEqualTo(new DegreeTitle("Técnico"));
-    assertThat(new DegreeTitle("Técnico")).hasSameHashCodeAs(new DegreeTitle("Técnico"));
-    assertThat(new DegreeTitle("Técnico")).isNotEqualTo(new DegreeTitle("Licenciado"));
+    assertThat(new DegreeTitle("Técnico"))
+        .isEqualTo(new DegreeTitle("Técnico"))
+        .hasSameHashCodeAs(new DegreeTitle("Técnico"))
+        .isNotEqualTo(new DegreeTitle("Licenciado"));
   }
 
   @Test

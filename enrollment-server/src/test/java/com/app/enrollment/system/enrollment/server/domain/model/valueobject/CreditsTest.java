@@ -40,14 +40,15 @@ class CreditsTest {
 
   @Test
   void equalityByValue() {
-    assertThat(new Credits(4)).isEqualTo(new Credits(4));
-    assertThat(new Credits(4)).hasSameHashCodeAs(new Credits(4));
-    assertThat(new Credits(4)).isNotEqualTo(new Credits(5));
+    assertThat(new Credits(4))
+        .isEqualTo(new Credits(4))
+        .hasSameHashCodeAs(new Credits(4))
+        .isNotEqualTo(new Credits(5));
   }
 
   @Test
   void toStringReturnsValue() {
-    assertThat(new Credits(4).toString()).isEqualTo("4");
+    assertThat(new Credits(4)).hasToString("4");
   }
 
   @Test

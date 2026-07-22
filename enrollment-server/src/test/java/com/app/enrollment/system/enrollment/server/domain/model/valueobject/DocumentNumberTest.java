@@ -60,9 +60,10 @@ class DocumentNumberTest {
 
   @Test
   void equalityByValue() {
-    assertThat(new DocumentNumber("12345678")).isEqualTo(new DocumentNumber("12345678"));
-    assertThat(new DocumentNumber("12345678")).hasSameHashCodeAs(new DocumentNumber("12345678"));
-    assertThat(new DocumentNumber("12345678")).isNotEqualTo(new DocumentNumber("87654321"));
+    assertThat(new DocumentNumber("12345678"))
+        .isEqualTo(new DocumentNumber("12345678"))
+        .hasSameHashCodeAs(new DocumentNumber("12345678"))
+        .isNotEqualTo(new DocumentNumber("87654321"));
   }
 
   @Test

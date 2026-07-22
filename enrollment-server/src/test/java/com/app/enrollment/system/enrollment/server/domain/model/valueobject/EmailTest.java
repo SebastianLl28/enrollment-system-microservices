@@ -60,8 +60,9 @@ class EmailTest {
 
   @Test
   void equalityByValue() {
-    assertThat(new Email("user@example.com")).isEqualTo(new Email("USER@EXAMPLE.COM"));
-    assertThat(new Email("user@example.com")).hasSameHashCodeAs(new Email("user@example.com"));
+    assertThat(new Email("user@example.com"))
+        .isEqualTo(new Email("USER@EXAMPLE.COM"))
+        .hasSameHashCodeAs(new Email("user@example.com"));
     assertThat(new Email("a@example.com")).isNotEqualTo(new Email("b@example.com"));
   }
 

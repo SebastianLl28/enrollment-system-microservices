@@ -25,7 +25,9 @@ class CareerIDTest {
 
   @Test
   void equalityByValue() {
-    assertThat(new CareerID(5)).isEqualTo(new CareerID(5)).hasSameHashCodeAs(new CareerID(5));
-    assertThat(new CareerID(5)).isNotEqualTo(new CareerID(6));
+    assertThat(new CareerID(5))
+        .isEqualTo(new CareerID(5))
+        .hasSameHashCodeAs(new CareerID(5))
+        .isNotEqualTo(new CareerID(6));
   }
 }
