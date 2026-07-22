@@ -103,9 +103,9 @@ class TwoFactorApplicationServiceTest {
   @Test
   void validate_user_not_found_throws() {
     given(userRepository.findByUsername("ghost")).willReturn(Optional.empty());
+    var cmd = new TwoFactorValidateCommand("123456");
 
-    assertThatThrownBy(() ->
-      service.validate("ghost", new TwoFactorValidateCommand("123456")))
+    assertThatThrownBy(() -> service.validate("ghost", cmd))
       .isInstanceOf(UserNotFoundException.class);
   }
 
@@ -113,9 +113,9 @@ class TwoFactorApplicationServiceTest {
   void validate_secret_not_initiated_throws() {
     User user = userWithout2fa("admin");
     given(userRepository.findByUsername("admin")).willReturn(Optional.of(user));
+    var cmd = new TwoFactorValidateCommand("123456");
 
-    assertThatThrownBy(() ->
-      service.validate("admin", new TwoFactorValidateCommand("123456")))
+    assertThatThrownBy(() -> service.validate("admin", cmd))
       .isInstanceOf(TwoFactorNotInitiatedException.class);
   }
 
@@ -124,9 +124,9 @@ class TwoFactorApplicationServiceTest {
     User user = userWith2fa("admin", false, "SECRET");
     given(userRepository.findByUsername("admin")).willReturn(Optional.of(user));
     given(twoFactorPort.verifyCode("SECRET", "000000")).willReturn(false);
+    var cmd = new TwoFactorValidateCommand("000000");
 
-    assertThatThrownBy(() ->
-      service.validate("admin", new TwoFactorValidateCommand("000000")))
+    assertThatThrownBy(() -> service.validate("admin", cmd))
       .isInstanceOf(InvalidTwoFactorCodeException.class);
   }
 
@@ -148,9 +148,9 @@ class TwoFactorApplicationServiceTest {
   @Test
   void verify_invalid_temp_token_throws() {
     given(twoFactorTokenPort.isTwoFactorToken("bad-token")).willReturn(false);
+    var cmd = new VerifyTwoFactorCommand("123456", "bad-token");
 
-    assertThatThrownBy(() ->
-      service.verify(new VerifyTwoFactorCommand("123456", "bad-token")))
+    assertThatThrownBy(() -> service.verify(cmd))
       .isInstanceOf(InvalidTwoFactorTokenException.class);
   }
 
@@ -159,9 +159,9 @@ class TwoFactorApplicationServiceTest {
     given(twoFactorTokenPort.isTwoFactorToken("temp")).willReturn(true);
     given(accessTokenPort.extractUsername("temp")).willReturn("ghost");
     given(userRepository.findByUsername("ghost")).willReturn(Optional.empty());
+    var cmd = new VerifyTwoFactorCommand("123456", "temp");
 
-    assertThatThrownBy(() ->
-      service.verify(new VerifyTwoFactorCommand("123456", "temp")))
+    assertThatThrownBy(() -> service.verify(cmd))
       .isInstanceOf(UserNotFoundException.class);
   }
 
@@ -172,9 +172,9 @@ class TwoFactorApplicationServiceTest {
     given(accessTokenPort.extractUsername("temp")).willReturn("admin");
     given(userRepository.findByUsername("admin")).willReturn(Optional.of(user));
     given(twoFactorPort.verifyCode("SECRET", "000000")).willReturn(false);
+    var cmd = new VerifyTwoFactorCommand("000000", "temp");
 
-    assertThatThrownBy(() ->
-      service.verify(new VerifyTwoFactorCommand("000000", "temp")))
+    assertThatThrownBy(() -> service.verify(cmd))
       .isInstanceOf(InvalidTwoFactorCodeException.class);
   }
 

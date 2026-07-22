@@ -26,19 +26,28 @@ class CareerCourseTest {
 
   @Test
   void createRequiresCareerId() {
-    assertThatThrownBy(() -> CareerCourse.create(null, new CourseID(2), new SemesterLevel(3)))
+    var courseId = new CourseID(2);
+    var level = new SemesterLevel(3);
+
+    assertThatThrownBy(() -> CareerCourse.create(null, courseId, level))
       .isInstanceOf(InvalidCarreerException.class);
   }
 
   @Test
   void createRequiresCourseId() {
-    assertThatThrownBy(() -> CareerCourse.create(new CareerID(1), null, new SemesterLevel(3)))
+    var careerId = new CareerID(1);
+    var level = new SemesterLevel(3);
+
+    assertThatThrownBy(() -> CareerCourse.create(careerId, null, level))
       .isInstanceOf(IllegalCourseIDException.class);
   }
 
   @Test
   void createRequiresSemesterLevel() {
-    assertThatThrownBy(() -> CareerCourse.create(new CareerID(1), new CourseID(2), null))
+    var careerId = new CareerID(1);
+    var courseId = new CourseID(2);
+
+    assertThatThrownBy(() -> CareerCourse.create(careerId, courseId, null))
       .isInstanceOf(InvalidSemesterLevelException.class);
   }
 }

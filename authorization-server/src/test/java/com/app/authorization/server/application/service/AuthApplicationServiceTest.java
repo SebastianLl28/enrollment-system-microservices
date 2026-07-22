@@ -91,8 +91,9 @@ class AuthApplicationServiceTest {
     @Test
     void login_unknown_user_throws_invalid_credentials() {
         given(userRepository.findByUsername("ghost")).willReturn(Optional.empty());
+        var cmd = new LoginCommand("ghost", "pass");
 
-        assertThatThrownBy(() -> service.login(new LoginCommand("ghost", "pass")))
+        assertThatThrownBy(() -> service.login(cmd))
                 .isInstanceOf(InvalidCredentialsException.class);
     }
 
@@ -101,8 +102,9 @@ class AuthApplicationServiceTest {
         User user = userWithout2fa();
         given(userRepository.findByUsername("admin")).willReturn(Optional.of(user));
         given(passwordHasher.verify("wrong", "hashed")).willReturn(false);
+        var cmd = new LoginCommand("admin", "wrong");
 
-        assertThatThrownBy(() -> service.login(new LoginCommand("admin", "wrong")))
+        assertThatThrownBy(() -> service.login(cmd))
                 .isInstanceOf(InvalidCredentialsException.class);
     }
 
