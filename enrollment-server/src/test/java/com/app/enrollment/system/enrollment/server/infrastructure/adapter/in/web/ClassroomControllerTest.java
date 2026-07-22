@@ -77,4 +77,19 @@ class ClassroomControllerTest {
         .content("{\"code\":\"A101\",\"capacity\":30,\"virtual\":false,\"active\":true}"))
       .andExpect(status().isNotFound());
   }
+
+  @Test
+  void updateClassroomReturns200() throws Exception {
+    ClassroomResponse classroom = new ClassroomResponse();
+    classroom.setId(1);
+    classroom.setCode("A101");
+    classroom.setVirtual(false);
+    when(updateClassroomUseCase.updateClassroom(any(), anyInt())).thenReturn(classroom);
+
+    mockMvc.perform(put("/api/v1/classroom/1")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"code\":\"A101\",\"capacity\":30,\"virtual\":false,\"active\":true}"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.code").value("A101"));
+  }
 }

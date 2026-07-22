@@ -51,6 +51,9 @@
 			**/*Filter.java,
 			**/*Exception.java,
 			**/*JpaEntity.java,
+			**/*Constants.java,
+			**/*Listener.java,
+			**/*Handler.java
 		</sonar.coverage.exclusions>
 
 		<sonar.cpd.exclusions>

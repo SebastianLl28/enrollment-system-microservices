@@ -80,4 +80,20 @@ class CourseControllerTest {
           + "\"careers\":[{\"careerId\":1,\"semesterLevel\":1}]}"))
       .andExpect(status().isNotFound());
   }
+
+  @Test
+  void updateCourseReturns200() throws Exception {
+    CourseResponse course = new CourseResponse();
+    course.setId(1);
+    course.setCode("CS101");
+    course.setName("Programación I Actualizada");
+    when(updateCourseUseCase.updateCourse(any(), anyInt())).thenReturn(course);
+
+    mockMvc.perform(put("/api/v1/course/1")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"code\":\"CS101\",\"name\":\"Programación I Actualizada\",\"credits\":4,"
+          + "\"careers\":[{\"careerId\":1,\"semesterLevel\":1}]}"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.name").value("Programación I Actualizada"));
+  }
 }

@@ -76,4 +76,18 @@ class SectionControllerTest {
         .content("{\"courseId\":1,\"termId\":1,\"classroomId\":1,\"sectionCode\":\"SEC-A\",\"active\":true}"))
       .andExpect(status().isNotFound());
   }
+
+  @Test
+  void updateSectionReturns200() throws Exception {
+    SectionResponse section = new SectionResponse();
+    section.setId(1);
+    section.setSectionCode("SEC-B");
+    when(updateSectionUseCase.updateSection(any(), anyInt())).thenReturn(section);
+
+    mockMvc.perform(put("/api/v1/section/1")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"courseId\":1,\"termId\":1,\"classroomId\":2,\"sectionCode\":\"SEC-B\",\"active\":true}"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.sectionCode").value("SEC-B"));
+  }
 }
