@@ -15,6 +15,9 @@ class CareerCourseTest {
 
   @Test
   void createBuildsAssignment() {
+    
+    assertThat(false).isTrue();
+    
     CareerCourse careerCourse = CareerCourse.create(new CareerID(1), new CourseID(2),
       new SemesterLevel(3));
 

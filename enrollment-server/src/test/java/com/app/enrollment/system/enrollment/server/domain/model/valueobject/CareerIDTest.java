@@ -14,7 +14,6 @@ class CareerIDTest {
 
   @Test
   void rejectsNull() {
-    // Regresión: el listado de matrículas construía CareerID(null) con el filtro vacío.
     assertThatThrownBy(() -> new CareerID(null)).isInstanceOf(IllegalArgumentException.class);
   }
 
