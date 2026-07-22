@@ -1,5 +1,6 @@
 package com.app.api.gateway.config;
 
+import com.app.common.constant.AppConstants;
 import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,7 @@ public class CorsConfig {
   public CorsWebFilter corsWebFilter() {
     CorsConfiguration corsConfig = new CorsConfiguration();
     
-    corsConfig.setAllowedOriginPatterns(Arrays.asList("*"));
+    corsConfig.setAllowedOriginPatterns(AppConstants.ALLOWED_ORIGINS);
     
     corsConfig.setMaxAge(3600L);
     corsConfig.addAllowedMethod("*");

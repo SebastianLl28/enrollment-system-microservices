@@ -109,7 +109,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
       getRedirectStrategy().sendRedirect(request, response, targetUrl);
       
     } catch (Exception e) {
-      e.printStackTrace();
       getRedirectStrategy().sendRedirect(
         request,
         response,
