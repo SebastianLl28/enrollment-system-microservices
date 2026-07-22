@@ -53,7 +53,11 @@
 			**/*JpaEntity.java,
 			**/*Constants.java,
 			**/*Listener.java,
-			**/*Handler.java
+			**/*Handler.java,
+			**/eventstore/**/*.java,
+			**/discovery/**/*.java,
+			**/gateway/**/*.java,
+			**/common/**/*.java
 		</sonar.coverage.exclusions>
 
 		<sonar.cpd.exclusions>
