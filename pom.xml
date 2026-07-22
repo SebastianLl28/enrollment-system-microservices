@@ -30,10 +30,28 @@
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.2</spring-cloud.version>
 
-		<!-- SonarQube: `make sonar` (o mvn clean verify sonar:sonar con SONAR_TOKEN) -->
 		<sonar.projectKey>enrollment-system-microservices</sonar.projectKey>
 		<sonar.projectName>Enrollment System Microservices</sonar.projectName>
 		<sonar.qualitygate.wait>false</sonar.qualitygate.wait>
+
+		<sonar.exclusions>
+			**/generated/**,
+			**/*Application.java
+		</sonar.exclusions>
+
+		<sonar.coverage.exclusions>
+			**/*Application.java,
+			**/config/**,
+			**/configuration/**,
+			**/dto/**,
+			**/generated/**
+		</sonar.coverage.exclusions>
+
+		<sonar.cpd.exclusions>
+			**/dto/**,
+			**/entity/**
+		</sonar.cpd.exclusions>
+
 	</properties>
 
 	<dependencyManagement>
