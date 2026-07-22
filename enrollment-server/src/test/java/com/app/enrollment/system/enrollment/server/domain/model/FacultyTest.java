@@ -155,8 +155,7 @@ class FacultyTest {
     Faculty a = Faculty.create("Ingeniería", null, "Campus A", null, CLOCK);
     Faculty b = Faculty.create("ingeniería", null, "Campus B", null, CLOCK);
 
-    assertThat(a).isEqualTo(b);
-    assertThat(a).hasSameHashCodeAs(b);
+    assertThat(a).isEqualTo(b).hasSameHashCodeAs(b);
   }
 
   @Test
