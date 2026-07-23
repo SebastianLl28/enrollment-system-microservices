@@ -1,5 +1,11 @@
 services:
 
+  frontend-client:
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend/nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro
+
   discovery-server:
     ports:
       - "8761:8761"

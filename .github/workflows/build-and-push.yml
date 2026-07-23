@@ -10,30 +10,86 @@ env:
   NAMESPACE: sllamuca
 
 jobs:
-  build:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend-matrix: ${{ steps.set-matrix.outputs.backend-matrix }}
+      frontend:       ${{ steps.filter.outputs.frontend-client }}
+      java-files:     ${{ steps.filter.outputs.java-files }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            api-gateway:
+              - 'api-gateway/**'
+              - 'common/**'
+              - 'pom.xml'
+            discovery-server:
+              - 'discovery-server/**'
+              - 'pom.xml'
+            authorization-server:
+              - 'authorization-server/**'
+              - 'common/**'
+              - 'pom.xml'
+            enrollment-server:
+              - 'enrollment-server/**'
+              - 'common/**'
+              - 'pom.xml'
+            notification-server:
+              - 'notification-server/**'
+              - 'common/**'
+              - 'pom.xml'
+            event-store-server:
+              - 'event-store-server/**'
+              - 'common/**'
+              - 'pom.xml'
+            frontend-client:
+              - 'frontend/**'
+            java-files:
+              - '**/src/**/*.java'
+              - '**/pom.xml'
+
+      - id: set-matrix
+        run: |
+          SERVICES=()
+          declare -A CHANGED=(
+            [api-gateway]="${{ steps.filter.outputs.api-gateway }}"
+            [discovery-server]="${{ steps.filter.outputs.discovery-server }}"
+            [authorization-server]="${{ steps.filter.outputs.authorization-server }}"
+            [enrollment-server]="${{ steps.filter.outputs.enrollment-server }}"
+            [notification-server]="${{ steps.filter.outputs.notification-server }}"
+            [event-store-server]="${{ steps.filter.outputs.event-store-server }}"
+          )
+          for SVC in "${!CHANGED[@]}"; do
+            [[ "${CHANGED[$SVC]}" == "true" ]] && \
+              SERVICES+=("{\"service\":\"$SVC\",\"context\":\".\",\"dockerfile\":\"./$SVC/Dockerfile\"}")
+          done
+          if [ ${#SERVICES[@]} -gt 0 ]; then
+            MATRIX=$(printf '%s,' "${SERVICES[@]}" | sed 's/,$//')
+            echo "backend-matrix={\"include\":[$MATRIX]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "backend-matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ── Build backends (solo los que cambiaron) ──────────────────────────────
+  build-backends:
+    needs: changes
+    if: needs.changes.outputs.backend-matrix != '{"include":[]}'
     runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - { service: api-gateway,          context: ., dockerfile: ./api-gateway/Dockerfile }
-          - { service: discovery-server,     context: ., dockerfile: ./discovery-server/Dockerfile }
-          - { service: authorization-server, context: ., dockerfile: ./authorization-server/Dockerfile }
-          - { service: enrollment-server,    context: ., dockerfile: ./enrollment-server/Dockerfile }
-          - { service: notification-server,  context: ., dockerfile: ./notification-server/Dockerfile }
-          - { service: event-store-server,   context: ., dockerfile: ./event-store-server/Dockerfile }
-          - service: frontend-client
-            context: ./frontend
-            dockerfile: ./frontend/Dockerfile
-            build-args: |
-              VITE_AUTH_BASE_URL=
-              VITE_API_URL=
+      matrix: ${{ fromJson(needs.changes.outputs.backend-matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: docker/setup-buildx-action@v4
+      - uses: docker/setup-buildx-action@v3
 
-      - uses: docker/login-action@v4
+      - uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -47,22 +103,61 @@ jobs:
             type=sha,prefix=
             type=semver,pattern={{version}}
 
-      - uses: docker/build-push-action@v7
+      - uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
           platforms: linux/arm64
-          build-args: ${{ matrix.build-args }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
+  build-frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.NAMESPACE }}/frontend-client
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,prefix=
+            type=semver,pattern={{version}}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          platforms: linux/arm64
+          build-args: |
+            VITE_AUTH_BASE_URL=
+            VITE_API_URL=
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=frontend-client
+          cache-to: type=gha,mode=max,scope=frontend-client
+
+  # ── Quality gate (solo si cambió código Java) ────────────────────────────
   quality-gate:
+    needs: changes
+    if: needs.changes.outputs.java-files == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -79,13 +174,12 @@ jobs:
 
       - name: Analyze
         run: |
-          mvn -B verify sonar:sonar \
+          mvn -B --no-transfer-progress verify sonar:sonar \
             -Dsonar.projectKey=enrollment-system-microservices \
             -Dsonar.host.url=${{ vars.SONAR_HOST_URL }} \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
-      - name: SonarQube Quality Gate
-        uses: sonarsource/sonarqube-quality-gate-action@master
+      - uses: sonarsource/sonarqube-quality-gate-action@master
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -94,9 +188,15 @@ jobs:
           scanMetadataReportFile: target/sonar/report-task.txt
 
   deploy:
-    needs: [build, quality-gate]
+    needs: [build-backends, build-frontend, quality-gate]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: |
+      always() &&
+      github.ref == 'refs/heads/master' &&
+      (needs.build-backends.result == 'success' || needs.build-backends.result == 'skipped') &&
+      (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
+      (needs.quality-gate.result == 'success' || needs.quality-gate.result == 'skipped') &&
+      (needs.build-backends.result == 'success' || needs.build-frontend.result == 'success')
     steps:
       - name: Deploy en la VM por SSH
         uses: appleboy/ssh-action@v1
@@ -107,6 +207,5 @@ jobs:
           script: |
             cd ~/enrollment-system-microservices
             git pull
-            docker compose pull
-            docker compose up -d
+            make prod
             docker image prune -f

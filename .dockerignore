@@ -1,23 +1,51 @@
+# Git
+.git/
+.gitignore
+
+# Build output (raíz y subdirectorios)
 target/
+**/target/
 build/
 
+# Maven / Gradle
 .gradle/
 .mvn/
-.mvn/wrapper/maven-wrapper.jar
+**/.mvn/
 
+# Frontend (no necesario en builds de backend)
+frontend/
+
+# Observabilidad y docs
+grafana/
+docs/
+assets/
+prometheus.yml
+promtail-config.yml
+
+# Compose y Makefile (no necesarios en el build context)
+docker-compose*.yml
+Makefile
+
+# IDE / OS
 .idea/
 .vscode/
 *.iml
 .DS_Store
 Thumbs.db
 
+# Logs y archivos temporales
 *.log
 logs/
-src/test/
-README.md
 
-.gitignore
-
+# Secretos y claves SSH
 .env
+*.key
+*.pub
+ssh-key-*
+secure.sql
 application-local.yml
 application-dev.yml
+
+# Docs
+README.md
+*.md
