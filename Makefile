@@ -49,8 +49,7 @@ reset:
 	$(COMPOSE) ps
 
 prod:
-	docker compose -f docker-compose.yml pull
-	docker compose -f docker-compose.yml up -d --wait --wait-timeout 180
+	docker compose -f docker-compose.yml up -d --build --wait --wait-timeout 180
 	docker compose -f docker-compose.yml ps
 
 sonar-up:
