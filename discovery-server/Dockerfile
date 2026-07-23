@@ -15,7 +15,7 @@ COPY discovery-server/src discovery-server/src
 RUN mvn -pl discovery-server -am package -DskipTests -q --no-transfer-progress
 
 FROM eclipse-temurin:17-jre-jammy
-RUN addgroup -S app && adduser -S app -G app
+RUN groupadd -r app && useradd -r -g app app
 USER app
 WORKDIR /app
 COPY --from=build /workspace/discovery-server/target/*.jar app.jar

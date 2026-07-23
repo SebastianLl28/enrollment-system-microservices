@@ -16,7 +16,7 @@ COPY api-gateway/src api-gateway/src
 RUN mvn -pl api-gateway -am package -DskipTests -q --no-transfer-progress
 
 FROM eclipse-temurin:17-jre-jammy
-RUN addgroup -S app && adduser -S app -G app
+RUN groupadd -r app && useradd -r -g app app
 USER app
 WORKDIR /app
 COPY --from=build /workspace/api-gateway/target/*.jar app.jar

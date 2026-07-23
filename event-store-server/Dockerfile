@@ -16,7 +16,7 @@ COPY event-store-server/src event-store-server/src
 RUN mvn -pl event-store-server -am package -DskipTests -q --no-transfer-progress
 
 FROM eclipse-temurin:17-jre-jammy
-RUN addgroup -S app && adduser -S app -G app
+RUN groupadd -r app && useradd -r -g app app
 USER app
 WORKDIR /app
 COPY --from=build /workspace/event-store-server/target/*.jar app.jar
