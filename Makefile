@@ -4,11 +4,6 @@
 
 COMPOSE = docker compose
 
-GIT_COMMIT      := $(shell git rev-parse HEAD 2>/dev/null || echo unknown)
-GIT_BRANCH      := $(shell git branch --show-current 2>/dev/null || echo unknown)
-GIT_COMMIT_TIME := $(shell git log -1 --format=%cI 2>/dev/null || echo unknown)
-export GIT_COMMIT GIT_BRANCH GIT_COMMIT_TIME
-
 # Carga las variables del archivo .env
 ifneq (,$(wildcard .env))
   include .env

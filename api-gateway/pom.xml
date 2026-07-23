@@ -110,7 +110,6 @@
           </execution>
         </executions>
         <configuration>
-          <skip>${skipGitPlugin}</skip>
           <failOnNoGitDirectory>false</failOnNoGitDirectory>
           <generateGitPropertiesFile>true</generateGitPropertiesFile>
           <includeOnlyProperties>

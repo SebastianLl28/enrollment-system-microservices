@@ -1,5 +1,4 @@
 # Git
-.git/
 .gitignore
 
 # Build output (raíz y subdirectorios)
