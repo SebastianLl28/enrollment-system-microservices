@@ -15,7 +15,7 @@ COPY common/src common/src
 COPY notification-server/src notification-server/src
 RUN mvn -pl notification-server -am package -DskipTests -q --no-transfer-progress
 
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre-jammy
 RUN addgroup -S app && adduser -S app -G app
 USER app
 WORKDIR /app

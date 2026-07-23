@@ -15,7 +15,7 @@ COPY common/src common/src
 COPY api-gateway/src api-gateway/src
 RUN mvn -pl api-gateway -am package -DskipTests -q --no-transfer-progress
 
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre-jammy
 RUN addgroup -S app && adduser -S app -G app
 USER app
 WORKDIR /app
