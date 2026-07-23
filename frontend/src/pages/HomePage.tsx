@@ -473,6 +473,7 @@ export default function HomePage() {
                     <Chip color="slate">Grafana</Chip>
                     <Chip color="slate">Loki + Promtail</Chip>
                     <Chip color="slate">Spring Actuator</Chip>
+                    <Chip color="slate">SonarQube</Chip>
                   </div>
                 </div>
               </div>
