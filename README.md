@@ -18,7 +18,7 @@ El sistema permite administrar **facultades, carreras, cursos, periodos académi
 * **Arquitectura orientada a eventos** para auditoría y notificaciones
 * **Pasarela de pagos** con Mercado Pago Checkout Pro (webhooks firmados)
 
-![architecture.png](assets/architecture.png)
+![architecture.gif](assets/architecture.gif)
 
 
 ---
