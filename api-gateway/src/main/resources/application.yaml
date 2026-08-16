@@ -21,6 +21,12 @@ eureka:
       defaultZone: ${EUREKA_URI:http://discovery-server:8761/eureka/}
     registry-fetch-interval-seconds: 5
 
+services:
+  authorization:
+    uri: ${AUTHORIZATION_SERVICE_URI:lb://authorization-server}
+  enrollment:
+    uri: ${ENROLLMENT_SERVICE_URI:lb://enrollment-server}
+
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -70,8 +76,6 @@ audit:
     - /swagger-ui
     - /v3/api-docs
     - /auth/validateToken
-# INFO/WARN a propósito: en DEBUG el gateway y netty vuelcan los headers completos
-# de cada request (incluido Authorization: Bearer <token>) a los logs.
 logging:
   level:
     org.springframework.cloud.gateway: INFO

@@ -20,6 +20,7 @@
     <jacoco.version>0.8.11</jacoco.version>
     <!-- La versión que gestiona Boot 3.2.5 (1.19.x) no habla la API mínima de Docker 29 -->
     <testcontainers.version>1.21.4</testcontainers.version>
+    <shedlock.version>5.16.0</shedlock.version>
   </properties>
   <dependencies>
     <dependency>
@@ -35,6 +36,24 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <!-- Boot 3.2.5 gestiona Flyway 9.22.3: el soporte de PostgreSQL va incluido en
+         flyway-core (el módulo flyway-database-postgresql aparte llegó recién en Flyway 10). -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>net.javacrumbs.shedlock</groupId>
+      <artifactId>shedlock-spring</artifactId>
+      <version>${shedlock.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.javacrumbs.shedlock</groupId>
+      <artifactId>shedlock-provider-jdbc-template</artifactId>
+      <version>${shedlock.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

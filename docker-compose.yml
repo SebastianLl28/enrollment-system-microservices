@@ -275,7 +275,7 @@ services:
       - backend-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health || exit 1" ]
+      test: ["CMD-SHELL", "pgrep -f app.jar || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -310,7 +310,7 @@ services:
       - backend-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health || exit 1" ]
+      test: ["CMD-SHELL", "pgrep -f app.jar || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -6,6 +6,7 @@ import com.app.api.gateway.dto.ValidationResponse;
 import com.app.common.constant.ApiConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
@@ -30,9 +31,10 @@ public class AuthFilter extends AbstractGatewayFilterFactory<Config> {
   private final RouterValidator routerValidator;
   
   
-  public AuthFilter(WebClient.Builder webClientBuilder, RouterValidator routerValidator) {
+  public AuthFilter(WebClient.Builder webClientBuilder, RouterValidator routerValidator,
+      @Value("${services.authorization.uri}") String authorizationUri) {
     super(Config.class);
-    this.webClient = webClientBuilder.baseUrl("lb://authorization-server")
+    this.webClient = webClientBuilder.baseUrl(authorizationUri)
         .build();
     this.routerValidator = routerValidator;
   }

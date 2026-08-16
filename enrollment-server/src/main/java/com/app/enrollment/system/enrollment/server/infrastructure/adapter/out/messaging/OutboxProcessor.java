@@ -7,6 +7,7 @@ import com.app.enrollment.system.enrollment.server.infrastructure.adapter.out.pe
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Clock;
 import java.util.List;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +44,7 @@ public class OutboxProcessor {
   }
   
   @Scheduled(fixedDelay = 5000)
+  @SchedulerLock(name = "outbox-process-pending", lockAtMostFor = "PT5M", lockAtLeastFor = "PT2S")
   @Transactional
   public void processPendingEvents() {
     
@@ -80,6 +82,7 @@ public class OutboxProcessor {
   }
   
   @Scheduled(fixedDelay = 20000)
+  @SchedulerLock(name = "outbox-retry-failed", lockAtMostFor = "PT5M", lockAtLeastFor = "PT10S")
   @Transactional
   public void retryFailedEvents() {
     List<OutboxEventJpaEntity> failedEvents =
