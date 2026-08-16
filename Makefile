@@ -1,7 +1,3 @@
-# ============================================
-#   Comandos del proyecto  ->  make <comando>
-# ============================================
-
 COMPOSE = docker compose
 
 # Carga las variables del archivo .env
@@ -53,8 +49,6 @@ sonar-up:
 sonar-down:
 	docker compose -f docker-compose.sonarqube.yml down
 
-# Tests con cobertura (solo enrollment-server tiene tests hoy) + análisis.
-# Requiere: make sonar-up y SONAR_TOKEN en .env (User > My Account > Security).
 sonar:
 	mvn clean verify sonar:sonar \
 		-Dsonar.host.url=$(if $(SONAR_HOST_URL),$(SONAR_HOST_URL),http://localhost:9000) \

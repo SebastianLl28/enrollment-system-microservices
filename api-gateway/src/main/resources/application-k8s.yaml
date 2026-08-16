@@ -1,0 +1,9 @@
+services:
+  authorization:
+    uri: ${AUTHORIZATION_SERVICE_URI:http://authorization-server:8080}
+  enrollment:
+    uri: ${ENROLLMENT_SERVICE_URI:http://enrollment-server:8080}
+
+eureka:
+  client:
+    enabled: false

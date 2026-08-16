@@ -17,9 +17,15 @@ spring:
     username: ${DB_EVENTS_USER:events_user}
     password: ${DB_EVENTS_PASSWORD:events_password}
 
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    locations: classpath:db/migration
+
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:

@@ -11,10 +11,15 @@ spring:
     username: ${DB_USER:enrollment_user}
     password: ${DB_PASSWORD:enrollment_password}
 
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    locations: classpath:db/migration
+
   jpa:
     hibernate:
-      ddl-auto: update
-#    show-sql: true
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
